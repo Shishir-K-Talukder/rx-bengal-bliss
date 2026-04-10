@@ -50,12 +50,20 @@ const Index = () => {
 
   const [printSettings, setPrintSettings] = useState<PrintSettings>({
     pageSize: "A4",
+    customWidth: "210",
+    customHeight: "297",
     headerSize: "medium",
     showDoctorInfo: true,
+    showCC: true,
+    showOE: true,
+    showDiagnosis: true,
+    showInvestigation: true,
   });
 
   const handlePrint = () => {
-    window.print();
+    const printData = { doctor, patient, clinical, medicines, advice, printSettings };
+    sessionStorage.setItem("prescription-print-data", JSON.stringify(printData));
+    window.open("/print", "_blank");
   };
 
   const handleNewPrescription = () => {
@@ -126,15 +134,6 @@ const Index = () => {
         </Tabs>
       </main>
 
-      {/* Print styles */}
-      <style>{`
-        @media print {
-          header, .tabs-list, [role="tablist"] { display: none !important; }
-          main { padding: 0 !important; }
-          .print-preview { border: none !important; box-shadow: none !important; max-width: 100% !important; }
-          @page { size: ${printSettings.pageSize}; margin: 10mm; }
-        }
-      `}</style>
     </div>
   );
 };
