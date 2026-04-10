@@ -134,15 +134,6 @@ const Index = () => {
         </Tabs>
       </main>
 
-      {/* Print styles */}
-      <style>{`
-        @media print {
-          header, .tabs-list, [role="tablist"] { display: none !important; }
-          main { padding: 0 !important; }
-          .print-preview { border: none !important; box-shadow: none !important; max-width: 100% !important; }
-          @page { size: ${printSettings.pageSize}; margin: 10mm; }
-        }
-      `}</style>
     </div>
   );
 };
