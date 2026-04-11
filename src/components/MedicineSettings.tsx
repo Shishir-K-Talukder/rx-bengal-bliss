@@ -107,8 +107,14 @@ const DEFAULT_OPTIONS: MedicineOptions = {
 
 export const loadMedicineOptions = (): MedicineOptions => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return { ...DEFAULT_OPTIONS, ...JSON.parse(stored) };
+    const version = localStorage.getItem(STORAGE_KEY + "-version");
+    if (version === SETTINGS_VERSION) {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) return { ...DEFAULT_OPTIONS, ...JSON.parse(stored) };
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY + "-version", SETTINGS_VERSION);
+    }
   } catch {}
   return DEFAULT_OPTIONS;
 };
