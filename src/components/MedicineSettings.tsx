@@ -105,7 +105,14 @@ export const loadMedicineOptions = (): MedicineOptions => {
     const version = localStorage.getItem(STORAGE_KEY + "-version");
     if (version === SETTINGS_VERSION) {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return { ...DEFAULT_OPTIONS, ...JSON.parse(stored) };
+      if (stored) {
+        const parsed = { ...DEFAULT_OPTIONS, ...JSON.parse(stored) };
+        // Migrate old {label, days} follow-up format to string[]
+        if (parsed.followUpOptions?.length && typeof parsed.followUpOptions[0] === "object") {
+          parsed.followUpOptions = parsed.followUpOptions.map((o: any) => typeof o === "string" ? o : o.label);
+        }
+        return parsed;
+      }
     } else {
       localStorage.removeItem(STORAGE_KEY);
       localStorage.setItem(STORAGE_KEY + "-version", SETTINGS_VERSION);
