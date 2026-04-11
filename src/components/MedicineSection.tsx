@@ -96,25 +96,25 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
               </div>
               <div className="flex-1 grid grid-cols-2 md:grid-cols-6 gap-2">
                 <div>
-                  <Label className="text-[10px] text-muted-foreground">Type</Label>
+                  <Label className="text-[11px] text-muted-foreground">Type</Label>
                   <Select value={med.type} onValueChange={(v) => updateMedicine(med.id, "type", v)}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>{options.types.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="col-span-2">
-                  <Label className="text-[10px] text-muted-foreground">Medicine Name</Label>
+                  <Label className="text-[11px] text-muted-foreground">Medicine Name</Label>
                   <Input value={med.name} onChange={(e) => updateMedicine(med.id, "name", e.target.value)} placeholder="Napa 500mg" className="h-8 text-xs" />
                 </div>
                 <div>
-                  <Label className="text-[10px] text-muted-foreground">Dose</Label>
+                  <Label className="text-[11px] text-muted-foreground">Dose</Label>
                   <Select value={med.dose} onValueChange={(v) => updateMedicine(med.id, "dose", v)}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>{options.doses.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-[10px] text-muted-foreground">Duration</Label>
+                  <Label className="text-[11px] text-muted-foreground">Duration</Label>
                   <Select value={med.duration} onValueChange={(v) => updateMedicine(med.id, "duration", v)}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>{options.durations.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
@@ -122,7 +122,7 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
                 </div>
                 <div className="flex items-end gap-1">
                   <div className="flex-1">
-                    <Label className="text-[10px] text-muted-foreground">Meal</Label>
+                    <Label className="text-[11px] text-muted-foreground">Meal</Label>
                     <Select value={med.mealTiming} onValueChange={(v) => updateMedicine(med.id, "mealTiming", v)}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>{options.meals.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
