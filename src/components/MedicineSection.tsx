@@ -31,7 +31,7 @@ const MedicineNameInput = ({ value, type, onChange, onSelect }: { value: string;
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (med: { name: string; strength: string; detectedType: string }) => {
-    const fullName = med.strength ? `${med.name} ${med.strength}` : med.name;
+    const fullName = `${med.detectedType}. ${med.name} ${med.strength}`.trim();
     setQuery(fullName);
     onChange(fullName);
     onSelect(med);
