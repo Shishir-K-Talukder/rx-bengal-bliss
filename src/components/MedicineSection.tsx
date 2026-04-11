@@ -19,6 +19,8 @@ export interface Medicine {
 interface Props {
   medicines: Medicine[];
   onChange: (m: Medicine[]) => void;
+  options: MedicineOptions;
+  onOptionsChange: (o: MedicineOptions) => void;
 }
 
 const MedicineSection = ({ medicines, onChange }: Props) => {

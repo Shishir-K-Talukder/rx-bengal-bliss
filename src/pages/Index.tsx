@@ -123,7 +123,7 @@ const Index = () => {
           <TabsContent value="write" className="space-y-0">
             <PatientInfo patient={patient} onChange={setPatient} />
             <ClinicalSection data={clinical} onChange={setClinical} />
-            <MedicineSection medicines={medicines} onChange={setMedicines} />
+            <MedicineSection medicines={medicines} onChange={setMedicines} options={medicineOptions} onOptionsChange={setMedicineOptions} />
             <AdviceSection data={advice} onChange={setAdvice} options={medicineOptions} />
           </TabsContent>
 
