@@ -16,6 +16,7 @@ export interface MedicineOptions {
 }
 
 const STORAGE_KEY = "medicine-options";
+const SETTINGS_VERSION = "v2";
 
 const DEFAULT_OPTIONS: MedicineOptions = {
   types: ["Tab", "Cap", "Syr", "Inj", "Supp", "Drop", "Cream", "Oint"],
@@ -71,7 +72,10 @@ const DEFAULT_OPTIONS: MedicineOptions = {
     "ব্যথা হলে", "বেশি ব্যথা হলে", "প্রয়োজনে",
     "রক্ত আসলে", "রক্ত বেশি আসলে", "জ্বর থাকলে/ব্যথা হলে", "৬ টি",
   ],
-  meals: ["খাবার পরে (After meal)", "খাবার আগে (Before meal)", "Empty stomach"],
+  meals: [
+    "খাবারের আগে", "খাবারের পরে", "খাবার ১৫ মিঃ আগে", "খাবার ৩০ মিঃ পরে",
+    "শোবার সময়", "খাবার পরে শোয়া নিষেধ", "খাবার ১৫ মিঃ আগে চামড়ার নিচে নিবেন",
+  ],
   adviceList: [
     "হাঁসের মাংস, কবুতরের মাংস, গরুর মাংস, হাঁসের ডিম,পুঁইশাক, মিষ্টি কুমড়া, বেগুন, শিম, মুশুরের ডাল, খাবার নিষেধ।",
     "অতিরিক্ত তেল চর্বি জাতীয় খাবার এবং আলগা লবণ খাওয়া নিষেধ।",
@@ -103,8 +107,14 @@ const DEFAULT_OPTIONS: MedicineOptions = {
 
 export const loadMedicineOptions = (): MedicineOptions => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return { ...DEFAULT_OPTIONS, ...JSON.parse(stored) };
+    const version = localStorage.getItem(STORAGE_KEY + "-version");
+    if (version === SETTINGS_VERSION) {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) return { ...DEFAULT_OPTIONS, ...JSON.parse(stored) };
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY + "-version", SETTINGS_VERSION);
+    }
   } catch {}
   return DEFAULT_OPTIONS;
 };

@@ -29,7 +29,10 @@ export const useDoctorSettings = () => {
         setPrintSettings({ ...defaultPrintSettings, ...(data.print_settings as Record<string, unknown>) } as PrintSettings);
       }
       if (data.medicine_options && typeof data.medicine_options === "object") {
-        setMedicineOptions({ ...loadMedicineOptions(), ...(data.medicine_options as Record<string, unknown>) } as MedicineOptions);
+        const stored = data.medicine_options as Record<string, unknown>;
+        // Only keep user customizations like types and followUpOptions; use fresh defaults for doses/durations/meals/adviceList
+        const defaults = loadMedicineOptions();
+        setMedicineOptions({ ...defaults, ...stored, doses: defaults.doses, durations: defaults.durations, meals: defaults.meals, adviceList: defaults.adviceList } as MedicineOptions);
       }
     }
     setLoading(false);
