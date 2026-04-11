@@ -51,7 +51,7 @@ const searchMedicines = (data: RawMedicine[], query: string): MedicineSuggestion
   for (const med of data) {
     if (results.length >= 20) break;
     if (med.n.toLowerCase().includes(q)) {
-      results.push({ name: med.n, strength: med.s, generic: med.g, company: med.c });
+      results.push({ name: med.n, strength: med.s, generic: med.g, company: med.c, detectedType: detectType(med.s) });
     }
   }
 

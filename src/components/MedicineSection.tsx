@@ -24,16 +24,17 @@ interface Props {
   onOptionsChange: (o: MedicineOptions) => void;
 }
 
-const MedicineNameInput = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
+const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onChange: (v: string) => void; onSelect: (med: { name: string; strength: string; detectedType: string }) => void }) => {
   const [query, setQuery] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { suggestions, loading } = useMedicineSearch(query);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const handleSelect = (med: { name: string; strength: string }) => {
+  const handleSelect = (med: { name: string; strength: string; detectedType: string }) => {
     const fullName = med.strength ? `${med.name} ${med.strength}` : med.name;
     setQuery(fullName);
     onChange(fullName);
+    onSelect(med);
     setShowSuggestions(false);
   };
 
