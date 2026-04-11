@@ -155,7 +155,7 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
               <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-2">
                 <div className="col-span-2">
                   <Label className="text-[11px] text-muted-foreground">Medicine Name</Label>
-                  <MedicineNameInput value={med.name} type={med.type} onChange={(v) => updateMedicine(med.id, "name", v)} onSelect={(selected) => updateMedicine(med.id, "type", selected.detectedType)} />
+                  <MedicineNameInput value={med.name} onChange={(v) => updateMedicine(med.id, "name", v)} onSelect={(fullName, detectedType) => updateMedicineMulti(med.id, { name: fullName, type: detectedType })} />
                 </div>
                 <div>
                   <Label className="text-[11px] text-muted-foreground">Dose</Label>
