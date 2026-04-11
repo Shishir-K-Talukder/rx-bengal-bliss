@@ -381,7 +381,13 @@ function addMedicine() {
         <div class="med-num">${id}</div>
       </div>
       <div style="flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" class="grid-5">
-        <div class="col-span-2"><label>Medicine Name</label><input type="text" placeholder="Type medicine name..." id="med-name-${id}"></div>
+        <div class="col-span-2"><label>Medicine Name</label>
+          <div class="med-name-wrap">
+            <input type="text" placeholder="Type medicine name..." id="med-name-${id}" autocomplete="off"
+              oninput="searchMedicine(${id}, this.value)" onfocus="searchMedicine(${id}, this.value)" onblur="setTimeout(()=>hideSuggestions(${id}),200)">
+            <div class="med-suggestions" id="med-sug-${id}"></div>
+          </div>
+        </div>
         <div>
           <label>Dose</label>
           <div id="dose-wrap-${id}">
