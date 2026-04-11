@@ -6,6 +6,7 @@ import DoctorHeader, { DoctorInfo } from "@/components/DoctorHeader";
 import PatientInfo, { PatientData } from "@/components/PatientInfo";
 import ClinicalSection, { ClinicalData, defaultOnExamination } from "@/components/ClinicalSection";
 import MedicineSection, { Medicine } from "@/components/MedicineSection";
+import { loadMedicineOptions, MedicineOptions } from "@/components/MedicineSettings";
 import AdviceSection, { AdviceData } from "@/components/AdviceSection";
 import PrintPreview, { PrintSettings } from "@/components/PrintPreview";
 import PrintSetup from "@/components/PrintSetup";
@@ -15,6 +16,7 @@ const today = new Date().toISOString().split("T")[0];
 const Index = () => {
   const [activeTab, setActiveTab] = useState("write");
   const [editDoctor, setEditDoctor] = useState(false);
+  const [medicineOptions, setMedicineOptions] = useState<MedicineOptions>(loadMedicineOptions);
 
   const [doctor, setDoctor] = useState<DoctorInfo>({
     name: "",
@@ -121,8 +123,8 @@ const Index = () => {
           <TabsContent value="write" className="space-y-0">
             <PatientInfo patient={patient} onChange={setPatient} />
             <ClinicalSection data={clinical} onChange={setClinical} />
-            <MedicineSection medicines={medicines} onChange={setMedicines} />
-            <AdviceSection data={advice} onChange={setAdvice} />
+            <MedicineSection medicines={medicines} onChange={setMedicines} options={medicineOptions} onOptionsChange={setMedicineOptions} />
+            <AdviceSection data={advice} onChange={setAdvice} options={medicineOptions} />
           </TabsContent>
 
           <TabsContent value="preview">

@@ -19,13 +19,14 @@ export interface Medicine {
 interface Props {
   medicines: Medicine[];
   onChange: (m: Medicine[]) => void;
+  options: MedicineOptions;
+  onOptionsChange: (o: MedicineOptions) => void;
 }
 
-const MedicineSection = ({ medicines, onChange }: Props) => {
+const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Props) => {
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [overIdx, setOverIdx] = useState<number | null>(null);
   const dragRef = useRef<number | null>(null);
-  const [options, setOptions] = useState<MedicineOptions>(loadMedicineOptions);
 
   const addMedicine = () => {
     onChange([
@@ -63,7 +64,7 @@ const MedicineSection = ({ medicines, onChange }: Props) => {
           Prescription
         </h3>
         <div className="flex items-center gap-2">
-          <MedicineSettings options={options} onChange={setOptions} />
+          <MedicineSettings options={options} onChange={onOptionsChange} />
           <Button onClick={addMedicine} size="sm" variant="outline" className="h-7 text-xs gap-1">
             <Plus className="w-3 h-3" /> Add Medicine
           </Button>
