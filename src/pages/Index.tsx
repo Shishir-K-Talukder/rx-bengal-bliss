@@ -64,6 +64,7 @@ const Index = () => {
   };
 
   const handleSave = () => {
+    savePatientToHistory(patient);
     savePrescription(patient, clinical, medicines, advice);
   };
 
