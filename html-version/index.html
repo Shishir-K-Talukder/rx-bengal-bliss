@@ -89,6 +89,23 @@ label { font-size: 11px; color: var(--muted-foreground); display: block; margin-
 .med-num { width: 20px; height: 20px; border-radius: 50%; background: var(--primary); color: var(--primary-foreground);
   display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
 
+/* Medicine Search Suggestions */
+.med-name-wrap { position: relative; }
+.med-suggestions { position: absolute; z-index: 50; top: 100%; left: 0; right: 0; margin-top: 4px; background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 200px; overflow-y: auto; display: none; }
+.med-suggestions.show { display: block; }
+.med-suggestions .sug-item { width: 100%; text-align: left; padding: 6px 12px; border: none; background: transparent; cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.03); transition: background 0.15s; display: block; }
+.med-suggestions .sug-item:last-child { border-bottom: none; }
+.med-suggestions .sug-item:hover { background: rgba(37,99,235,0.05); }
+.sug-name { font-size: 12px; font-weight: 500; color: var(--foreground); }
+.sug-type { display: inline-block; background: rgba(37,99,235,0.1); color: var(--primary); font-weight: 700; border-radius: 4px;
+  padding: 1px 6px; font-size: 10px; margin-right: 6px; }
+.sug-meta { font-size: 10px; color: var(--muted-foreground); padding-left: 42px; }
+.sug-loading { padding: 8px 12px; font-size: 12px; color: var(--muted-foreground); display: flex; align-items: center; gap: 8px; }
+.sug-loading .spinner { width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* Print Preview */
 .print-preview { background: white; color: black; padding: 32px; max-width: 800px; margin: 0 auto;
   border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -364,7 +381,13 @@ function addMedicine() {
         <div class="med-num">${id}</div>
       </div>
       <div style="flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" class="grid-5">
-        <div class="col-span-2"><label>Medicine Name</label><input type="text" placeholder="Type medicine name..." id="med-name-${id}"></div>
+        <div class="col-span-2"><label>Medicine Name</label>
+          <div class="med-name-wrap">
+            <input type="text" placeholder="Type medicine name..." id="med-name-${id}" autocomplete="off"
+              oninput="searchMedicine(${id}, this.value)" onfocus="searchMedicine(${id}, this.value)" onblur="setTimeout(()=>hideSuggestions(${id}),200)">
+            <div class="med-suggestions" id="med-sug-${id}"></div>
+          </div>
+        </div>
         <div>
           <label>Dose</label>
           <div id="dose-wrap-${id}">
@@ -476,6 +499,101 @@ function updatePreview() {
       </div>
     </div>`;
 }
+
+// ===== MEDICINE SEARCH FROM medicines.json =====
+let medicineData = null;
+let medicineLoading = false;
+const searchTimers = {};
+
+// Load medicines.json on first search
+async function loadMedicineData() {
+  if (medicineData) return medicineData;
+  if (medicineLoading) {
+    return new Promise(resolve => {
+      const check = setInterval(() => { if (medicineData) { clearInterval(check); resolve(medicineData); } }, 100);
+    });
+  }
+  medicineLoading = true;
+  try {
+    const resp = await fetch('medicines.json');
+    medicineData = await resp.json();
+  } catch (e) {
+    console.error('Failed to load medicines.json:', e);
+    medicineData = [];
+  }
+  medicineLoading = false;
+  return medicineData;
+}
+
+function detectMedType(strength) {
+  const s = strength.toLowerCase();
+  if (/\/5\s*ml|\/ml|mg\/ml/.test(s) && !/injection|iv|im/.test(s)) return 'Syr';
+  if (/drop|\/drop/.test(s)) return 'Drop';
+  if (/cream/i.test(s)) return 'Cream';
+  if (/ointment|oint/i.test(s)) return 'Oint';
+  if (/suppository|supp/i.test(s)) return 'Supp';
+  if (/injection|iv|im|\/vial|\/ampoule/i.test(s)) return 'Inj';
+  if (/capsule|cap/i.test(s)) return 'Cap';
+  return 'Tab';
+}
+
+function searchMedicine(id, query) {
+  if (searchTimers[id]) clearTimeout(searchTimers[id]);
+  const sugBox = document.getElementById('med-sug-' + id);
+  if (query.length < 2) { sugBox.classList.remove('show'); sugBox.innerHTML = ''; return; }
+
+  sugBox.innerHTML = '<div class="sug-loading"><div class="spinner"></div> Searching medicines...</div>';
+  sugBox.classList.add('show');
+
+  searchTimers[id] = setTimeout(async () => {
+    const data = await loadMedicineData();
+    const q = query.toLowerCase();
+    const results = [];
+    for (const med of data) {
+      if (results.length >= 20) break;
+      if (med.n.toLowerCase().includes(q)) {
+        const dtype = detectMedType(med.s);
+        results.push({ name: med.n, strength: med.s, generic: med.g, company: med.c, type: dtype });
+      }
+    }
+    // Sort starts-with first
+    results.sort((a, b) => {
+      const aS = a.name.toLowerCase().startsWith(q) ? 0 : 1;
+      const bS = b.name.toLowerCase().startsWith(q) ? 0 : 1;
+      return aS - bS;
+    });
+
+    if (results.length === 0) {
+      sugBox.innerHTML = '<div style="padding:8px 12px;font-size:12px;color:var(--muted-foreground);">No results found</div>';
+    } else {
+      sugBox.innerHTML = results.map((m, i) =>
+        `<button type="button" class="sug-item" onmousedown="event.preventDefault();selectMedicine(${id},'${escapeHtml(m.name)}','${escapeHtml(m.strength)}','${m.type}')">
+          <div class="sug-name"><span class="sug-type">${m.type}</span>${escapeHtml(m.name)} ${escapeHtml(m.strength)}</div>
+          <div class="sug-meta">${escapeHtml(m.generic)} • ${escapeHtml(m.company)}</div>
+        </button>`
+      ).join('');
+    }
+    sugBox.classList.add('show');
+  }, 150);
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function selectMedicine(id, name, strength, type) {
+  const fullName = type + '. ' + name + ' ' + strength;
+  document.getElementById('med-name-' + id).value = fullName;
+  hideSuggestions(id);
+}
+
+function hideSuggestions(id) {
+  const sugBox = document.getElementById('med-sug-' + id);
+  if (sugBox) { sugBox.classList.remove('show'); sugBox.innerHTML = ''; }
+}
+
+// Preload medicines data on page load
+loadMedicineData();
 </script>
 </body>
 </html>
