@@ -16,6 +16,7 @@ const today = new Date().toISOString().split("T")[0];
 const Index = () => {
   const [activeTab, setActiveTab] = useState("write");
   const [editDoctor, setEditDoctor] = useState(false);
+  const [medicineOptions, setMedicineOptions] = useState<MedicineOptions>(loadMedicineOptions);
 
   const [doctor, setDoctor] = useState<DoctorInfo>({
     name: "",
