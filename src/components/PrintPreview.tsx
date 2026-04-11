@@ -10,6 +10,7 @@ export interface PrintSettings {
   customHeight: string;
   headerSize: "small" | "medium" | "large" | "custom";
   customHeaderHeight?: string;
+  customHeaderWidth?: string;
   showDoctorInfo: boolean;
   showDoctorText: boolean;
   showCC: boolean;
