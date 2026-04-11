@@ -64,7 +64,7 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
           Prescription
         </h3>
         <div className="flex items-center gap-2">
-          <MedicineSettings options={options} onChange={setOptions} />
+          <MedicineSettings options={options} onChange={onOptionsChange} />
           <Button onClick={addMedicine} size="sm" variant="outline" className="h-7 text-xs gap-1">
             <Plus className="w-3 h-3" /> Add Medicine
           </Button>
