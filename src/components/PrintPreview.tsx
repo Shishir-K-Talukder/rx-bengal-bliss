@@ -152,6 +152,15 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
                 <p className="text-gray-600 mt-0.5">
                   {med.dose} — ({med.mealTiming}){med.duration ? ` — ${med.duration}` : ""}
                 </p>
+                {med.taperingDoses && med.taperingDoses.length > 0 && (
+                  <div className="ml-4 mt-0.5 space-y-0.5">
+                    {med.taperingDoses.map((td, i) => (
+                      <p key={td.id || i} className="text-gray-600">
+                        Then → {td.dose} — {td.duration}
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
