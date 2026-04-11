@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 export interface MedicineSuggestion {
   name: string;
@@ -7,39 +7,49 @@ export interface MedicineSuggestion {
   company: string;
 }
 
-// Scrape medex.com.bd search results for medicine suggestions
-const parseMedicines = (html: string): MedicineSuggestion[] => {
-  const results: MedicineSuggestion[] = [];
-  const regex = /<a[^>]*href="https?:\/\/medex\.com\.bd\/brands\/\d+\/[^"]*"[^>]*>([\s\S]*?)<\/a>/g;
-  let match;
-  while ((match = regex.exec(html)) !== null) {
-    const raw = match[1].replace(/<[^>]+>/g, '\n');
-    const parts = raw.split('\n').map(p => p.trim()).filter(p => p.length > 0);
-    if (parts.length >= 1 && parts[0].length > 1) {
-      results.push({
-        name: parts[0],
-        strength: parts[1] || '',
-        generic: parts[2] || '',
-        company: parts[3] || '',
-      });
-    }
-  }
-  return results;
+interface RawMedicine {
+  n: string;
+  s: string;
+  g: string;
+  c: string;
+}
+
+let cachedData: RawMedicine[] | null = null;
+let loadingPromise: Promise<RawMedicine[]> | null = null;
+
+const loadMedicines = async (): Promise<RawMedicine[]> => {
+  if (cachedData) return cachedData;
+  if (loadingPromise) return loadingPromise;
+
+  loadingPromise = fetch("/medicines.json")
+    .then((r) => r.json())
+    .then((data: RawMedicine[]) => {
+      cachedData = data;
+      return data;
+    });
+
+  return loadingPromise;
 };
 
-// Use a CORS proxy to fetch medex data
-const fetchMedicines = async (query: string): Promise<MedicineSuggestion[]> => {
-  if (query.length < 2) return [];
-  try {
-    const url = `https://medex.com.bd/brands?q=${encodeURIComponent(query)}`;
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-    const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
-    if (!resp.ok) return [];
-    const html = await resp.text();
-    return parseMedicines(html);
-  } catch {
-    return [];
+const searchMedicines = (data: RawMedicine[], query: string): MedicineSuggestion[] => {
+  const q = query.toLowerCase();
+  const results: MedicineSuggestion[] = [];
+
+  for (const med of data) {
+    if (results.length >= 20) break;
+    if (med.n.toLowerCase().includes(q)) {
+      results.push({ name: med.n, strength: med.s, generic: med.g, company: med.c });
+    }
   }
+
+  // Sort: starts-with first
+  results.sort((a, b) => {
+    const aStarts = a.name.toLowerCase().startsWith(q) ? 0 : 1;
+    const bStarts = b.name.toLowerCase().startsWith(q) ? 0 : 1;
+    return aStarts - bStarts;
+  });
+
+  return results;
 };
 
 export const useMedicineSearch = (query: string) => {
@@ -57,10 +67,11 @@ export const useMedicineSearch = (query: string) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(async () => {
-      const results = await fetchMedicines(query);
+      const data = await loadMedicines();
+      const results = searchMedicines(data, query);
       setSuggestions(results);
       setLoading(false);
-    }, 400);
+    }, 150);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
