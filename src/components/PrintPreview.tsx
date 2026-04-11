@@ -66,6 +66,26 @@ const headerTextClass: Record<string, string> = {
 const isDoctorFilled = (doctor: DoctorInfo) =>
   !!(doctor.name || doctor.degrees || doctor.specialization || doctor.bmdcNo);
 
+const toBanglaDigits = (str: string): string => {
+  const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return str.replace(/[0-9]/g, (d) => banglaDigits[parseInt(d)]);
+};
+
+const formatFollowUpBangla = (followUp: string): string => {
+  if (!followUp) return "";
+  // "X days" format
+  const daysMatch = followUp.match(/^(\d+)\s*days?$/i);
+  if (daysMatch) {
+    return `${toBanglaDigits(daysMatch[1])} দিন পর`;
+  }
+  // Date format (YYYY-MM-DD)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(followUp)) {
+    const [y, m, d] = followUp.split("-");
+    return `${toBanglaDigits(d)}/${toBanglaDigits(m)}/${toBanglaDigits(y)}`;
+  }
+  return toBanglaDigits(followUp);
+};
+
 const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSettings }: Props) => {
   const settings = { ...defaultPrintSettings, ...printSettings };
 
@@ -176,7 +196,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
                 <div className="mb-2"><p className="font-bold">Advice:</p><p className="whitespace-pre-wrap">{advice.advice}</p></div>
               )}
               {advice.followUpDate && (
-                <p><strong>Follow-up:</strong> {advice.followUpDate}</p>
+                <p><strong>ফলো-আপ:</strong> {formatFollowUpBangla(advice.followUpDate)}</p>
               )}
             </div>
           )}
