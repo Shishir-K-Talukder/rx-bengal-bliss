@@ -24,7 +24,7 @@ interface Props {
   onOptionsChange: (o: MedicineOptions) => void;
 }
 
-const MedicineNameInput = ({ value, type, onChange, onSelect }: { value: string; type: string; onChange: (v: string) => void; onSelect: (med: { name: string; strength: string; detectedType: string }) => void }) => {
+const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onChange: (v: string) => void; onSelect: (fullName: string, detectedType: string) => void }) => {
   const [query, setQuery] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { suggestions, loading } = useMedicineSearch(query);
@@ -33,8 +33,7 @@ const MedicineNameInput = ({ value, type, onChange, onSelect }: { value: string;
   const handleSelect = (med: { name: string; strength: string; detectedType: string }) => {
     const fullName = `${med.detectedType}. ${med.name} ${med.strength}`.trim();
     setQuery(fullName);
-    onChange(fullName);
-    onSelect(med);
+    onSelect(fullName, med.detectedType);
     setShowSuggestions(false);
   };
 
@@ -96,6 +95,10 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
     onChange(medicines.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
   };
 
+  const updateMedicineMulti = (id: string, updates: Partial<Medicine>) => {
+    onChange(medicines.map((m) => (m.id === id ? { ...m, ...updates } : m)));
+  };
+
   const handleDragStart = (idx: number) => { setDragIdx(idx); dragRef.current = idx; };
   const handleDragOver = (e: React.DragEvent, idx: number) => { e.preventDefault(); setOverIdx(idx); };
   const handleDrop = (idx: number) => {
@@ -152,7 +155,7 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
               <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-2">
                 <div className="col-span-2">
                   <Label className="text-[11px] text-muted-foreground">Medicine Name</Label>
-                  <MedicineNameInput value={med.name} type={med.type} onChange={(v) => updateMedicine(med.id, "name", v)} onSelect={(selected) => updateMedicine(med.id, "type", selected.detectedType)} />
+                  <MedicineNameInput value={med.name} onChange={(v) => updateMedicine(med.id, "name", v)} onSelect={(fullName, detectedType) => updateMedicineMulti(med.id, { name: fullName, type: detectedType })} />
                 </div>
                 <div>
                   <Label className="text-[11px] text-muted-foreground">Dose</Label>
