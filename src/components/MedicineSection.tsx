@@ -95,6 +95,10 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
     onChange(medicines.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
   };
 
+  const updateMedicineMulti = (id: string, updates: Partial<Medicine>) => {
+    onChange(medicines.map((m) => (m.id === id ? { ...m, ...updates } : m)));
+  };
+
   const handleDragStart = (idx: number) => { setDragIdx(idx); dragRef.current = idx; };
   const handleDragOver = (e: React.DragEvent, idx: number) => { e.preventDefault(); setOverIdx(idx); };
   const handleDrop = (idx: number) => {
