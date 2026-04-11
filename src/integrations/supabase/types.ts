@@ -130,6 +130,7 @@ export type Database = {
           id: string
           name: string
           phone: string
+          profile_photo_url: string
           specialization: string
           updated_at: string
           user_id: string
@@ -142,6 +143,7 @@ export type Database = {
           id?: string
           name?: string
           phone?: string
+          profile_photo_url?: string
           specialization?: string
           updated_at?: string
           user_id: string
@@ -154,6 +156,7 @@ export type Database = {
           id?: string
           name?: string
           phone?: string
+          profile_photo_url?: string
           specialization?: string
           updated_at?: string
           user_id?: string
