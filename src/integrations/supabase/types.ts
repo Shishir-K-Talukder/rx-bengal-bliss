@@ -14,7 +14,152 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      doctor_settings: {
+        Row: {
+          created_at: string
+          id: string
+          medicine_options: Json
+          print_settings: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          medicine_options?: Json
+          print_settings?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          medicine_options?: Json
+          print_settings?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      patients: {
+        Row: {
+          address: string
+          age: string
+          created_at: string
+          id: string
+          mobile: string
+          name: string
+          sex: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string
+          age?: string
+          created_at?: string
+          id?: string
+          mobile?: string
+          name?: string
+          sex?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          age?: string
+          created_at?: string
+          id?: string
+          mobile?: string
+          name?: string
+          sex?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      prescriptions: {
+        Row: {
+          advice: Json
+          clinical_data: Json
+          created_at: string
+          id: string
+          medicines: Json
+          patient_data: Json
+          patient_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          advice?: Json
+          clinical_data?: Json
+          created_at?: string
+          id?: string
+          medicines?: Json
+          patient_data?: Json
+          patient_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          advice?: Json
+          clinical_data?: Json
+          created_at?: string
+          id?: string
+          medicines?: Json
+          patient_data?: Json
+          patient_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescriptions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          bmdc_no: string
+          chamber_address: string
+          created_at: string
+          degrees: string
+          id: string
+          name: string
+          phone: string
+          specialization: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bmdc_no?: string
+          chamber_address?: string
+          created_at?: string
+          degrees?: string
+          id?: string
+          name?: string
+          phone?: string
+          specialization?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bmdc_no?: string
+          chamber_address?: string
+          created_at?: string
+          degrees?: string
+          id?: string
+          name?: string
+          phone?: string
+          specialization?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
