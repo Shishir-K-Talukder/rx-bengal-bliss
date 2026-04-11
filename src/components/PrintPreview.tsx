@@ -155,9 +155,6 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
               {advice.followUpDate && (
                 <p><strong>Follow-up:</strong> {advice.followUpDate}</p>
               )}
-              {advice.followUpDays && (
-                <p><strong>Follow-up:</strong> {advice.followUpDays}</p>
-              )}
             </div>
           )}
         </div>
