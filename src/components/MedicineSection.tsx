@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, GripVertical, Loader2 } from "lucide-react";
+import { Plus, Trash2, GripVertical, Loader2, Pencil } from "lucide-react";
 import { useRef, useState } from "react";
 import MedicineSettings, { MedicineOptions } from "./MedicineSettings";
 import { useMedicineSearch } from "@/hooks/useMedicineSearch";
@@ -74,6 +74,42 @@ const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onCha
         </div>
       )}
     </div>
+  );
+};
+
+const DoseInput = ({ value, options, onChange }: { value: string; options: string[]; onChange: (v: string) => void }) => {
+  const [isCustom, setIsCustom] = useState(!options.includes(value) && value !== "");
+
+  if (isCustom) {
+    return (
+      <div className="flex gap-1">
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Custom dose..."
+          className="h-8 text-xs flex-1"
+          autoFocus
+        />
+        <Button variant="outline" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground" title="Back to list" onClick={() => { setIsCustom(false); onChange(options[0] || ""); }}>
+          ✕
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Select value={options.includes(value) ? value : "__custom__"} onValueChange={(v) => {
+      if (v === "__custom__") { setIsCustom(true); onChange(""); }
+      else onChange(v);
+    }}>
+      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+      <SelectContent className="max-h-[300px]">
+        {options.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+        <SelectItem value="__custom__" className="text-xs font-medium border-t border-border mt-1 pt-1">
+          <span className="flex items-center gap-1"><Pencil className="w-3 h-3" /> Custom Dose</span>
+        </SelectItem>
+      </SelectContent>
+    </Select>
   );
 };
 
@@ -159,10 +195,7 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
                 </div>
                 <div>
                   <Label className="text-[11px] text-muted-foreground">Dose</Label>
-                  <Select value={med.dose} onValueChange={(v) => updateMedicine(med.id, "dose", v)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{options.doses.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <DoseInput value={med.dose} options={options.doses} onChange={(v) => updateMedicine(med.id, "dose", v)} />
                 </div>
                 <div>
                   <Label className="text-[11px] text-muted-foreground">Duration</Label>
