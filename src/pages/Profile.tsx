@@ -7,12 +7,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { DoctorInfo } from "@/components/DoctorHeader";
 import FloatingNav from "@/components/FloatingNav";
+import ProfilePhotoUpload from "@/components/ProfilePhotoUpload";
 import { Save, User } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const { user } = useAuth();
   const { profile, saveProfile, loading } = useProfile();
+  const [photoUrl, setPhotoUrl] = useState("");
   
   const [doctor, setDoctor] = useState<DoctorInfo>({
     name: "", degrees: "", specialization: "", bmdcNo: "", chamberAddress: "", phone: "",
@@ -23,6 +26,27 @@ const Profile = () => {
       setDoctor(profile);
     }
   }, [loading, profile]);
+
+  useEffect(() => {
+    if (user) loadPhotoUrl();
+  }, [user]);
+
+  const loadPhotoUrl = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("profiles")
+      .select("profile_photo_url")
+      .eq("user_id", user.id)
+      .single();
+    if (data?.profile_photo_url) setPhotoUrl(data.profile_photo_url);
+  };
+
+  const handlePhotoChange = async (url: string) => {
+    setPhotoUrl(url);
+    if (user) {
+      await supabase.from("profiles").update({ profile_photo_url: url }).eq("user_id", user.id);
+    }
+  };
 
   const handleSave = () => {
     saveProfile(doctor);
@@ -53,7 +77,12 @@ const Profile = () => {
               <User className="w-4 h-4 text-primary" /> Doctor Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
+            <ProfilePhotoUpload
+              photoUrl={photoUrl}
+              doctorName={doctor.name}
+              onPhotoChange={handlePhotoChange}
+            />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {fields.map((f) => (
                 <div key={f.key}>
