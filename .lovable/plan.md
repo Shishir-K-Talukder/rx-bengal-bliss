@@ -1,51 +1,40 @@
 
 
-# Full-Stack Backend Plan for Rx Prescription App
+# Backend Fixes — Attach Missing Database Triggers
 
-## Summary
-Set up Lovable Cloud (Supabase) with authentication, database tables, and integrate everything so doctors can log in, save/load prescriptions, manage patients, and persist all their settings.
+## Current State
+Your database tables (`profiles`, `patients`, `prescriptions`, `doctor_settings`) and functions (`handle_new_user`, `update_updated_at_column`) already exist with proper RLS policies. However, **no triggers are attached**, meaning:
 
-## What Gets Built
+1. **New signups don't auto-create a profile** — the `handle_new_user` function exists but isn't wired to fire on `auth.users` inserts
+2. **`updated_at` columns don't auto-update** — the function exists but no trigger fires it
 
-### 1. Enable Lovable Cloud & Database
-- Enable Lovable Cloud with Supabase integration
-- Set up authentication (email/password login for doctors)
+## What Will Be Done
 
-### 2. Database Tables
+### Migration: Attach triggers
 
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| `profiles` | Doctor info | name, degrees, specialization, bmdc_no, chamber_address, phone |
-| `patients` | Patient records | name, age, sex, mobile, address, user_id (FK to doctor) |
-| `prescriptions` | Saved prescriptions | patient_id, clinical_data (JSON), medicines (JSON), advice (JSON), created_at |
-| `doctor_settings` | Print setup + medicine options | user_id, print_settings (JSON), medicine_options (JSON) |
+```sql
+-- Auto-create profile on signup
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
-All tables have RLS policies so each doctor only sees their own data.
+-- Auto-update updated_at on profiles, patients, prescriptions, doctor_settings
+CREATE TRIGGER update_profiles_updated_at
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-### 3. Auth Pages
-- **Login page** (`/login`) — email & password
-- **Signup page** (`/signup`) — register new doctor
-- **Protected routes** — redirect to login if not authenticated
+CREATE TRIGGER update_patients_updated_at
+  BEFORE UPDATE ON public.patients
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-### 4. Save & Load Features
-- **Doctor profile**: Auto-loads on login, replaces localStorage
-- **Print settings**: Saved per doctor in `doctor_settings` table
-- **Medicine options** (dose/duration presets): Saved per doctor
-- **Prescriptions**: Save button stores full prescription; history list to reload past prescriptions
-- **Patient records**: Auto-saved when creating prescriptions; searchable patient list with history
+CREATE TRIGGER update_prescriptions_updated_at
+  BEFORE UPDATE ON public.prescriptions
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-### 5. UI Changes
-- Add login/signup pages
-- Add "Save Prescription" button in header
-- Add "Prescription History" tab or sidebar
-- Add "Patient List" accessible from the app
-- Doctor info auto-populates from profile on login
-- Print settings persist to cloud instead of localStorage
+CREATE TRIGGER update_doctor_settings_updated_at
+  BEFORE UPDATE ON public.doctor_settings
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+```
 
-## Technical Details
-- Lovable Cloud (Supabase) for database, auth, and RLS
-- `onAuthStateChange` listener for session management
-- Database trigger to auto-create doctor profile on signup
-- JSON columns for flexible clinical/medicine/advice data storage
-- All existing localStorage usage migrated to cloud storage
+No code changes needed — just this one migration to wire up the existing functions.
 
