@@ -52,6 +52,10 @@ interface TypeInferenceContext {
   genericTypeCounts: Map<string, TypeCountMap>;
 }
 
+const CAPSULE_PREFERRED_GENERIC_DEFAULTS = new Set([
+  "omeprazole",
+]);
+
 const normalizeText = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
 
 const sanitizeQuery = (query: string) => normalizeText(query);
@@ -95,7 +99,10 @@ const detectExplicitType = (name: string, strength: string, generic = ""): strin
   return null;
 };
 
-const detectType = (name: string, strength: string, generic = "") => detectExplicitType(name, strength, generic) ?? "Tab";
+const detectType = (name: string, strength: string, generic = "") => {
+  const medicine = { name, strength, generic, company: "" } satisfies DbMedicine;
+  return detectExplicitType(name, strength, generic) ?? getDefaultTypeForGroup(inferTypeGroup(medicine), medicine);
+};
 
 const FORMULATION_QUERY_TERMS = new Set([
   "tab", "tabs", "tablet", "tablets",
@@ -201,6 +208,7 @@ const inferTypeGroup = (medicine: DbMedicine): MedicineTypeGroup => {
 
 const getDefaultTypeForGroup = (group: MedicineTypeGroup, medicine: DbMedicine) => {
   const combined = `${medicine.name} ${medicine.strength} ${medicine.generic}`.toLowerCase();
+  const genericKey = normalizeGenericLookup(medicine.generic);
 
   if (group === "topical") {
     if (/\blotion\b/i.test(combined)) return "Lotion";
@@ -218,7 +226,11 @@ const getDefaultTypeForGroup = (group: MedicineTypeGroup, medicine: DbMedicine) 
   if (group === "injectable") return "Inj";
   if (group === "inhaled") return /\bnebu\b|\bneb\b|\brespules?\b/i.test(combined) ? "Nebu" : "Inhaler";
   if (group === "suppository") return "Supp";
-  if (group === "oralSolid") return /sachet/i.test(combined) ? "Sachet" : "Tab";
+  if (group === "oralSolid") {
+    if (/sachet/i.test(combined)) return "Sachet";
+    if (CAPSULE_PREFERRED_GENERIC_DEFAULTS.has(genericKey)) return "Cap";
+    return "Tab";
+  }
 
   return "Tab";
 };
