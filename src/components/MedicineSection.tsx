@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, GripVertical, Loader2, Pencil, ChevronDown, ChevronUp } from "lucide-react";
 import { useRef, useState } from "react";
-import MedicineSettings, { MedicineOptions } from "./MedicineSettings";
+import { MedicineOptions } from "./MedicineSettings";
 import { useMedicineSearch } from "@/hooks/useMedicineSearch";
 
 export interface TaperingDose {
@@ -227,7 +227,7 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
           Prescription
         </h3>
         <div className="flex items-center gap-2">
-          <MedicineSettings options={options} onChange={onOptionsChange} />
+          
           <Button onClick={addMedicine} size="sm" variant="default" className="h-8 text-xs gap-1.5 shadow-sm">
             <Plus className="w-3.5 h-3.5" /> Add Medicine
           </Button>
