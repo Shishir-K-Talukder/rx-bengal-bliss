@@ -661,6 +661,8 @@ const searchFromDb = async (query: string): Promise<MedicineSuggestion[]> => {
 };
 
 export const useMedicineSearch = (query: string) => {
+  // Eagerly preload fallback data on first mount
+  useEffect(() => { loadFallbackRanked(); }, []);
   const [suggestions, setSuggestions] = useState<MedicineSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
