@@ -9,15 +9,36 @@ export interface MedicineSuggestion {
   detectedType: string;
 }
 
-const detectType = (strength: string): string => {
+const detectType = (name: string, strength: string): string => {
+  const n = name.toLowerCase();
   const s = strength.toLowerCase();
-  if (/\/5\s*ml|\/ml|mg\/ml/.test(s) && !/injection|iv|im/.test(s)) return "Syr";
-  if (/drop|\/drop/.test(s)) return "Drop";
-  if (/cream/i.test(s)) return "Cream";
-  if (/ointment|oint/i.test(s)) return "Oint";
-  if (/suppository|supp/i.test(s)) return "Supp";
-  if (/injection|iv|im|\/vial|\/ampoule/i.test(s)) return "Inj";
-  if (/capsule|cap/i.test(s)) return "Cap";
+  const combined = `${n} ${s}`;
+
+  // Check name for explicit formulation keywords first
+  if (/\bcream\b/i.test(n)) return "Cream";
+  if (/\bgel\b/i.test(n)) return "Gel";
+  if (/\blotion\b/i.test(n)) return "Lotion";
+  if (/\bointment\b|\boint\b/i.test(n)) return "Oint";
+  if (/\bshampoo\b/i.test(n)) return "Shampoo";
+  if (/\bspray\b/i.test(n)) return "Spray";
+  if (/\binhaler\b|\bhaler\b/i.test(combined)) return "Inhaler";
+  if (/\bnebuli[sz]/i.test(combined)) return "Nebu";
+  if (/\beye\s*drop\b|\bear\s*drop\b|\bnasal\s*drop\b|\bdrop\b/i.test(n)) return "Drop";
+  if (/\bsuppository\b|\bsupp\b/i.test(combined)) return "Supp";
+  if (/\binjection\b|\binj\b/i.test(n)) return "Inj";
+
+  // Check strength patterns
+  if (/\/vial|\/ampoule|\/prefilled|\/syringe/i.test(s)) return "Inj";
+  if (/\/puff|mcg\/dose/i.test(s)) return "Inhaler";
+  if (/\/5\s*ml|\/10\s*ml|syrup/i.test(combined) && !/injection|iv|im/i.test(combined)) return "Syr";
+  if (/\/ml|mg\/ml/i.test(s) && !/injection|iv|im|vial/i.test(combined)) return "Drop";
+  if (/topical/i.test(s)) return "Cream";
+  if (/sachet/i.test(s)) return "Sachet";
+
+  // Capsule detection — but avoid false positives from names containing "cap" as part of brand
+  if (/\bcapsule\b/i.test(combined)) return "Cap";
+
+  // Default tablet
   return "Tab";
 };
 
@@ -46,7 +67,7 @@ const toSuggestion = (medicine: DbMedicine): MedicineSuggestion => ({
   strength: medicine.strength,
   generic: medicine.generic,
   company: medicine.company,
-  detectedType: detectType(medicine.strength),
+  detectedType: detectType(medicine.name, medicine.strength),
 });
 
 // Fallback: load from static JSON if DB is empty
