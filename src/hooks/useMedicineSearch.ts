@@ -96,10 +96,10 @@ const detectExplicitType = (name: string, strength: string, generic = ""): strin
   if (/\bvaginal pessary\b/i.test(combined)) return "Supp";
   if (/\bvaginal tablet\b/i.test(combined)) return "Tab";
   if (/\bvaginal\b/i.test(g)) return "Tab";
-  if (/\bcream\b/i.test(combined) || hasNameOrGenericToken(/cream$/)) return "Cream";
-  if (/\bgel\b|\bjelly\b/i.test(combined) || hasNameOrGenericToken(/gel$/)) return "Gel";
-  if (/\blotion\b/i.test(combined) || hasNameOrGenericToken(/lotion$/)) return "Lotion";
-  if (/\beye ointment\b|\bointment\b|\boint\b/i.test(combined) || hasNameOrGenericToken(/ointment$/, /oint$/)) return "Oint";
+  if (/\bcream\b/i.test(combined) || hasGenericToken(/cream$/)) return "Cream";
+  if (/\bgel\b|\bjelly\b/i.test(combined) || hasGenericToken(/^gel$/)) return "Gel";
+  if (/\blotion\b/i.test(combined) || hasGenericToken(/lotion$/)) return "Lotion";
+  if (/\beye ointment\b|\bointment\b|\boint\b/i.test(combined) || hasGenericToken(/ointment$/, /oint$/)) return "Oint";
   if (/\bshampoo\b/i.test(combined)) return "Shampoo";
   if (/\bnasal spray\b|\bspray\b/i.test(combined)) return "Spray";
   if (/\bdental paste\b|\bpaste\b/i.test(combined)) return "Paste";
