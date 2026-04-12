@@ -350,7 +350,13 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
             value={data.drugHistory}
             onChange={(e) => onChange({ ...data, drugHistory: e.target.value })}
             placeholder="রোগী আগে কী কী ওষুধ খেয়েছে / বর্তমানে কী চলছে..."
-            className="text-sm min-h-[140px] resize-none"
+            className="text-sm min-h-[80px] resize-none mb-3"
+          />
+
+          {/* Medicine suggestions for D/H */}
+          <DrugHistoryMedicineSelector
+            selectedMedicines={data.drugHistoryMedicines || []}
+            onChange={(meds) => onChange({ ...data, drugHistoryMedicines: meds })}
           />
         </TabsContent>
 
