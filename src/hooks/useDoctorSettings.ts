@@ -32,6 +32,10 @@ export const useDoctorSettings = () => {
         const stored = data.medicine_options as Record<string, unknown>;
         // Only keep user customizations like types and followUpOptions; use fresh defaults for doses/durations/meals/adviceList
         const defaults = loadMedicineOptions();
+        // Migrate old {label, days} follow-up format to string[]
+        const rawFollowUp = Array.isArray(stored.followUpOptions) ? stored.followUpOptions : defaults.followUpOptions;
+        const migratedFollowUp = rawFollowUp.map((o: any) => typeof o === "string" ? o : o.label ?? String(o));
+
         setMedicineOptions({
           ...defaults,
           ...stored,
@@ -42,6 +46,7 @@ export const useDoctorSettings = () => {
           investigations: Array.isArray(stored.investigations) ? stored.investigations as string[] : defaults.investigations,
           chiefComplaints: Array.isArray(stored.chiefComplaints) ? stored.chiefComplaints as string[] : defaults.chiefComplaints,
           pediatricRules: Array.isArray(stored.pediatricRules) ? stored.pediatricRules as MedicineOptions["pediatricRules"] : defaults.pediatricRules,
+          followUpOptions: migratedFollowUp as string[],
         } as MedicineOptions);
       }
     }
