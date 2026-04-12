@@ -33,7 +33,7 @@ const COMMON_INVESTIGATIONS = [
   "S. Creatinine", "S. Uric Acid", "S. Electrolyte",
   "Lipid Profile", "LFT", "Thyroid Profile (FT4, TSH)",
   "Urine R/M/E", "Urine C/S", "Stool R/M/E",
-  "X-Ray Chest P/A", "X-Ray L/S Spine", "X-Ray KUB",
+  "X-Ray Chest P/A", "X-Ray L/S Spine B/V", "X-Ray KUB",
   "USG of W/A", "USG of KUB", "Echo",
   "ECG", "CT Scan", "MRI",
   "Blood Grouping", "HBsAg", "Anti-HCV",

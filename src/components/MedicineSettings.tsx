@@ -13,6 +13,8 @@ export interface MedicineOptions {
   meals: string[];
   adviceList: string[];
   followUpOptions: string[];
+  investigations: string[];
+  chiefComplaints: string[];
 }
 
 const STORAGE_KEY = "medicine-options";
