@@ -85,7 +85,7 @@ const Index = () => {
 
   const handleNewPrescription = () => {
     setPatient({ name: "", age: "", sex: "", mobile: "", address: "", date: today });
-    setClinical({ chiefComplaint: "", onExamination: { ...defaultOnExamination }, drugHistory: "", diagnosis: "", investigation: "" });
+    setClinical({ chiefComplaint: "", onExamination: { ...defaultOnExamination }, drugHistory: "", drugHistoryMedicines: [], diagnosis: "", investigation: "" });
     setMedicines([]);
     setAdvice({ advice: "", followUpDate: "" });
     setActiveTab("write");
