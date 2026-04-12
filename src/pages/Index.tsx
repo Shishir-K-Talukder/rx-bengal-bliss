@@ -58,6 +58,10 @@ const Index = () => {
   };
 
   const handlePrint = () => {
+    // Auto-save prescription when printing
+    savePatientToHistory(patient);
+    savePrescription(patient, clinical, medicines, advice);
+
     const printData = { doctor, patient, clinical, medicines, advice, printSettings };
     sessionStorage.setItem("prescription-print-data", JSON.stringify(printData));
 
