@@ -167,10 +167,10 @@ const AppointmentPanel = () => {
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                   {appt.status === "scheduled" && (
                     <>
-                      <Button size="icon" variant="ghost" className="h-7 w-7 text-green-600 hover:bg-green-50" onClick={() => updateAppointmentStatus(appt.id, "completed")} title="Mark completed">
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-primary hover:bg-primary/10" onClick={() => updateAppointmentStatus(appt.id, "completed")} title="Mark completed">
                         <CheckCircle className="w-3.5 h-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:bg-red-50" onClick={() => updateAppointmentStatus(appt.id, "cancelled")} title="Cancel">
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:bg-destructive/10" onClick={() => updateAppointmentStatus(appt.id, "cancelled")} title="Cancel">
                         <XCircle className="w-3.5 h-3.5" />
                       </Button>
                     </>
