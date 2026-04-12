@@ -54,6 +54,11 @@ interface TypeInferenceContext {
 
 const CAPSULE_PREFERRED_GENERIC_DEFAULTS = new Set([
   "omeprazole",
+  "esomeprazole",
+  "lansoprazole",
+  "dexlansoprazole",
+  "rabeprazole sodium",
+  "pantoprazole sodium",
 ]);
 
 let derivedCapsulePreferredGenericDefaults = new Set<string>();
