@@ -370,17 +370,19 @@ const detectFormulationHint = (query: string): FormulationHint | null => {
   if (/\bointment\b|\boint\b/.test(raw)) return { exactType: "Oint", group: "topical" };
   if (/\blotion\b/.test(raw)) return { exactType: "Lotion", group: "topical" };
   if (/\bcream\b/.test(raw)) return { exactType: "Cream", group: "topical" };
-  if (/\bgel\b/.test(raw)) return { exactType: "Gel", group: "topical" };
+  if (/\bgel\b|\bjelly\b/.test(raw)) return { exactType: "Gel", group: "topical" };
+  if (/\bpaste\b/.test(raw)) return { exactType: "Paste", group: "topical" };
+  if (/\blacquer\b/.test(raw)) return { exactType: "Lacquer", group: "topical" };
   if (/\bsachet\b/.test(raw)) return { exactType: "Sachet", group: "oralSachet" };
+  if (/\binhalation\b|\binhaler\b|\bpuff\b/.test(raw)) return { exactType: "Inhaler", group: "inhaled" };
+  if (/\bnebu\b|\bneb\b|\brespules?\b|\bnebulizer\b|\bnebuliser\b|\brespirator\b/.test(raw)) return { exactType: "Nebu", group: "inhaled" };
   if (/\bcapsule\b|\bcaps\b|\bcap\b|\bsoftgel\b/.test(raw)) return { exactType: "Cap", group: "oralUnitSolid" };
-  if (/\btablet\b|\btablets\b|\btab\b|\btabs\b/.test(raw)) return { exactType: "Tab", group: "oralUnitSolid" };
+  if (/\btablet\b|\btablets\b|\btab\b|\btabs\b|\bmups\b/.test(raw)) return { exactType: "Tab", group: "oralUnitSolid" };
   if (/\bsyrup\b|\bsuspension\b|\bsyr\b|\bsyp\b/.test(raw)) return { exactType: "Syr", group: "oralLiquid" };
   if (/\bdrop\b|\bdrops\b/.test(raw)) return { exactType: "Drop", group: "oralLiquid" };
-  if (/\binjection\b|\binj\b|\bvial\b|\bamp\b|\bampoule\b/.test(raw)) return { exactType: "Inj", group: "injectable" };
-  if (/\binhaler\b|\bpuff\b/.test(raw)) return { exactType: "Inhaler", group: "inhaled" };
-  if (/\bnebu\b|\bneb\b|\brespules?\b|\bnebulizer\b|\bnebuliser\b/.test(raw)) return { exactType: "Nebu", group: "inhaled" };
-  if (/\bsupp\b|\bsuppository\b/.test(raw)) return { exactType: "Supp", group: "suppository" };
-  if (/\bophthalmic\b|\botic\b|\bnasal\b/.test(raw)) return { exactType: "Drop", group: "oralLiquid" };
+  if (/\binjection\b|\binj\b|\bvial\b|\bamp\b|\bampoule\b|\binfusion\b/.test(raw)) return { exactType: "Inj", group: "injectable" };
+  if (/\bsupp\b|\bsuppository\b|\brectal\b|\bpessary\b/.test(raw)) return { exactType: "Supp", group: "suppository" };
+  if (/\bophthalmic\b|\botic\b|\bnasal\b|\bear\b/.test(raw)) return { exactType: "Drop", group: "oralLiquid" };
 
   return null;
 };
