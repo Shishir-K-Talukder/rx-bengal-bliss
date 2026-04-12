@@ -38,9 +38,11 @@ const ListEditor = ({ items, onChange, placeholder }: ListEditorProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Input value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder={placeholder} className="h-12 text-base" onKeyDown={(e) => e.key === "Enter" && addItem()} />
-        <Button size="lg" variant="default" className="h-12 text-base gap-2 px-6 shrink-0 font-semibold" onClick={addItem}><Plus className="w-5 h-5" /> Add</Button>
+      <div className="flex gap-3">
+        <Input value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder={placeholder} className="h-14 text-base rounded-xl border-2 border-input focus:border-primary" onKeyDown={(e) => e.key === "Enter" && addItem()} />
+        <Button size="lg" variant="default" className="h-14 text-base gap-2 px-7 shrink-0 font-bold rounded-xl shadow-md hover:shadow-lg transition-all" onClick={addItem}>
+          <Plus className="w-6 h-6" /> Add
+        </Button>
       </div>
       <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
         {items.map((item, idx) => (
@@ -51,28 +53,36 @@ const ListEditor = ({ items, onChange, placeholder }: ListEditorProps) => {
             onDragEnter={() => handleDragEnter(idx)}
             onDragEnd={handleDragEnd}
             onDragOver={(e) => e.preventDefault()}
-            className={`flex items-center gap-2 bg-muted/40 rounded-xl px-4 py-3 text-base group border transition-colors cursor-grab active:cursor-grabbing ${
-              dragOverIdx === idx ? "border-primary bg-primary/5" : "border-transparent hover:border-border"
+            className={`flex items-center gap-3 bg-muted/40 rounded-xl px-4 py-3 text-base group border-2 transition-all cursor-grab active:cursor-grabbing ${
+              dragOverIdx === idx ? "border-primary bg-primary/5 shadow-sm" : "border-transparent hover:border-border hover:bg-muted/60"
             }`}
           >
             {editIdx === idx ? (
               <>
-                <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} className="h-11 text-base flex-1" onKeyDown={(e) => e.key === "Enter" && (() => { const v = editValue.trim(); if (v) { const u = [...items]; u[idx] = v; onChange(u); } setEditIdx(null); })()} autoFocus />
-                <Button size="icon" variant="outline" className="h-11 w-11 shrink-0" onClick={() => { const v = editValue.trim(); if (v) { const u = [...items]; u[idx] = v; onChange(u); } setEditIdx(null); }}><Check className="w-5 h-5 text-primary" /></Button>
-                <Button size="icon" variant="outline" className="h-11 w-11 shrink-0" onClick={() => setEditIdx(null)}><X className="w-5 h-5" /></Button>
+                <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} className="h-12 text-base flex-1 rounded-lg" onKeyDown={(e) => e.key === "Enter" && (() => { const v = editValue.trim(); if (v) { const u = [...items]; u[idx] = v; onChange(u); } setEditIdx(null); })()} autoFocus />
+                <Button size="icon" variant="default" className="h-12 w-12 shrink-0 rounded-xl shadow-sm" onClick={() => { const v = editValue.trim(); if (v) { const u = [...items]; u[idx] = v; onChange(u); } setEditIdx(null); }}>
+                  <Check className="w-6 h-6" />
+                </Button>
+                <Button size="icon" variant="outline" className="h-12 w-12 shrink-0 rounded-xl border-2" onClick={() => setEditIdx(null)}>
+                  <X className="w-6 h-6" />
+                </Button>
               </>
             ) : (
               <>
-                <GripVertical className="w-5 h-5 text-muted-foreground/50 shrink-0" />
-                <span className="flex-1 text-foreground font-medium">{item}</span>
-                <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 opacity-60 group-hover:opacity-100" onClick={() => { setEditIdx(idx); setEditValue(item); }}><Pencil className="w-5 h-5 text-muted-foreground" /></Button>
-                <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 opacity-60 group-hover:opacity-100 text-destructive" onClick={() => onChange(items.filter((_, i) => i !== idx))}><Trash2 className="w-5 h-5" /></Button>
+                <GripVertical className="w-5 h-5 text-muted-foreground/40 shrink-0" />
+                <span className="flex-1 text-foreground font-medium text-[15px]">{item}</span>
+                <Button size="icon" variant="outline" className="h-12 w-12 shrink-0 rounded-xl border-2 opacity-70 group-hover:opacity-100 hover:bg-primary/10 hover:border-primary hover:text-primary transition-all" onClick={() => { setEditIdx(idx); setEditValue(item); }}>
+                  <Pencil className="w-5 h-5" />
+                </Button>
+                <Button size="icon" variant="outline" className="h-12 w-12 shrink-0 rounded-xl border-2 opacity-70 group-hover:opacity-100 hover:bg-destructive/10 hover:border-destructive hover:text-destructive transition-all" onClick={() => onChange(items.filter((_, i) => i !== idx))}>
+                  <Trash2 className="w-5 h-5" />
+                </Button>
               </>
             )}
           </div>
         ))}
       </div>
-      <p className="text-sm text-muted-foreground font-medium">{items.length} items</p>
+      <p className="text-sm text-muted-foreground font-semibold">{items.length} items</p>
     </div>
   );
 };
@@ -88,21 +98,25 @@ const FollowUpEditor = ({ items, onChange }: { items: { label: string; days: num
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Label" className="h-12 text-base flex-1" />
-        <Input value={newDays} onChange={(e) => setNewDays(e.target.value)} placeholder="Days" type="number" className="h-12 text-base w-24" />
-        <Button size="lg" variant="default" className="h-12 text-base gap-2 px-6 shrink-0 font-semibold" onClick={addItem}><Plus className="w-5 h-5" /> Add</Button>
+      <div className="flex gap-3">
+        <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Label" className="h-14 text-base flex-1 rounded-xl border-2 border-input focus:border-primary" />
+        <Input value={newDays} onChange={(e) => setNewDays(e.target.value)} placeholder="Days" type="number" className="h-14 text-base w-24 rounded-xl border-2 border-input focus:border-primary" />
+        <Button size="lg" variant="default" className="h-14 text-base gap-2 px-7 shrink-0 font-bold rounded-xl shadow-md hover:shadow-lg transition-all" onClick={addItem}>
+          <Plus className="w-6 h-6" /> Add
+        </Button>
       </div>
       <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
         {items.map((item, idx) => (
-          <div key={idx} className="flex items-center gap-2 bg-muted/40 rounded-xl px-4 py-3 text-base group border border-transparent hover:border-border transition-colors">
-            <span className="flex-1 text-foreground font-medium">{item.label}</span>
-            <span className="text-sm text-muted-foreground bg-muted rounded-full px-3 py-1">{item.days}d</span>
-            <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 opacity-60 group-hover:opacity-100 text-destructive" onClick={() => onChange(items.filter((_, i) => i !== idx))}><Trash2 className="w-5 h-5" /></Button>
+          <div key={idx} className="flex items-center gap-3 bg-muted/40 rounded-xl px-4 py-3 text-base group border-2 border-transparent hover:border-border hover:bg-muted/60 transition-all">
+            <span className="flex-1 text-foreground font-medium text-[15px]">{item.label}</span>
+            <span className="text-sm text-muted-foreground bg-muted rounded-full px-3 py-1.5 font-semibold">{item.days}d</span>
+            <Button size="icon" variant="outline" className="h-12 w-12 shrink-0 rounded-xl border-2 opacity-70 group-hover:opacity-100 hover:bg-destructive/10 hover:border-destructive hover:text-destructive transition-all" onClick={() => onChange(items.filter((_, i) => i !== idx))}>
+              <Trash2 className="w-5 h-5" />
+            </Button>
           </div>
         ))}
       </div>
-      <p className="text-sm text-muted-foreground font-medium">{items.length} items</p>
+      <p className="text-sm text-muted-foreground font-semibold">{items.length} items</p>
     </div>
   );
 };
@@ -128,14 +142,14 @@ const MedicineSettingsPage = ({ options, onChange }: Props) => {
 
   return (
     <div className="section-card p-5">
-      <h3 className="text-base font-bold text-foreground mb-5 flex items-center gap-2">
-        <Settings className="w-5 h-5 text-primary" /> Prescription Settings
+      <h3 className="text-lg font-bold text-foreground mb-5 flex items-center gap-2">
+        <Settings className="w-6 h-6 text-primary" /> Prescription Settings
       </h3>
       <Tabs defaultValue="types">
-        <TabsList className="w-full flex-wrap h-auto gap-1.5 p-2 bg-muted/50">
+        <TabsList className="w-full flex-wrap h-auto gap-2 p-2.5 bg-muted/50 rounded-xl">
           {tabs.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value} className="text-sm gap-2 px-3 py-2 font-medium">
-              <tab.icon className="w-4 h-4" /> {tab.label}
+            <TabsTrigger key={tab.value} value={tab.value} className="text-sm gap-2 px-4 py-2.5 font-semibold rounded-lg data-[state=active]:shadow-md transition-all">
+              <tab.icon className="w-5 h-5" /> {tab.label}
             </TabsTrigger>
           ))}
         </TabsList>
