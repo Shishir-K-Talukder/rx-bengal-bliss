@@ -21,6 +21,7 @@ export interface PrintSettings {
   showDoctorText: boolean;
   showCC: boolean;
   showOE: boolean;
+  showInvestigationResults: boolean;
   showDiagnosis: boolean;
   showInvestigation: boolean;
   showFooter: boolean;
@@ -38,6 +39,7 @@ export const defaultPrintSettings: PrintSettings = {
   showDoctorText: true,
   showCC: true,
   showOE: true,
+  showInvestigationResults: true,
   showDiagnosis: true,
   showInvestigation: true,
   showFooter: true,
@@ -214,7 +216,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
               <p className="whitespace-pre-wrap mt-1">{clinical.investigation}</p>
             </div>
           )}
-          {settings.showInvestigation && (clinical as any).investigationResults && (
+          {settings.showInvestigationResults && (clinical as any).investigationResults && (
             <div>
               <p className="font-bold underline">Investigation Results (IX)</p>
               <p className="whitespace-pre-wrap mt-1">{(clinical as any).investigationResults}</p>
