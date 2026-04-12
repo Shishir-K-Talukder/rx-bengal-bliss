@@ -20,10 +20,10 @@ const FloatingNav = ({ actions }: { actions?: NavAction[] }) => {
   const { isAdmin } = useAdmin();
 
   const navItems = [
-    { icon: <Stethoscope className="w-4 h-4" />, label: "Write Rx", path: "/" },
-    { icon: <LayoutDashboard className="w-4 h-4" />, label: "Dashboard", path: "/dashboard" },
-    { icon: <User className="w-4 h-4" />, label: "Profile", path: "/profile" },
-    ...(isAdmin ? [{ icon: <Shield className="w-4 h-4" />, label: "Admin", path: "/admin" }] : []),
+    { icon: <Stethoscope className="w-5 h-5" />, label: "Write Rx", path: "/" },
+    { icon: <LayoutDashboard className="w-5 h-5" />, label: "Dashboard", path: "/dashboard" },
+    { icon: <User className="w-5 h-5" />, label: "Profile", path: "/profile" },
+    ...(isAdmin ? [{ icon: <Shield className="w-5 h-5" />, label: "Admin", path: "/admin" }] : []),
   ];
 
   return (
@@ -98,7 +98,7 @@ const FloatingNav = ({ actions }: { actions?: NavAction[] }) => {
               className="h-9 w-9 rounded-full text-destructive hover:text-destructive"
               onClick={signOut}
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-5 h-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">Sign out</TooltipContent>
