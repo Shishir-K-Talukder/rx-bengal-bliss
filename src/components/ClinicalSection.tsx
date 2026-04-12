@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ClipboardList, Plus, X } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { MedicineOptions } from "@/components/MedicineSettings";
 
 export interface OnExaminationData {
   bp: string; weight: string; temp: string; pulse: string; heart: string; lungs: string; abd: string;
@@ -33,7 +34,7 @@ const COMMON_INVESTIGATIONS = [
   "S. Creatinine", "S. Uric Acid", "S. Electrolyte",
   "Lipid Profile", "LFT", "Thyroid Profile (FT4, TSH)",
   "Urine R/M/E", "Urine C/S", "Stool R/M/E",
-  "X-Ray Chest P/A", "X-Ray L/S Spine", "X-Ray KUB",
+  "X-Ray Chest P/A", "X-Ray L/S Spine B/V", "X-Ray KUB",
   "USG of W/A", "USG of KUB", "Echo",
   "ECG", "CT Scan", "MRI",
   "Blood Grouping", "HBsAg", "Anti-HCV",
@@ -46,6 +47,7 @@ const COMMON_INVESTIGATIONS = [
 interface Props {
   data: ClinicalData;
   onChange: (d: ClinicalData) => void;
+  options?: MedicineOptions;
 }
 
 const presentAbsentOptions = ["Absent", "Present"];
@@ -123,7 +125,7 @@ const OEInputWithSuggestions = ({ fieldKey, value, placeholder, onChange }: {
   );
 };
 
-const InvestigationTab = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
+const InvestigationTab = ({ value, onChange, investigationList }: { value: string; onChange: (v: string) => void; investigationList: string[] }) => {
   const [customInv, setCustomInv] = useState("");
 
   // Parse current investigation string into array of items
@@ -195,7 +197,7 @@ const InvestigationTab = ({ value, onChange }: { value: string; onChange: (v: st
       {/* Common investigations checkboxes */}
       <div className="max-h-[280px] overflow-y-auto rounded-lg border border-border">
         <div className="grid grid-cols-2 gap-0">
-          {COMMON_INVESTIGATIONS.map((inv, idx) => {
+          {investigationList.map((inv, idx) => {
             const checked = currentItems.includes(inv);
             return (
               <label
@@ -219,7 +221,7 @@ const InvestigationTab = ({ value, onChange }: { value: string; onChange: (v: st
   );
 };
 
-const ClinicalSection = ({ data, onChange }: Props) => {
+const ClinicalSection = ({ data, onChange, options }: Props) => {
   const updateOE = (key: keyof OnExaminationData, value: string) => {
     onChange({ ...data, onExamination: { ...data.onExamination, [key]: value } });
   };
@@ -285,13 +287,13 @@ const ClinicalSection = ({ data, onChange }: Props) => {
           <div className="mt-2">
             <p className="text-[10px] text-muted-foreground mb-1.5 uppercase tracking-wider font-medium">Quick Add:</p>
             <div className="flex flex-wrap gap-1.5">
-              {[
+              {(options?.chiefComplaints?.length ? options.chiefComplaints : [
                 "Fever", "Cough", "Cold", "Headache", "Body ache",
                 "Sore throat", "Vomiting", "Diarrhoea", "Abdominal pain",
                 "Chest pain", "Breathlessness", "Weakness", "Dizziness",
                 "Burning micturition", "Skin rash", "Joint pain",
                 "Back pain", "Loss of appetite", "Weight loss",
-              ].map((cc) => (
+              ]).map((cc) => (
                 <button
                   key={cc}
                   type="button"
@@ -365,6 +367,7 @@ const ClinicalSection = ({ data, onChange }: Props) => {
           <InvestigationTab
             value={data.investigation}
             onChange={(v) => onChange({ ...data, investigation: v })}
+            investigationList={options?.investigations?.length ? options.investigations : COMMON_INVESTIGATIONS}
           />
         </TabsContent>
       </Tabs>
