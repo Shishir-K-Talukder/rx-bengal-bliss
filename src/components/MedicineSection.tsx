@@ -226,12 +226,6 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
           <span className="text-xl font-serif italic text-primary">℞</span>
           Prescription
         </h3>
-        <div className="flex items-center gap-2">
-          
-          <Button onClick={addMedicine} size="sm" variant="default" className="h-8 text-xs gap-1.5 shadow-sm">
-            <Plus className="w-3.5 h-3.5" /> Add Medicine
-          </Button>
-        </div>
       </div>
 
       {medicines.length === 0 && (
@@ -319,6 +313,12 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
             </div>
           );
         })}
+      </div>
+
+      <div className="flex justify-end mt-4">
+        <Button onClick={addMedicine} size="sm" variant="default" className="h-8 text-xs gap-1.5 shadow-sm">
+          <Plus className="w-3.5 h-3.5" /> Add Medicine
+        </Button>
       </div>
     </div>
   );
