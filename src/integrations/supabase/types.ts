@@ -97,6 +97,33 @@ export type Database = {
         }
         Relationships: []
       }
+      medicines: {
+        Row: {
+          company: string
+          created_at: string
+          generic: string
+          id: string
+          name: string
+          strength: string
+        }
+        Insert: {
+          company?: string
+          created_at?: string
+          generic?: string
+          id?: string
+          name?: string
+          strength?: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          generic?: string
+          id?: string
+          name?: string
+          strength?: string
+        }
+        Relationships: []
+      }
       patients: {
         Row: {
           address: string
