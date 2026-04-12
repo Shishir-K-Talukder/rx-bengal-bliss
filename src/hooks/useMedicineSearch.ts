@@ -140,13 +140,13 @@ const FORMULATION_QUERY_TERMS = new Set([
   "cap", "caps", "capsule", "capsules",
   "syr", "syp", "syrup", "susp", "suspension",
   "drop", "drops",
-  "cream", "gel", "lotion", "ointment", "oint",
-  "shampoo", "spray",
-  "inj", "injection", "vial", "amp", "ampoule", "iv", "im",
-  "supp", "suppository", "suppositories",
-  "inhaler", "puff", "nebu", "neb", "nebulizer", "nebuliser",
-  "ophthalmic", "otic", "nasal",
-  "softgel",
+  "cream", "gel", "lotion", "ointment", "oint", "jelly", "paste",
+  "shampoo", "spray", "lacquer",
+  "inj", "injection", "vial", "amp", "ampoule", "iv", "im", "infusion",
+  "supp", "suppository", "suppositories", "rectal", "pessary",
+  "inhaler", "puff", "nebu", "neb", "nebulizer", "nebuliser", "inhalation", "respirator",
+  "ophthalmic", "otic", "nasal", "ear", "vaginal",
+  "softgel", "mups",
 ]);
 
 const STRENGTH_QUERY_TERMS = new Set([
