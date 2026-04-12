@@ -67,7 +67,7 @@ const toSuggestion = (medicine: DbMedicine): MedicineSuggestion => ({
   strength: medicine.strength,
   generic: medicine.generic,
   company: medicine.company,
-  detectedType: detectType(medicine.strength),
+  detectedType: detectType(medicine.name, medicine.strength),
 });
 
 // Fallback: load from static JSON if DB is empty
