@@ -54,6 +54,11 @@ interface TypeInferenceContext {
 
 const CAPSULE_PREFERRED_GENERIC_DEFAULTS = new Set([
   "omeprazole",
+  "esomeprazole",
+  "lansoprazole",
+  "dexlansoprazole",
+  "rabeprazole sodium",
+  "pantoprazole sodium",
 ]);
 
 let derivedCapsulePreferredGenericDefaults = new Set<string>();
@@ -76,6 +81,7 @@ const detectExplicitType = (name: string, strength: string, generic = ""): strin
   const genericTokens = tokenizeText(generic);
   const hasToken = (tokens: string[], ...patterns: RegExp[]) =>
     tokens.some((token) => patterns.some((pattern) => pattern.test(token)));
+  const hasGenericToken = (...patterns: RegExp[]) => hasToken(genericTokens, ...patterns);
   const hasNameOrGenericToken = (...patterns: RegExp[]) =>
     hasToken(nameTokens, ...patterns) || hasToken(genericTokens, ...patterns);
 
@@ -90,10 +96,10 @@ const detectExplicitType = (name: string, strength: string, generic = ""): strin
   if (/\bvaginal pessary\b/i.test(combined)) return "Supp";
   if (/\bvaginal tablet\b/i.test(combined)) return "Tab";
   if (/\bvaginal\b/i.test(g)) return "Tab";
-  if (/\bcream\b/i.test(combined) || hasNameOrGenericToken(/cream$/)) return "Cream";
-  if (/\bgel\b|\bjelly\b/i.test(combined) || hasNameOrGenericToken(/gel$/)) return "Gel";
-  if (/\blotion\b/i.test(combined) || hasNameOrGenericToken(/lotion$/)) return "Lotion";
-  if (/\beye ointment\b|\bointment\b|\boint\b/i.test(combined) || hasNameOrGenericToken(/ointment$/, /oint$/)) return "Oint";
+  if (/\bcream\b/i.test(combined) || hasGenericToken(/cream$/)) return "Cream";
+  if (/\bgel\b|\bjelly\b/i.test(combined) || hasGenericToken(/^gel$/)) return "Gel";
+  if (/\blotion\b/i.test(combined) || hasGenericToken(/lotion$/)) return "Lotion";
+  if (/\beye ointment\b|\bointment\b|\boint\b/i.test(combined) || hasGenericToken(/ointment$/, /oint$/)) return "Oint";
   if (/\bshampoo\b/i.test(combined)) return "Shampoo";
   if (/\bnasal spray\b|\bspray\b/i.test(combined)) return "Spray";
   if (/\bdental paste\b|\bpaste\b/i.test(combined)) return "Paste";
@@ -124,8 +130,8 @@ const detectExplicitType = (name: string, strength: string, generic = ""): strin
   if (/sachet/i.test(combined)) return "Sachet";
   if (/\bmups\b/i.test(combined)) return "Tab";
   if (/\bextended release\b|\bprolonged release\b/i.test(combined)) return "Tab";
-  if (/\bcapsule\b|\bsoftgel\b/i.test(combined) || hasNameOrGenericToken(/caps?$/)) return "Cap";
-  if (/\btablet\b|\btablets\b/i.test(combined) || hasNameOrGenericToken(/tabs?$/, /tablet$/)) return "Tab";
+  if (/\bcapsule\b|\bsoftgel\b/i.test(combined) || hasGenericToken(/caps?$/)) return "Cap";
+  if (/\btablet\b|\btablets\b/i.test(combined) || hasGenericToken(/tabs?$/, /tablet$/)) return "Tab";
 
   return null;
 };
@@ -655,6 +661,8 @@ const searchFromDb = async (query: string): Promise<MedicineSuggestion[]> => {
 };
 
 export const useMedicineSearch = (query: string) => {
+  // Eagerly preload fallback data on first mount
+  useEffect(() => { loadFallbackRanked(); }, []);
   const [suggestions, setSuggestions] = useState<MedicineSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -677,7 +685,7 @@ export const useMedicineSearch = (query: string) => {
         setSuggestions(results);
         setLoading(false);
       }
-    }, 150);
+    }, 80);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
