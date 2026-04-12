@@ -99,24 +99,24 @@ const Index = () => {
     <div className="min-h-screen bg-background pt-16 pb-8">
       <FloatingNav
         actions={[
-          { icon: <FileText className="w-4 h-4" />, label: "New Rx", onClick: handleNewPrescription },
-          { icon: <Save className="w-4 h-4" />, label: "Save", onClick: handleSave },
-          { icon: <Printer className="w-4 h-4" />, label: "Print", onClick: handlePrint },
+          { icon: <FileText className="w-5 h-5" />, label: "New Rx", onClick: handleNewPrescription },
+          { icon: <Save className="w-5 h-5" />, label: "Save", onClick: handleSave },
+          { icon: <Printer className="w-5 h-5" />, label: "Print", onClick: handlePrint },
         ]}
       />
 
       <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="flex items-center justify-between mb-6">
-            <TabsList className="bg-card border border-border/60 shadow-sm h-11 p-1 rounded-xl">
-              <TabsTrigger value="write" className="gap-2 text-xs font-medium rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
-                <Stethoscope className="w-3.5 h-3.5" /> Write Rx
+            <TabsList className="bg-card border border-border/60 shadow-sm h-12 p-1 rounded-xl">
+              <TabsTrigger value="write" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
+                <Stethoscope className="w-4 h-4" /> Write Rx
               </TabsTrigger>
-              <TabsTrigger value="preview" className="gap-2 text-xs font-medium rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
-                <Eye className="w-3.5 h-3.5" /> Preview
+              <TabsTrigger value="preview" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
+                <Eye className="w-4 h-4" /> Preview
               </TabsTrigger>
-              <TabsTrigger value="history" className="gap-2 text-xs font-medium rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
-                <History className="w-3.5 h-3.5" /> History
+              <TabsTrigger value="history" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
+                <History className="w-4 h-4" /> History
               </TabsTrigger>
             </TabsList>
           </div>
