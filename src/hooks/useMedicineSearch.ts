@@ -260,13 +260,14 @@ const inferTypeGroup = (medicine: DbMedicine): MedicineTypeGroup => {
   const s = medicine.strength.toLowerCase();
   const combined = `${medicine.name} ${medicine.strength} ${medicine.generic}`.toLowerCase();
 
-  if (/\binjection\b|\binj\b|\/vial|\/ampoule|\/prefilled|\/syringe/i.test(combined)) return "injectable";
-  if (/\bcream\b|\bgel\b|\blotion\b|\bointment\b|\boint\b|\bshampoo\b|\bspray\b|\btopical\b/i.test(combined)) return "topical";
-  if (/\binhaler\b|\bhaler\b|\/puff|mcg\/dose|\bnebuli[sz]er?\b|\brespules?\b/i.test(combined)) return "inhaled";
-  if (/\bsuppository\b|\bsupp\b/i.test(combined)) return "suppository";
-  if (/\bsuspension\b|\bdry syrup\b|\bsyrup\b|\bsyr\b|\bsyp\b|powder for suspension|\bophthalmic\b|\botic\b|\bnasal\b/i.test(combined)) return "oralLiquid";
+  if (/\binjection\b|\binj\b|\/vial|\/ampoule|\/prefilled|\/syringe|\biv infusion\b|\bsc injection\b/i.test(combined)) return "injectable";
+  if (/\bcream\b|\bgel\b|\bjelly\b|\blotion\b|\bointment\b|\boint\b|\bshampoo\b|\bspray\b|\btopical\b|\bnail lacquer\b|\bpaste\b|\bdental paste\b/i.test(combined)) return "topical";
+  if (/\binhaler\b|\bhaler\b|\/puff|mcg\/dose|\bnebuli[sz]er?\b|\brespules?\b|\binhalation\b|\brespirator\b|\bsolution for inhalation\b/i.test(combined)) return "inhaled";
+  if (/\bsuppository\b|\bsupp\b|\brectal\b|\bvaginal pessary\b/i.test(combined)) return "suppository";
+  if (/\bsuspension\b|\bdry syrup\b|\bsyrup\b|\bsyr\b|\bsyp\b|powder for suspension|\bophthalmic\b|\botic\b|\bnasal\b|\bear drop\b|\beye\/ear\b|\boral solution\b|\bnasal preparation\b/i.test(combined)) return "oralLiquid";
   if ((/\/5\s*ml|\/10\s*ml|\/15\s*ml/i.test(s) || /\/ml|mg\/ml/i.test(s)) && !/injection|iv|im|vial/i.test(combined)) return "oralLiquid";
   if (/sachet/i.test(combined)) return "oralSachet";
+  if (/\bmups\b|\bextended release\b|\bprolonged release\b/i.test(combined)) return "oralUnitSolid";
   if (/\d/.test(s) || /\bcapsule\b|\bsoftgel\b|\btablet\b|\btablets\b/i.test(combined)) return "oralUnitSolid";
   return "other";
 };
