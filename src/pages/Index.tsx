@@ -93,17 +93,6 @@ const Index = () => {
     savePrescription(patient, clinical, medicines, advice);
   };
 
-  const handleAddCalculatedMedicine = (medicine: Omit<Medicine, "id">) => {
-    setMedicines((prev) => [
-      ...prev,
-      {
-        ...medicine,
-        id: crypto.randomUUID(),
-        taperingDoses: medicine.taperingDoses || [],
-      },
-    ]);
-    setActiveTab("write");
-  };
 
   const handleLoadPrescription = (rx: PrescriptionRecord) => {
     setPatient({ ...rx.patient_data, date: today });
