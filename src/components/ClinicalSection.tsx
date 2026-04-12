@@ -5,9 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ClipboardList, Plus, X } from "lucide-react";
+import { ClipboardList, Plus, X, Pill } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MedicineOptions } from "@/components/MedicineSettings";
+import { useMedicineSearch, MedicineSuggestion } from "@/hooks/useMedicineSearch";
 
 export interface OnExaminationData {
   bp: string; weight: string; temp: string; pulse: string; heart: string; lungs: string; abd: string;
@@ -19,6 +20,7 @@ export interface ClinicalData {
   chiefComplaint: string;
   onExamination: OnExaminationData;
   drugHistory: string;
+  drugHistoryMedicines?: string[];
   diagnosis: string;
   investigation: string;
 }
@@ -221,6 +223,99 @@ const InvestigationTab = ({ value, onChange, investigationList }: { value: strin
   );
 };
 
+const DrugHistoryMedicineSelector = ({ selectedMedicines, onChange }: { selectedMedicines: string[]; onChange: (meds: string[]) => void }) => {
+  const [query, setQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const { suggestions } = useMedicineSearch(query);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const addMedicine = (name: string) => {
+    if (!selectedMedicines.includes(name)) {
+      onChange([...selectedMedicines, name]);
+    }
+    setQuery("");
+    setShowSuggestions(false);
+  };
+
+  const removeMedicine = (name: string) => {
+    onChange(selectedMedicines.filter((m) => m !== name));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const trimmed = query.trim();
+      if (trimmed) addMedicine(trimmed);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
+        <Pill className="w-3.5 h-3.5" /> Current / Previous Medicines
+      </Label>
+
+      {/* Selected medicines as chips */}
+      {selectedMedicines.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 p-2 bg-accent/20 rounded-lg border border-border/50">
+          {selectedMedicines.map((med) => (
+            <span
+              key={med}
+              className="inline-flex items-center gap-1 bg-primary/10 text-primary text-[11px] font-medium px-2 py-0.5 rounded-full border border-primary/20"
+            >
+              • {med}
+              <button type="button" onClick={() => removeMedicine(med)} className="hover:text-destructive transition-colors">
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Search input */}
+      <div ref={wrapperRef} className="relative">
+        <div className="flex gap-1.5">
+          <Input
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); setShowSuggestions(true); }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            onKeyDown={handleKeyDown}
+            placeholder="Search medicine name..."
+            className="h-8 text-xs flex-1"
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs gap-1 shrink-0"
+            onClick={() => { if (query.trim()) addMedicine(query.trim()); }}
+            disabled={!query.trim()}
+          >
+            <Plus className="w-3 h-3" /> Add
+          </Button>
+        </div>
+
+        {/* Suggestions dropdown */}
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute z-50 top-full left-0 right-0 bg-popover border border-border rounded-md shadow-lg mt-1 max-h-[200px] overflow-y-auto">
+            {suggestions.map((s, i) => (
+              <button
+                key={`${s.name}-${s.strength}-${i}`}
+                type="button"
+                className="w-full text-left px-3 py-1.5 text-xs hover:bg-accent transition-colors flex items-center justify-between border-b border-border/30 last:border-0"
+                onMouseDown={(e) => { e.preventDefault(); addMedicine(`${s.name} ${s.strength}`); }}
+              >
+                <span className="font-medium">{s.name} <span className="text-muted-foreground">{s.strength}</span></span>
+                <span className="text-[10px] text-muted-foreground">{s.generic}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const ClinicalSection = ({ data, onChange, options }: Props) => {
   const updateOE = (key: keyof OnExaminationData, value: string) => {
     onChange({ ...data, onExamination: { ...data.onExamination, [key]: value } });
@@ -348,7 +443,13 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
             value={data.drugHistory}
             onChange={(e) => onChange({ ...data, drugHistory: e.target.value })}
             placeholder="রোগী আগে কী কী ওষুধ খেয়েছে / বর্তমানে কী চলছে..."
-            className="text-sm min-h-[140px] resize-none"
+            className="text-sm min-h-[80px] resize-none mb-3"
+          />
+
+          {/* Medicine suggestions for D/H */}
+          <DrugHistoryMedicineSelector
+            selectedMedicines={data.drugHistoryMedicines || []}
+            onChange={(meds) => onChange({ ...data, drugHistoryMedicines: meds })}
           />
         </TabsContent>
 
