@@ -171,8 +171,9 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
       )}
 
       <div
-        className="flex flex-wrap justify-between text-xs mb-4 pb-2 border-b border-gray-300"
+        className="flex flex-wrap justify-between mb-4 pb-2 border-b border-gray-300"
         style={{
+          fontSize: settings.patientInfoFontSize ? `${settings.patientInfoFontSize}px` : '12px',
           ...(settings.patientInfoWidth ? { maxWidth: `${settings.patientInfoWidth}mm` } : {}),
           ...(settings.patientInfoHeight ? { minHeight: `${settings.patientInfoHeight}mm` } : {}),
         }}
@@ -186,8 +187,9 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
       {/* Main content area - grows to fill available space */}
       <div className="flex flex-1 min-h-0">
         <div
-          className="w-[35%] border-r border-gray-300 pr-4 space-y-4 text-xs"
+          className="w-[35%] border-r border-gray-300 pr-4 space-y-4"
           style={{
+            fontSize: settings.clinicalNotesFontSize ? `${settings.clinicalNotesFontSize}px` : '12px',
             ...(settings.clinicalNotesWidth ? { width: `${settings.clinicalNotesWidth}mm`, flex: 'none' } : {}),
             ...(settings.clinicalNotesHeight ? { minHeight: `${settings.clinicalNotesHeight}mm` } : {}),
           }}
@@ -252,6 +254,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
         <div
           className="flex-1 pl-6"
           style={{
+            fontSize: settings.prescriptionFontSize ? `${settings.prescriptionFontSize}px` : '12px',
             ...(settings.rxSectionWidth ? { width: `${settings.rxSectionWidth}mm`, flex: 'none' } : {}),
             ...(settings.rxSectionHeight ? { minHeight: `${settings.rxSectionHeight}mm` } : {}),
           }}
@@ -259,7 +262,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
           <p className="text-3xl font-serif italic mb-4">℞</p>
           <div className="space-y-4">
             {medicines.map((med) => (
-              <div key={med.id} className="text-xs">
+              <div key={med.id}>
                 <p className="font-bold uppercase">
                   {(med.formulation || med.type) ? `${med.formulation || med.type}. ` : ""}{med.name}
                 </p>
