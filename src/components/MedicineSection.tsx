@@ -40,7 +40,7 @@ const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onCha
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (med: { name: string; strength: string; detectedType: string }) => {
-    const fullName = `${med.detectedType}. ${med.name} ${med.strength}`.trim();
+    const fullName = `${med.name} ${med.strength}`.trim();
     setQuery(fullName);
     onSelect(fullName, med.detectedType);
     setShowSuggestions(false);
@@ -74,10 +74,9 @@ const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onCha
               onMouseDown={(e) => { e.preventDefault(); handleSelect(med); }}
             >
               <div className="text-xs font-medium text-foreground">
-                <span className="inline-block bg-primary/15 text-primary font-bold rounded px-1.5 py-0.5 mr-1.5 text-[10px]">{med.detectedType}</span>
                 {med.name} {med.strength}
               </div>
-              <div className="text-[10px] text-muted-foreground pl-[42px]">{med.generic} • {med.company}</div>
+              <div className="text-[10px] text-muted-foreground">{med.generic} • {med.company}</div>
             </button>
           ))}
         </div>
@@ -190,7 +189,7 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
   const addMedicine = () => {
     onChange([
       ...medicines,
-      { id: crypto.randomUUID(), type: options.types[0] || "Tab", name: "", dose: options.doses[2] || "1+0+1", duration: options.durations[1] || "5 days", mealTiming: options.meals[0] || "After meal", instructions: "", taperingDoses: [] },
+      { id: crypto.randomUUID(), type: options.types[0] || "Tab", formulation: options.types[0] || "Tab", name: "", dose: options.doses[2] || "1+0+1", duration: options.durations[1] || "5 days", mealTiming: options.meals[0] || "After meal", instructions: "", taperingDoses: [] },
     ]);
   };
 
@@ -202,6 +201,10 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
 
   const updateMedicineMulti = (id: string, updates: Partial<Medicine>) => {
     onChange(medicines.map((m) => (m.id === id ? { ...m, ...updates } : m)));
+  };
+
+  const handleMedicineSelect = (id: string, fullName: string, detectedType: string) => {
+    onChange(medicines.map((m) => (m.id === id ? { ...m, name: fullName, type: detectedType, formulation: detectedType } : m)));
   };
 
   const updateTaperingDoses = (medId: string, taperingDoses: TaperingDose[]) => {
