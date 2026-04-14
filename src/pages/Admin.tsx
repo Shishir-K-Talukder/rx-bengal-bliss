@@ -349,8 +349,9 @@ const Admin = () => {
                         <TableHead>BMDC</TableHead>
                         <TableHead>Phone</TableHead>
                         <TableHead className="text-center">Rx</TableHead>
-                        <TableHead className="text-center">Patients</TableHead>
+                         <TableHead className="text-center">Patients</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Expiry</TableHead>
                         <TableHead>Joined</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
