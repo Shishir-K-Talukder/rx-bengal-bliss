@@ -27,6 +27,7 @@ interface DoctorProfile {
   id: string; user_id: string; name: string; degrees: string; specialization: string;
   bmdc_no: string; phone: string; chamber_address: string; is_active: boolean;
   profile_photo_url: string; created_at: string; updated_at: string;
+  panel_expires_at: string | null;
 }
 interface Patient {
   id: string; user_id: string; name: string; age: string; sex: string;
