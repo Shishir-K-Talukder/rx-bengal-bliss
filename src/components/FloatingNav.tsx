@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Stethoscope, LayoutDashboard, User, LogOut, Shield } from "lucide-react";
+import { Stethoscope, LayoutDashboard, User, LogOut } from "lucide-react";
 
 
 interface NavAction {
