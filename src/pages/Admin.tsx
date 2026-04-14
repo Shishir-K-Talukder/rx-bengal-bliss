@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
-import FloatingNav from "@/components/FloatingNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Users, Stethoscope, FileText, Shield, Search, Trash2, Eye } from "lucide-react";
+import { Users, Stethoscope, FileText, Shield, Search, Trash2, Eye, UserCheck, UserX, ArrowLeft } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 interface DoctorProfile {
   id: string;
@@ -22,7 +22,10 @@ interface DoctorProfile {
   specialization: string;
   bmdc_no: string;
   phone: string;
+  chamber_address: string;
+  is_active: boolean;
   created_at: string;
+  updated_at: string;
 }
 
 interface Patient {
@@ -55,6 +58,7 @@ interface UserRole {
 
 const Admin = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { isAdmin, loading: adminLoading } = useAdmin();
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -63,6 +67,7 @@ const Admin = () => {
   const [search, setSearch] = useState("");
   const [newAdminUserId, setNewAdminUserId] = useState("");
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
+  const [selectedDoctor, setSelectedDoctor] = useState<DoctorProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,11 +82,26 @@ const Admin = () => {
       supabase.from("prescriptions").select("*").order("created_at", { ascending: false }),
       supabase.from("user_roles").select("*").order("created_at", { ascending: false }),
     ]);
-    if (docRes.data) setDoctors(docRes.data);
+    if (docRes.data) setDoctors(docRes.data as any);
     if (patRes.data) setPatients(patRes.data);
     if (rxRes.data) setPrescriptions(rxRes.data);
     if (roleRes.data) setRoles(roleRes.data as any);
     setLoading(false);
+  };
+
+  const toggleUserActive = async (userId: string, currentActive: boolean) => {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_active: !currentActive } as any)
+      .eq("user_id", userId);
+    if (error) {
+      toast.error("Failed to update user status");
+      return;
+    }
+    setDoctors((prev) =>
+      prev.map((d) => (d.user_id === userId ? { ...d, is_active: !currentActive } : d))
+    );
+    toast.success(!currentActive ? "User activated" : "User deactivated");
   };
 
   const deletePatient = async (id: string) => {
@@ -126,7 +146,7 @@ const Admin = () => {
   }
 
   const filteredDoctors = doctors.filter((d) =>
-    `${d.name} ${d.specialization} ${d.bmdc_no}`.toLowerCase().includes(search.toLowerCase())
+    `${d.name} ${d.specialization} ${d.bmdc_no} ${d.phone}`.toLowerCase().includes(search.toLowerCase())
   );
   const filteredPatients = patients.filter((p) =>
     `${p.name} ${p.mobile} ${p.address}`.toLowerCase().includes(search.toLowerCase())
@@ -137,50 +157,72 @@ const Admin = () => {
     return doc?.name || userId.slice(0, 8) + "...";
   };
 
+  const getDoctorPrescriptionCount = (userId: string) =>
+    prescriptions.filter((rx) => rx.user_id === userId).length;
+
+  const getDoctorPatientCount = (userId: string) =>
+    patients.filter((p) => p.user_id === userId).length;
+
+  const activeDoctors = doctors.filter((d) => d.is_active !== false).length;
+  const inactiveDoctors = doctors.filter((d) => d.is_active === false).length;
+
   return (
     <div className="min-h-screen bg-background">
-      <FloatingNav />
-      <div className="pt-20 px-4 max-w-7xl mx-auto pb-8">
+      <div className="pt-6 px-4 max-w-7xl mx-auto pb-8">
+        {/* Header */}
         <div className="flex items-center gap-3 mb-6">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
           <Shield className="w-6 h-6 text-primary" />
           <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
+          <Badge variant="outline" className="ml-auto text-xs">Secret Access</Badge>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
           <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <Stethoscope className="w-8 h-8 text-primary" />
+            <CardContent className="p-3 flex items-center gap-2">
+              <Stethoscope className="w-6 h-6 text-primary" />
               <div>
-                <p className="text-2xl font-bold">{doctors.length}</p>
-                <p className="text-xs text-muted-foreground">Doctors</p>
+                <p className="text-xl font-bold">{doctors.length}</p>
+                <p className="text-[10px] text-muted-foreground">Total Doctors</p>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <Users className="w-8 h-8 text-primary" />
+            <CardContent className="p-3 flex items-center gap-2">
+              <UserCheck className="w-6 h-6 text-green-500" />
               <div>
-                <p className="text-2xl font-bold">{patients.length}</p>
-                <p className="text-xs text-muted-foreground">Patients</p>
+                <p className="text-xl font-bold">{activeDoctors}</p>
+                <p className="text-[10px] text-muted-foreground">Active</p>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <FileText className="w-8 h-8 text-primary" />
+            <CardContent className="p-3 flex items-center gap-2">
+              <UserX className="w-6 h-6 text-destructive" />
               <div>
-                <p className="text-2xl font-bold">{prescriptions.length}</p>
-                <p className="text-xs text-muted-foreground">Prescriptions</p>
+                <p className="text-xl font-bold">{inactiveDoctors}</p>
+                <p className="text-[10px] text-muted-foreground">Deactivated</p>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <Shield className="w-8 h-8 text-primary" />
+            <CardContent className="p-3 flex items-center gap-2">
+              <Users className="w-6 h-6 text-primary" />
               <div>
-                <p className="text-2xl font-bold">{roles.length}</p>
-                <p className="text-xs text-muted-foreground">Admins</p>
+                <p className="text-xl font-bold">{patients.length}</p>
+                <p className="text-[10px] text-muted-foreground">Patients</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-3 flex items-center gap-2">
+              <FileText className="w-6 h-6 text-primary" />
+              <div>
+                <p className="text-xl font-bold">{prescriptions.length}</p>
+                <p className="text-[10px] text-muted-foreground">Prescriptions</p>
               </div>
             </CardContent>
           </Card>
@@ -189,12 +231,7 @@ const Admin = () => {
         {/* Search */}
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search doctors, patients..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+          <Input placeholder="Search doctors, patients..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
 
         <Tabs defaultValue="doctors">
@@ -202,41 +239,66 @@ const Admin = () => {
             <TabsTrigger value="doctors">Doctors</TabsTrigger>
             <TabsTrigger value="patients">Patients</TabsTrigger>
             <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
-            <TabsTrigger value="roles">Roles</TabsTrigger>
+            <TabsTrigger value="roles">Admin Access</TabsTrigger>
           </TabsList>
 
           {/* Doctors Tab */}
           <TabsContent value="doctors">
             <Card>
-              <CardHeader><CardTitle>All Doctors</CardTitle></CardHeader>
+              <CardHeader><CardTitle>All Doctors / Users</CardTitle></CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead>Degrees</TableHead>
                       <TableHead>Specialization</TableHead>
-                      <TableHead>BMDC No</TableHead>
+                      <TableHead>BMDC</TableHead>
                       <TableHead>Phone</TableHead>
+                      <TableHead className="text-center">Rx</TableHead>
+                      <TableHead className="text-center">Patients</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Joined</TableHead>
+                      <TableHead>Last Active</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredDoctors.map((doc) => (
-                      <TableRow key={doc.id}>
-                        <TableCell className="font-medium">{doc.name || "—"}</TableCell>
-                        <TableCell>{doc.degrees || "—"}</TableCell>
-                        <TableCell>{doc.specialization || "—"}</TableCell>
-                        <TableCell>{doc.bmdc_no || "—"}</TableCell>
-                        <TableCell>{doc.phone || "—"}</TableCell>
-                        <TableCell className="text-xs text-muted-foreground">
+                      <TableRow key={doc.id} className={doc.is_active === false ? "opacity-50" : ""}>
+                        <TableCell className="font-medium">
+                          <button className="text-left hover:underline" onClick={() => setSelectedDoctor(doc)}>
+                            {doc.name || "—"}
+                          </button>
+                        </TableCell>
+                        <TableCell className="text-xs">{doc.specialization || "—"}</TableCell>
+                        <TableCell className="text-xs">{doc.bmdc_no || "—"}</TableCell>
+                        <TableCell className="text-xs">{doc.phone || "—"}</TableCell>
+                        <TableCell className="text-center text-xs">{getDoctorPrescriptionCount(doc.user_id)}</TableCell>
+                        <TableCell className="text-center text-xs">{getDoctorPatientCount(doc.user_id)}</TableCell>
+                        <TableCell>
+                          <Badge variant={doc.is_active !== false ? "default" : "destructive"} className="text-[10px]">
+                            {doc.is_active !== false ? "Active" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-[10px] text-muted-foreground">
                           {new Date(doc.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-[10px] text-muted-foreground">
+                          {new Date(doc.updated_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={doc.is_active !== false}
+                              onCheckedChange={() => toggleUserActive(doc.user_id, doc.is_active !== false)}
+                            />
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
                     {filteredDoctors.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground">No doctors found</TableCell>
+                        <TableCell colSpan={10} className="text-center text-muted-foreground">No doctors found</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -333,10 +395,10 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
-          {/* Roles Tab */}
+          {/* Admin Access Tab */}
           <TabsContent value="roles">
             <Card>
-              <CardHeader><CardTitle>Manage Admin Roles</CardTitle></CardHeader>
+              <CardHeader><CardTitle>Manage Admin Access</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
                   <Input
@@ -350,6 +412,7 @@ const Admin = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>User</TableHead>
+                      <TableHead>User ID</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Assigned</TableHead>
                       <TableHead>Actions</TableHead>
@@ -358,7 +421,8 @@ const Admin = () => {
                   <TableBody>
                     {roles.map((r) => (
                       <TableRow key={r.id}>
-                        <TableCell className="text-xs font-mono">{getDoctorName(r.user_id)}</TableCell>
+                        <TableCell className="font-medium">{getDoctorName(r.user_id)}</TableCell>
+                        <TableCell className="text-[10px] font-mono text-muted-foreground">{r.user_id}</TableCell>
                         <TableCell><Badge>{r.role}</Badge></TableCell>
                         <TableCell className="text-xs text-muted-foreground">
                           {new Date(r.created_at).toLocaleDateString()}
@@ -372,7 +436,7 @@ const Admin = () => {
                     ))}
                     {roles.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground">No roles assigned</TableCell>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground">No roles assigned</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -381,6 +445,36 @@ const Admin = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Doctor Detail Dialog */}
+        <Dialog open={!!selectedDoctor} onOpenChange={() => setSelectedDoctor(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Doctor Details</DialogTitle>
+            </DialogHeader>
+            {selectedDoctor && (
+              <div className="space-y-3 text-sm">
+                <div className="grid grid-cols-2 gap-2">
+                  <div><span className="text-muted-foreground">Name:</span> <strong>{selectedDoctor.name || "—"}</strong></div>
+                  <div><span className="text-muted-foreground">Degrees:</span> {selectedDoctor.degrees || "—"}</div>
+                  <div><span className="text-muted-foreground">Specialization:</span> {selectedDoctor.specialization || "—"}</div>
+                  <div><span className="text-muted-foreground">BMDC No:</span> {selectedDoctor.bmdc_no || "—"}</div>
+                  <div><span className="text-muted-foreground">Phone:</span> {selectedDoctor.phone || "—"}</div>
+                  <div><span className="text-muted-foreground">Chamber:</span> {selectedDoctor.chamber_address || "—"}</div>
+                  <div><span className="text-muted-foreground">Status:</span> <Badge variant={selectedDoctor.is_active !== false ? "default" : "destructive"}>{selectedDoctor.is_active !== false ? "Active" : "Inactive"}</Badge></div>
+                  <div><span className="text-muted-foreground">Joined:</span> {new Date(selectedDoctor.created_at).toLocaleDateString()}</div>
+                </div>
+                <div className="border-t pt-3">
+                  <p className="text-xs text-muted-foreground font-mono">User ID: {selectedDoctor.user_id}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Card><CardContent className="p-3 text-center"><p className="text-lg font-bold">{getDoctorPrescriptionCount(selectedDoctor.user_id)}</p><p className="text-[10px] text-muted-foreground">Prescriptions</p></CardContent></Card>
+                  <Card><CardContent className="p-3 text-center"><p className="text-lg font-bold">{getDoctorPatientCount(selectedDoctor.user_id)}</p><p className="text-[10px] text-muted-foreground">Patients</p></CardContent></Card>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Prescription Detail Dialog */}
         <Dialog open={!!selectedPrescription} onOpenChange={() => setSelectedPrescription(null)}>
@@ -392,27 +486,19 @@ const Admin = () => {
               <div className="space-y-4 text-sm">
                 <div>
                   <h4 className="font-semibold mb-1">Patient</h4>
-                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">
-                    {JSON.stringify(selectedPrescription.patient_data, null, 2)}
-                  </pre>
+                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">{JSON.stringify(selectedPrescription.patient_data, null, 2)}</pre>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Clinical Data</h4>
-                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">
-                    {JSON.stringify(selectedPrescription.clinical_data, null, 2)}
-                  </pre>
+                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">{JSON.stringify(selectedPrescription.clinical_data, null, 2)}</pre>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Medicines</h4>
-                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">
-                    {JSON.stringify(selectedPrescription.medicines, null, 2)}
-                  </pre>
+                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">{JSON.stringify(selectedPrescription.medicines, null, 2)}</pre>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Advice</h4>
-                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">
-                    {JSON.stringify(selectedPrescription.advice, null, 2)}
-                  </pre>
+                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">{JSON.stringify(selectedPrescription.advice, null, 2)}</pre>
                 </div>
               </div>
             )}
