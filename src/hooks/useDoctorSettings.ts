@@ -56,12 +56,17 @@ export const useDoctorSettings = () => {
   const savePrintSettings = async (settings: PrintSettings) => {
     if (!user) return;
     setPrintSettings(settings);
-    await supabase
+    const { error } = await supabase
       .from("doctor_settings")
       .upsert({
         user_id: user.id,
         print_settings: settings as unknown as Json,
       }, { onConflict: "user_id" });
+    if (error) {
+      console.error("Failed to save print settings:", error);
+    } else {
+      console.log("Print settings saved successfully");
+    }
   };
 
   const saveMedicineOptions = async (options: MedicineOptions) => {
