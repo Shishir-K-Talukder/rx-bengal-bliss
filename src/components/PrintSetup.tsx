@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { PrintSettings } from "./PrintPreview";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Save, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   settings: PrintSettings;
@@ -11,12 +14,27 @@ interface Props {
 }
 
 const PrintSetup = ({ settings, onChange }: Props) => {
+  const { toast } = useToast();
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    onChange(settings);
+    setSaved(true);
+    toast({ title: "Saved", description: "Print settings saved successfully." });
+    setTimeout(() => setSaved(false), 2000);
+  };
   return (
     <div className="section-card p-5">
-      <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-        <SlidersHorizontal className="w-4 h-4 text-primary" />
-        Print Page Setup
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <SlidersHorizontal className="w-4 h-4 text-primary" />
+          Print Page Setup
+        </h3>
+        <Button size="sm" onClick={handleSave} className="gap-1.5 h-8 text-xs">
+          {saved ? <Check className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
+          {saved ? "Saved!" : "Save Settings"}
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
