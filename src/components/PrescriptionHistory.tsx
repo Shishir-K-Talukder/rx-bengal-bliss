@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trash2, FileText, Clock, Search } from "lucide-react";
 import { format } from "date-fns";
+import HistorySkeleton from "@/components/skeletons/HistorySkeleton";
 
 interface Props {
   prescriptions: PrescriptionRecord[];
@@ -26,7 +27,7 @@ const PrescriptionHistory = ({ prescriptions, onLoad, onDelete, loading }: Props
   });
 
   if (loading) {
-    return <div className="text-center py-10 text-muted-foreground text-sm">Loading...</div>;
+    return <HistorySkeleton />;
   }
 
   return (

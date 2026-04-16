@@ -17,6 +17,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Users, FileText, CalendarDays, SlidersHorizontal, Settings, Stethoscope, Home, DollarSign, Plus, Trash2, Building2, Phone, TrendingUp, ClipboardList, FolderOpen } from "lucide-react";
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { AdviceData } from "@/components/AdviceSection";
+import DashboardSkeleton from "@/components/skeletons/DashboardSkeleton";
 
 // --- Types ---
 interface HonorariumEntry {
@@ -148,7 +149,7 @@ const Dashboard = () => {
   };
 
   if (profileLoading || settingsLoading) {
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground text-sm">Loading...</div>;
+    return <DashboardSkeleton />;
   }
 
   return (
