@@ -16,6 +16,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useDoctorSettings } from "@/hooks/useDoctorSettings";
 import { usePrescriptions, PrescriptionRecord } from "@/hooks/usePrescriptions";
 import { useNavigate } from "react-router-dom";
+import IndexSkeleton from "@/components/skeletons/IndexSkeleton";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -111,14 +112,7 @@ const Index = () => {
   };
 
   if (profileLoading || settingsLoading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
-          <Stethoscope className="w-5 h-5 text-primary" />
-        </div>
-        <p className="text-sm text-muted-foreground">Loading your workspace...</p>
-      </div>
-    );
+    return <IndexSkeleton />;
   }
 
   return (

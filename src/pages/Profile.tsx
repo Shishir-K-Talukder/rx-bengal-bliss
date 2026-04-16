@@ -12,6 +12,7 @@ import PanelExpiryCountdown from "@/components/PanelExpiryCountdown";
 import { Save, User } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import ProfileSkeleton from "@/components/skeletons/ProfileSkeleton";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -85,7 +86,7 @@ const Profile = () => {
   ];
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground text-sm">Loading...</div>;
+    return <ProfileSkeleton />;
   }
 
   return (
