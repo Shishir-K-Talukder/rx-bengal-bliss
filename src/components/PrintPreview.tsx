@@ -31,6 +31,8 @@ export interface PrintSettings {
   patientInfoFontSize?: string;
   clinicalNotesFontSize?: string;
   prescriptionFontSize?: string;
+  /** UI dropdown/select text scale on the Write Rx page (px). Default 14 */
+  uiDropdownFontSize?: string;
 }
 
 export const defaultPrintSettings: PrintSettings = {
@@ -53,6 +55,7 @@ export const defaultPrintSettings: PrintSettings = {
   patientInfoFontSize: "12",
   clinicalNotesFontSize: "12",
   prescriptionFontSize: "12",
+  uiDropdownFontSize: "14",
 };
 
 interface Props {

@@ -17,10 +17,16 @@ interface Props {
   data: AdviceData;
   onChange: (d: AdviceData) => void;
   options: MedicineOptions;
+  /** Font size in px for dropdown trigger + items. Default 14. */
+  uiFontSize?: string;
 }
 
-const AdviceSection = ({ data, onChange, options }: Props) => {
+const AdviceSection = ({ data, onChange, options, uiFontSize }: Props) => {
   const adviceRef = useRef<HTMLTextAreaElement>(null);
+  const fontPx = Math.max(12, Math.min(28, parseInt(uiFontSize || "14") || 14));
+  const triggerStyle = { fontSize: `${fontPx}px` };
+  const itemStyle = { fontSize: `${fontPx}px`, lineHeight: 1.4 };
+  const triggerHeight = Math.max(32, Math.round(fontPx * 2.2));
 
   const handleAdviceSelect = (value: string) => {
     if (value === "__custom__") return;
@@ -69,12 +75,17 @@ const AdviceSection = ({ data, onChange, options }: Props) => {
           <Label className="field-label">Quick Advice</Label>
           <div className="flex gap-2">
             <Select onValueChange={handleAdviceSelect}>
-              <SelectTrigger className="h-8 text-xs flex-1"><SelectValue placeholder="Select advice..." /></SelectTrigger>
+              <SelectTrigger
+                className="flex-1"
+                style={{ ...triggerStyle, height: `${triggerHeight}px` }}
+              >
+                <SelectValue placeholder="Select advice..." />
+              </SelectTrigger>
               <SelectContent>
                 {options.adviceList.map((a) => (
-                  <SelectItem key={a} value={a} className="text-xs">{a}</SelectItem>
+                  <SelectItem key={a} value={a} style={itemStyle} className="py-2">{a}</SelectItem>
                 ))}
-                <SelectItem value="__custom__" className="text-xs font-medium">✏️ Custom Advice</SelectItem>
+                <SelectItem value="__custom__" style={itemStyle} className="py-2 font-medium">✏️ Custom Advice</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -82,10 +93,11 @@ const AdviceSection = ({ data, onChange, options }: Props) => {
               variant="outline"
               size="sm"
               onClick={applyBold}
-              className="h-8 px-2 gap-1 text-xs font-bold"
+              className="px-3 gap-1.5 font-bold"
+              style={{ height: `${triggerHeight}px`, fontSize: `${fontPx}px` }}
               title="Bold (wrap selection in **text**)"
             >
-              <Bold className="w-3.5 h-3.5" /> Bold
+              <Bold className="w-4 h-4" /> Bold
             </Button>
           </div>
           <Textarea
@@ -99,12 +111,14 @@ const AdviceSection = ({ data, onChange, options }: Props) => {
         <div className="space-y-2">
           <Label className="field-label">Follow-up</Label>
           <Select onValueChange={handleFollowUpSelect}>
-            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select follow-up..." /></SelectTrigger>
+            <SelectTrigger style={{ ...triggerStyle, height: `${triggerHeight}px` }}>
+              <SelectValue placeholder="Select follow-up..." />
+            </SelectTrigger>
             <SelectContent>
               {options.followUpOptions.map((opt) => (
-                <SelectItem key={opt} value={opt} className="text-xs">{opt}</SelectItem>
+                <SelectItem key={opt} value={opt} style={itemStyle} className="py-2">{opt}</SelectItem>
               ))}
-              <SelectItem value="__custom__" className="text-xs font-medium">✏️ Custom</SelectItem>
+              <SelectItem value="__custom__" style={itemStyle} className="py-2 font-medium">✏️ Custom</SelectItem>
             </SelectContent>
           </Select>
           <Input
