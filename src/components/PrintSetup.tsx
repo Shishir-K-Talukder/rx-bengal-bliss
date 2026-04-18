@@ -222,6 +222,29 @@ const PrintSetup = ({ settings, onChange }: Props) => {
           </div>
         </div>
       </div>
+
+      <div className="mt-5 pt-4 border-t border-border">
+        <Label className="text-[11px] text-muted-foreground font-semibold mb-3 block">
+          Write-Rx UI Text Size (for older doctors / better readability)
+        </Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <Label className="text-[11px] text-muted-foreground mb-1 block">Dropdown / Select Font Size (px)</Label>
+            <Input
+              value={local.uiDropdownFontSize || ""}
+              onChange={(e) => setLocal({ ...local, uiDropdownFontSize: e.target.value })}
+              placeholder="14 (default) — try 16, 18, 20"
+              className="h-9 text-xs"
+              type="number"
+              min={12}
+              max={28}
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Controls the size of advice & follow-up dropdown options on the Write Rx page.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
