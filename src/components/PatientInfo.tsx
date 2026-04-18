@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { usePatientAges } from "@/hooks/usePatientAges";
 
 export interface PatientData {
   name: string;
@@ -104,14 +105,70 @@ const PatientFieldWithSuggestions = ({
   );
 };
 
+const AgeFieldWithMemory = ({
+  value, onChange, savedAges,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  savedAges: string[];
+}) => {
+  const [focused, setFocused] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const filtered = focused
+    ? (value.length > 0
+        ? savedAges.filter((a) => a.toLowerCase().includes(value.toLowerCase()))
+        : savedAges
+      ).slice(0, 8)
+    : [];
+
+  const handleBlur = useCallback(() => {
+    setTimeout(() => {
+      if (!wrapperRef.current?.contains(document.activeElement)) setFocused(false);
+    }, 150);
+  }, []);
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={handleBlur}
+        placeholder="বয়স"
+        className="h-9 text-sm"
+      />
+      {filtered.length > 0 && (
+        <div className="absolute z-50 top-full left-0 right-0 bg-popover border border-border rounded-md shadow-md mt-0.5 max-h-[200px] overflow-y-auto">
+          {filtered.map((a, i) => (
+            <button
+              key={i}
+              type="button"
+              className="w-full text-left px-2.5 py-1.5 text-xs hover:bg-accent transition-colors"
+              onMouseDown={(e) => { e.preventDefault(); onChange(a); setFocused(false); }}
+            >
+              {a}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const PatientInfo = ({ patient, onChange }: Props) => {
   const [history, setHistory] = useState<PatientHistoryEntry[]>([]);
+  const { ages: savedAges } = usePatientAges();
 
   useEffect(() => {
     setHistory(getPatientHistory());
   }, []);
 
   const nameSuggestions = history.map((h) => ({ label: h.name, data: h }));
+
+  // Merge cloud-synced ages + local history ages (cloud first, dedup)
+  const localAges = Array.from(new Set(history.map((h) => h.age.trim()).filter(Boolean)));
+  const mergedAges = Array.from(new Set([...savedAges, ...localAges]));
 
   const handleSelectPatient = (entry: PatientHistoryEntry) => {
     onChange({
@@ -146,7 +203,11 @@ const PatientInfo = ({ patient, onChange }: Props) => {
         </div>
         <div>
           <Label className="field-label">Age</Label>
-          <Input value={patient.age} onChange={(e) => onChange({ ...patient, age: e.target.value })} placeholder="বয়স" className="h-9 text-sm" />
+          <AgeFieldWithMemory
+            value={patient.age}
+            onChange={(v) => onChange({ ...patient, age: v })}
+            savedAges={mergedAges}
+          />
         </div>
         <div>
           <Label className="field-label">Sex</Label>
