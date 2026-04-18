@@ -276,7 +276,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
                   <div className="ml-4 mt-0.5 space-y-0.5">
                     {med.taperingDoses.map((td, i) => (
                       <p key={td.id || i} className="text-black">
-                        Then → {td.dose} — {td.duration}
+                        এর পরে → {td.dose} — {td.duration}
                       </p>
                     ))}
                   </div>
