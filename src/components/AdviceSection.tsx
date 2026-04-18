@@ -17,10 +17,16 @@ interface Props {
   data: AdviceData;
   onChange: (d: AdviceData) => void;
   options: MedicineOptions;
+  /** Font size in px for dropdown trigger + items. Default 14. */
+  uiFontSize?: string;
 }
 
-const AdviceSection = ({ data, onChange, options }: Props) => {
+const AdviceSection = ({ data, onChange, options, uiFontSize }: Props) => {
   const adviceRef = useRef<HTMLTextAreaElement>(null);
+  const fontPx = Math.max(12, Math.min(28, parseInt(uiFontSize || "14") || 14));
+  const triggerStyle = { fontSize: `${fontPx}px` };
+  const itemStyle = { fontSize: `${fontPx}px`, lineHeight: 1.4 };
+  const triggerHeight = Math.max(32, Math.round(fontPx * 2.2));
 
   const handleAdviceSelect = (value: string) => {
     if (value === "__custom__") return;
