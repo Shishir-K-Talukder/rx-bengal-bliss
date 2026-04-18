@@ -276,7 +276,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
                   <div className="ml-4 mt-0.5 space-y-0.5">
                     {med.taperingDoses.map((td, i) => (
                       <p key={td.id || i} className="text-black">
-                        Then → {td.dose} — {td.duration}
+                        এর পরে → {td.dose} — {td.duration}
                       </p>
                     ))}
                   </div>
@@ -287,7 +287,16 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
           {(advice.advice || advice.followUpDate) && (
             <div className="mt-8 pt-3 border-t border-gray-300 text-xs">
               {advice.advice && (
-                <div className="mb-2"><p className="font-bold">Advice:</p><p className="whitespace-pre-wrap">{advice.advice}</p></div>
+                <div className="mb-2">
+                  <p className="font-bold">Advice:</p>
+                  <p className="whitespace-pre-wrap">
+                    {advice.advice.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+                      part.startsWith("**") && part.endsWith("**") && part.length > 4
+                        ? <strong key={i}>{part.slice(2, -2)}</strong>
+                        : <span key={i}>{part}</span>
+                    )}
+                  </p>
+                </div>
               )}
               {advice.followUpDate && (
                 <p><strong>Follow Up:</strong> {formatFollowUpBangla(advice.followUpDate)}</p>

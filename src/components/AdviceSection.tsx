@@ -1,8 +1,10 @@
+import { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Bold } from "lucide-react";
 import { MedicineOptions } from "./MedicineSettings";
 
 export interface AdviceData {
@@ -18,6 +20,8 @@ interface Props {
 }
 
 const AdviceSection = ({ data, onChange, options }: Props) => {
+  const adviceRef = useRef<HTMLTextAreaElement>(null);
+
   const handleAdviceSelect = (value: string) => {
     if (value === "__custom__") return;
     const current = data.advice;
@@ -33,6 +37,25 @@ const AdviceSection = ({ data, onChange, options }: Props) => {
     onChange({ ...data, followUpDate: value });
   };
 
+  const applyBold = () => {
+    const ta = adviceRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const text = data.advice;
+    if (start === end) {
+      // Insert bold marker at cursor
+      const next = `${text.slice(0, start)}**bold**${text.slice(end)}`;
+      onChange({ ...data, advice: next });
+      setTimeout(() => { ta.focus(); ta.setSelectionRange(start + 2, start + 6); }, 0);
+    } else {
+      const selected = text.slice(start, end);
+      const next = `${text.slice(0, start)}**${selected}**${text.slice(end)}`;
+      onChange({ ...data, advice: next });
+      setTimeout(() => { ta.focus(); ta.setSelectionRange(start, end + 4); }, 0);
+    }
+  };
+
   return (
     <div className="section-card p-5">
       <h3 className="section-header mb-4">
@@ -44,19 +67,32 @@ const AdviceSection = ({ data, onChange, options }: Props) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="md:col-span-2 space-y-2">
           <Label className="field-label">Quick Advice</Label>
-          <Select onValueChange={handleAdviceSelect}>
-            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select advice..." /></SelectTrigger>
-            <SelectContent>
-              {options.adviceList.map((a) => (
-                <SelectItem key={a} value={a} className="text-xs">{a}</SelectItem>
-              ))}
-              <SelectItem value="__custom__" className="text-xs font-medium">✏️ Custom Advice</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <Select onValueChange={handleAdviceSelect}>
+              <SelectTrigger className="h-8 text-xs flex-1"><SelectValue placeholder="Select advice..." /></SelectTrigger>
+              <SelectContent>
+                {options.adviceList.map((a) => (
+                  <SelectItem key={a} value={a} className="text-xs">{a}</SelectItem>
+                ))}
+                <SelectItem value="__custom__" className="text-xs font-medium">✏️ Custom Advice</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={applyBold}
+              className="h-8 px-2 gap-1 text-xs font-bold"
+              title="Bold (wrap selection in **text**)"
+            >
+              <Bold className="w-3.5 h-3.5" /> Bold
+            </Button>
+          </div>
           <Textarea
+            ref={adviceRef}
             value={data.advice}
             onChange={(e) => onChange({ ...data, advice: e.target.value })}
-            placeholder="পরামর্শ লিখুন বা উপর থেকে নির্বাচন করুন..."
+            placeholder="পরামর্শ লিখুন বা উপর থেকে নির্বাচন করুন... (নির্বাচিত টেক্সটে Bold বোতাম চাপুন)"
             className="text-sm min-h-[60px] resize-none"
           />
         </div>

@@ -143,7 +143,7 @@ const TaperingSection = ({ taperingDoses, options, onUpdate }: {
       {taperingDoses.map((td, idx) => (
         <div key={td.id} className="flex items-center gap-2 bg-accent/20 rounded-md px-2 py-1.5 border border-border/50">
           <span className="text-[10px] font-bold text-muted-foreground whitespace-nowrap">
-            Then →
+            এর পরে →
           </span>
           <div className="flex-1">
             <DoseInput value={td.dose} options={options.doses} onChange={(v) => updateTapering(td.id, "dose", v)} />
