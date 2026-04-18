@@ -269,6 +269,9 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
                 <p className="text-black mt-0.5">
                   {med.dose} — ({med.mealTiming}){med.duration ? ` — ${med.duration}` : ""}
                 </p>
+                {med.instructions && (
+                  <p className="text-black italic mt-0.5">{med.instructions}</p>
+                )}
                 {med.taperingDoses && med.taperingDoses.length > 0 && (
                   <div className="ml-4 mt-0.5 space-y-0.5">
                     {med.taperingDoses.map((td, i) => (
