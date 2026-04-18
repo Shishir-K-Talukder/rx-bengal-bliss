@@ -156,7 +156,7 @@ const Index = () => {
             </div>
 
             {/* Advice & Documents */}
-            <AdviceSection data={advice} onChange={setAdvice} options={medicineOptions} />
+            <AdviceSection data={advice} onChange={setAdvice} options={medicineOptions} uiFontSize={printSettings.uiDropdownFontSize} />
             <div className="section-card p-5">
               <PatientDocuments patientId={prescriptions.find(
                 (rx) => rx.patient_data.name === patient.name && rx.patient_data.mobile === patient.mobile
