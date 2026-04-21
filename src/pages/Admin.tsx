@@ -267,22 +267,47 @@ const Admin = () => {
     if (!deleteDoctor) return;
     setDeleting(true);
     try {
-      const { data, error } = await supabase.functions.invoke("delete-doctor", {
-        body: { target_user_id: deleteDoctor.user_id },
-      });
-      if (error || (data as any)?.error) {
-        toast.error(`Delete failed: ${error?.message || (data as any)?.error}`);
+      const uid = deleteDoctor.user_id;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        toast.error("Not authenticated. Please re-login.");
         return;
       }
-      const uid = deleteDoctor.user_id;
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-doctor`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ target_user_id: uid }),
+      });
+
+      const text = await res.text();
+      let parsed: any = {};
+      try { parsed = text ? JSON.parse(text) : {}; } catch { parsed = { error: text }; }
+
+      if (!res.ok || parsed?.error) {
+        const msg = parsed?.error || `HTTP ${res.status}`;
+        console.error("delete-doctor failed:", res.status, parsed);
+        toast.error(`Delete failed: ${msg}`);
+        return;
+      }
+
       setDoctors((prev) => prev.filter((d) => d.user_id !== uid));
       setPatients((prev) => prev.filter((p) => p.user_id !== uid));
       setPrescriptions((prev) => prev.filter((p) => p.user_id !== uid));
       setAppointments((prev) => prev.filter((a) => a.user_id !== uid));
       setTemplates((prev) => prev.filter((t) => t.user_id !== uid));
       setRoles((prev) => prev.filter((r) => r.user_id !== uid));
-      toast.success(`Doctor "${deleteDoctor.name || uid.slice(0, 8)}" deleted`);
+      toast.success(`Doctor "${deleteDoctor.name || uid.slice(0, 8)}" deleted permanently`);
       setDeleteDoctor(null);
+    } catch (e) {
+      console.error("delete-doctor error:", e);
+      toast.error(`Delete failed: ${(e as Error).message}`);
     } finally {
       setDeleting(false);
     }
