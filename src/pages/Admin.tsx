@@ -16,6 +16,10 @@ import {
   BarChart3, Activity, Clock, Timer,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Navigate, useNavigate } from "react-router-dom";
 import FloatingNav from "@/components/FloatingNav";
