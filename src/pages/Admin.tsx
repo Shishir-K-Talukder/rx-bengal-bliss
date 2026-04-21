@@ -94,7 +94,7 @@ const Admin = () => {
       supabase.from("prescriptions").select("*").order("created_at", { ascending: false }),
       supabase.from("user_roles").select("*").order("created_at", { ascending: false }),
       supabase.from("appointments").select("*").order("appointment_date", { ascending: false }),
-      supabase.from("medicines").select("*").order("name").limit(500),
+      supabase.from("medicines").select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("treatment_templates").select("*").order("created_at", { ascending: false }),
     ]);
     if (docRes.data) setDoctors(docRes.data as any);
@@ -145,6 +145,29 @@ const Admin = () => {
     `${m.name} ${m.generic} ${m.company}`.toLowerCase().includes(medSearch.toLowerCase())
   );
 
+  // Live DB search across the FULL medicines table (not just loaded 500)
+  useEffect(() => {
+    const term = medSearch.trim();
+    if (term.length < 2) return;
+    const handle = setTimeout(async () => {
+      const safe = term.replace(/[%(),'"]/g, " ").trim();
+      if (!safe) return;
+      const { data } = await supabase
+        .from("medicines")
+        .select("*")
+        .or(`name.ilike.%${safe}%,generic.ilike.%${safe}%,company.ilike.%${safe}%`)
+        .limit(200);
+      if (data && data.length > 0) {
+        setMedicines((prev) => {
+          const map = new Map(prev.map((m) => [m.id, m]));
+          (data as any[]).forEach((m) => map.set(m.id, m));
+          return Array.from(map.values());
+        });
+      }
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [medSearch]);
+
   // ─── Actions ───
   const toggleUserActive = async (userId: string, currentActive: boolean) => {
     const { error } = await supabase.from("profiles").update({ is_active: !currentActive } as any).eq("user_id", userId);
@@ -178,15 +201,32 @@ const Admin = () => {
   };
 
   const addMedicine = async () => {
-    if (!newMedName.trim()) return;
-    const { data, error } = await supabase.from("medicines").insert({
-      name: newMedName.trim(), generic: newMedGeneric.trim(),
-      strength: newMedStrength.trim(), company: newMedCompany.trim(),
-    }).select().single();
-    if (error) { toast.error(error.message); return; }
-    if (data) setMedicines((prev) => [data as any, ...prev]);
+    const name = newMedName.trim();
+    if (!name) { toast.error("Medicine name is required"); return; }
+    const payload = {
+      name,
+      generic: newMedGeneric.trim(),
+      strength: newMedStrength.trim(),
+      company: newMedCompany.trim(),
+    };
+    const { data, error } = await supabase
+      .from("medicines")
+      .insert(payload)
+      .select()
+      .single();
+    if (error) {
+      console.error("Add medicine failed:", error);
+      toast.error(`Failed to add: ${error.message}`);
+      return;
+    }
+    if (data) {
+      // Prepend so the new medicine is visible immediately at the top of the list
+      setMedicines((prev) => [data as any, ...prev.filter((m) => m.id !== (data as any).id)]);
+      // Clear search so the new row is not hidden by an active filter
+      setMedSearch("");
+    }
     setNewMedName(""); setNewMedGeneric(""); setNewMedStrength(""); setNewMedCompany("");
-    toast.success("Medicine added");
+    toast.success(`"${name}" added to medicine database`);
   };
 
   const deleteTemplate = async (id: string) => {
