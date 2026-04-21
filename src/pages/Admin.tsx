@@ -79,6 +79,8 @@ const Admin = () => {
   // Expiry management
   const [expiryDoctor, setExpiryDoctor] = useState<DoctorProfile | null>(null);
   const [expiryDate, setExpiryDate] = useState("");
+  const [deleteDoctor, setDeleteDoctor] = useState<DoctorProfile | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // New medicine form
   const [newMedName, setNewMedName] = useState("");
