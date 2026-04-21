@@ -16,6 +16,10 @@ import {
   BarChart3, Activity, Clock, Timer,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Navigate, useNavigate } from "react-router-dom";
 import FloatingNav from "@/components/FloatingNav";
@@ -75,6 +79,8 @@ const Admin = () => {
   // Expiry management
   const [expiryDoctor, setExpiryDoctor] = useState<DoctorProfile | null>(null);
   const [expiryDate, setExpiryDate] = useState("");
+  const [deleteDoctor, setDeleteDoctor] = useState<DoctorProfile | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // New medicine form
   const [newMedName, setNewMedName] = useState("");
@@ -257,6 +263,31 @@ const Admin = () => {
     setExpiryDoctor(null); setExpiryDate("");
   };
 
+  const confirmDeleteDoctor = async () => {
+    if (!deleteDoctor) return;
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-doctor", {
+        body: { target_user_id: deleteDoctor.user_id },
+      });
+      if (error || (data as any)?.error) {
+        toast.error(`Delete failed: ${error?.message || (data as any)?.error}`);
+        return;
+      }
+      const uid = deleteDoctor.user_id;
+      setDoctors((prev) => prev.filter((d) => d.user_id !== uid));
+      setPatients((prev) => prev.filter((p) => p.user_id !== uid));
+      setPrescriptions((prev) => prev.filter((p) => p.user_id !== uid));
+      setAppointments((prev) => prev.filter((a) => a.user_id !== uid));
+      setTemplates((prev) => prev.filter((t) => t.user_id !== uid));
+      setRoles((prev) => prev.filter((r) => r.user_id !== uid));
+      toast.success(`Doctor "${deleteDoctor.name || uid.slice(0, 8)}" deleted`);
+      setDeleteDoctor(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const exportData = () => {
     const data = { doctors, patients, prescriptions, appointments, templates, roles, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -432,6 +463,15 @@ const Admin = () => {
                             <Switch checked={doc.is_active !== false} onCheckedChange={() => toggleUserActive(doc.user_id, doc.is_active !== false)} />
                             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setExpiryDoctor(doc); setExpiryDate(doc.panel_expires_at ? doc.panel_expires_at.split("T")[0] : ""); }}>
                               <Timer className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-destructive hover:text-destructive"
+                              onClick={() => setDeleteDoctor(doc)}
+                              title="Delete doctor permanently"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -739,6 +779,31 @@ const Admin = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Delete Doctor Confirmation */}
+        <AlertDialog open={!!deleteDoctor} onOpenChange={(open) => !open && setDeleteDoctor(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-destructive">Delete Doctor Permanently?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently remove <strong>{deleteDoctor?.name || "this doctor"}</strong> and ALL their data:
+                patients, prescriptions, appointments, templates, settings, roles, and login account.
+                <br /><br />
+                <span className="text-destructive font-semibold">This action cannot be undone.</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => { e.preventDefault(); confirmDeleteDoctor(); }}
+                disabled={deleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {deleting ? "Deleting..." : "Delete Permanently"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
