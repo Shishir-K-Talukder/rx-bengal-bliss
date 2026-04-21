@@ -779,6 +779,31 @@ const Admin = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Delete Doctor Confirmation */}
+        <AlertDialog open={!!deleteDoctor} onOpenChange={(open) => !open && setDeleteDoctor(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-destructive">Delete Doctor Permanently?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently remove <strong>{deleteDoctor?.name || "this doctor"}</strong> and ALL their data:
+                patients, prescriptions, appointments, templates, settings, roles, and login account.
+                <br /><br />
+                <span className="text-destructive font-semibold">This action cannot be undone.</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => { e.preventDefault(); confirmDeleteDoctor(); }}
+                disabled={deleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {deleting ? "Deleting..." : "Delete Permanently"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
