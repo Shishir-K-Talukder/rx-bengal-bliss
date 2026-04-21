@@ -145,6 +145,29 @@ const Admin = () => {
     `${m.name} ${m.generic} ${m.company}`.toLowerCase().includes(medSearch.toLowerCase())
   );
 
+  // Live DB search across the FULL medicines table (not just loaded 500)
+  useEffect(() => {
+    const term = medSearch.trim();
+    if (term.length < 2) return;
+    const handle = setTimeout(async () => {
+      const safe = term.replace(/[%(),'"]/g, " ").trim();
+      if (!safe) return;
+      const { data } = await supabase
+        .from("medicines")
+        .select("*")
+        .or(`name.ilike.%${safe}%,generic.ilike.%${safe}%,company.ilike.%${safe}%`)
+        .limit(200);
+      if (data && data.length > 0) {
+        setMedicines((prev) => {
+          const map = new Map(prev.map((m) => [m.id, m]));
+          (data as any[]).forEach((m) => map.set(m.id, m));
+          return Array.from(map.values());
+        });
+      }
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [medSearch]);
+
   // ─── Actions ───
   const toggleUserActive = async (userId: string, currentActive: boolean) => {
     const { error } = await supabase.from("profiles").update({ is_active: !currentActive } as any).eq("user_id", userId);
