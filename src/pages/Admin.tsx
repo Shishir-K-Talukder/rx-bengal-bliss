@@ -263,6 +263,31 @@ const Admin = () => {
     setExpiryDoctor(null); setExpiryDate("");
   };
 
+  const confirmDeleteDoctor = async () => {
+    if (!deleteDoctor) return;
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-doctor", {
+        body: { target_user_id: deleteDoctor.user_id },
+      });
+      if (error || (data as any)?.error) {
+        toast.error(`Delete failed: ${error?.message || (data as any)?.error}`);
+        return;
+      }
+      const uid = deleteDoctor.user_id;
+      setDoctors((prev) => prev.filter((d) => d.user_id !== uid));
+      setPatients((prev) => prev.filter((p) => p.user_id !== uid));
+      setPrescriptions((prev) => prev.filter((p) => p.user_id !== uid));
+      setAppointments((prev) => prev.filter((a) => a.user_id !== uid));
+      setTemplates((prev) => prev.filter((t) => t.user_id !== uid));
+      setRoles((prev) => prev.filter((r) => r.user_id !== uid));
+      toast.success(`Doctor "${deleteDoctor.name || uid.slice(0, 8)}" deleted`);
+      setDeleteDoctor(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const exportData = () => {
     const data = { doctors, patients, prescriptions, appointments, templates, roles, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
