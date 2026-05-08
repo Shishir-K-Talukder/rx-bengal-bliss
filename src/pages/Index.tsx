@@ -99,9 +99,13 @@ const Index = () => {
   };
 
   const handlePrint = () => {
-    const error = validateRequiredFields(patient, advice);
-    if (error) {
-      toast.error(error);
+    const missing = getMissingFields(patient, advice);
+    if (missing.length > 0) {
+      setActiveTab("write");
+      toast.error(`Please fill: ${missing.map((m) => m.label).join(", ")} before printing.`, {
+        action: { label: `Go to ${missing[0].label}`, onClick: () => focusMissingField(missing[0].fieldId) },
+      });
+      focusMissingField(missing[0].fieldId);
       return;
     }
     // Auto-save prescription when printing
@@ -117,13 +121,18 @@ const Index = () => {
   };
 
   const handleSave = () => {
-    const error = validateRequiredFields(patient, advice);
-    if (error) {
-      toast.error(error);
+    const missing = getMissingFields(patient, advice);
+    if (missing.length > 0) {
+      setActiveTab("write");
+      toast.error(`Please fill: ${missing.map((m) => m.label).join(", ")} before saving.`, {
+        action: { label: `Go to ${missing[0].label}`, onClick: () => focusMissingField(missing[0].fieldId) },
+      });
+      focusMissingField(missing[0].fieldId);
       return;
     }
     savePatientToHistory(patient);
     savePrescription(patient, clinical, medicines, advice);
+    toast.success("Prescription saved.");
   };
 
 
