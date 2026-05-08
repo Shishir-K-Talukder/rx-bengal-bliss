@@ -128,7 +128,7 @@ const AdviceSection = ({ data, onChange, options, uiFontSize }: Props) => {
             className="h-8 text-sm"
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2" id="advice-visitFee">
           <Label className="field-label">Visit Fee (৳)</Label>
           <Input
             value={data.visitFee || ""}

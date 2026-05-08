@@ -190,7 +190,7 @@ const PatientInfo = ({ patient, onChange }: Props) => {
         Patient Information
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="col-span-2">
+        <div className="col-span-2" id="patient-name">
           <Label className="field-label">Patient Name</Label>
           <PatientFieldWithSuggestions
             value={patient.name}
@@ -201,7 +201,7 @@ const PatientInfo = ({ patient, onChange }: Props) => {
             onSelect={handleSelectPatient}
           />
         </div>
-        <div>
+        <div id="patient-age">
           <Label className="field-label">Age</Label>
           <AgeFieldWithMemory
             value={patient.age}
@@ -209,7 +209,7 @@ const PatientInfo = ({ patient, onChange }: Props) => {
             savedAges={mergedAges}
           />
         </div>
-        <div>
+        <div id="patient-sex">
           <Label className="field-label">Sex</Label>
           <Select value={patient.sex} onValueChange={(v) => onChange({ ...patient, sex: v })}>
             <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
