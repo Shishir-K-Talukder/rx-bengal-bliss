@@ -88,6 +88,11 @@ const Index = () => {
   };
 
   const handlePrint = () => {
+    const error = validateRequiredFields(patient, advice);
+    if (error) {
+      toast.error(error);
+      return;
+    }
     // Auto-save prescription when printing
     savePatientToHistory(patient);
     savePrescription(patient, clinical, medicines, advice);
@@ -101,6 +106,11 @@ const Index = () => {
   };
 
   const handleSave = () => {
+    const error = validateRequiredFields(patient, advice);
+    if (error) {
+      toast.error(error);
+      return;
+    }
     savePatientToHistory(patient);
     savePrescription(patient, clinical, medicines, advice);
   };
