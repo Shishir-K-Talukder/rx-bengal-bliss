@@ -19,14 +19,25 @@ import { useNavigate } from "react-router-dom";
 import IndexSkeleton from "@/components/skeletons/IndexSkeleton";
 import { toast } from "sonner";
 
-const validateRequiredFields = (patient: PatientData, advice: AdviceData): string | null => {
-  const missing: string[] = [];
-  if (!patient.name?.trim()) missing.push("Patient Name");
-  if (!patient.age?.toString().trim()) missing.push("Age");
-  if (!patient.sex?.trim()) missing.push("Sex");
-  if (!advice.visitFee?.toString().trim()) missing.push("Visit Fee");
-  if (missing.length === 0) return null;
-  return `Please fill: ${missing.join(", ")} before saving or printing.`;
+type MissingField = { label: string; fieldId: string };
+
+const getMissingFields = (patient: PatientData, advice: AdviceData): MissingField[] => {
+  const missing: MissingField[] = [];
+  if (!patient.name?.trim()) missing.push({ label: "Patient Name", fieldId: "patient-name" });
+  if (!String(patient.age ?? "").trim()) missing.push({ label: "Age", fieldId: "patient-age" });
+  if (!patient.sex?.trim()) missing.push({ label: "Sex", fieldId: "patient-sex" });
+  if (!String(advice.visitFee ?? "").trim()) missing.push({ label: "Visit Fee", fieldId: "advice-visitFee" });
+  return missing;
+};
+
+const focusMissingField = (fieldId: string) => {
+  setTimeout(() => {
+    const el = document.getElementById(fieldId);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      (el as HTMLElement).focus?.();
+    }
+  }, 50);
 };
 
 const today = new Date().toISOString().split("T")[0];
