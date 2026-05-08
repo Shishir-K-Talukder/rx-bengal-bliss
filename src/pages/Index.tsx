@@ -17,6 +17,17 @@ import { useDoctorSettings } from "@/hooks/useDoctorSettings";
 import { usePrescriptions, PrescriptionRecord } from "@/hooks/usePrescriptions";
 import { useNavigate } from "react-router-dom";
 import IndexSkeleton from "@/components/skeletons/IndexSkeleton";
+import { toast } from "sonner";
+
+const validateRequiredFields = (patient: PatientData, advice: AdviceData): string | null => {
+  const missing: string[] = [];
+  if (!patient.name?.trim()) missing.push("Patient Name");
+  if (!patient.age?.toString().trim()) missing.push("Age");
+  if (!patient.sex?.trim()) missing.push("Sex");
+  if (!advice.visitFee?.toString().trim()) missing.push("Visit Fee");
+  if (missing.length === 0) return null;
+  return `Please fill: ${missing.join(", ")} before saving or printing.`;
+};
 
 const today = new Date().toISOString().split("T")[0];
 
