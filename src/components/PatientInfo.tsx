@@ -209,7 +209,7 @@ const PatientInfo = ({ patient, onChange }: Props) => {
             savedAges={mergedAges}
           />
         </div>
-        <div>
+        <div id="patient-sex">
           <Label className="field-label">Sex</Label>
           <Select value={patient.sex} onValueChange={(v) => onChange({ ...patient, sex: v })}>
             <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
