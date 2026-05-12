@@ -661,8 +661,22 @@ const Admin = () => {
           <TabsContent value="medicines">
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm flex items-center justify-between">
+                <CardTitle className="text-sm flex items-center justify-between gap-2 flex-wrap">
                   <span>Medicine Database ({medicines.length}+)</span>
+                  <div className="flex items-center gap-2">
+                    {syncInfo && (
+                      <span className="text-[10px] font-normal text-muted-foreground">
+                        Last sync: {syncInfo.last_run ? new Date(syncInfo.last_run).toLocaleString() : "—"} • next page {((syncInfo.page || 0) + 1)}/{syncInfo.total_pages || "?"}
+                      </span>
+                    )}
+                    <Button size="sm" variant="outline" className="h-8 gap-1.5 text-xs" disabled={syncing} onClick={() => runMedicineSync(false)}>
+                      <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+                      {syncing ? "Syncing..." : "Sync from medex.com.bd"}
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 text-[10px]" disabled={syncing} onClick={() => runMedicineSync(true)} title="Restart sync from page 1">
+                      Reset
+                    </Button>
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
