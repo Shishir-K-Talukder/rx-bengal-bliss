@@ -246,9 +246,46 @@ const Admin = () => {
   };
 
   const addAdminRole = async () => {
-    if (!newAdminUserId.trim()) return;
-    const { error } = await supabase.from("user_roles").insert({ user_id: newAdminUserId.trim(), role: "admin" as any });
-    if (error) { toast.error(error.message); } else { toast.success("Admin role assigned"); setNewAdminUserId(""); loadAll(); }
+    const uid = newAdminUserId.trim();
+    if (!uid) { toast.error("Select a doctor first"); return; }
+    if (roles.some((r) => r.user_id === uid && r.role === "admin")) {
+      toast.error("This user is already an admin"); return;
+    }
+    const { error } = await supabase.from("user_roles").insert({ user_id: uid, role: "admin" as any });
+    if (error) { toast.error(error.message); } else {
+      const docName = doctors.find((d) => d.user_id === uid)?.name || uid.slice(0, 8);
+      toast.success(`Admin role assigned to ${docName}`);
+      setNewAdminUserId("");
+      loadAll();
+    }
+  };
+
+  const runMedicineSync = async (reset = false) => {
+    setSyncing(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) { toast.error("Not authenticated"); return; }
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-medicines?pages=60${reset ? "&reset=1" : ""}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+      });
+      const json = await res.json();
+      if (!res.ok) { toast.error(json.error || `HTTP ${res.status}`); return; }
+      toast.success(`Synced pages ${json.fromPage}–${json.toPage} • ${json.upserted} medicines updated`);
+      loadAll();
+      loadSyncInfo();
+    } catch (e) {
+      toast.error(`Sync failed: ${(e as Error).message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const loadSyncInfo = async () => {
+    const { data } = await supabase.from("sync_state").select("value").eq("key", "medex_last_page").maybeSingle();
+    if (data?.value) setSyncInfo(data.value as any);
   };
 
   const removeRole = async (id: string) => {
