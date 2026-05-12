@@ -88,6 +88,10 @@ const Admin = () => {
   const [newMedStrength, setNewMedStrength] = useState("");
   const [newMedCompany, setNewMedCompany] = useState("");
 
+  // Sync state
+  const [syncing, setSyncing] = useState(false);
+  const [syncInfo, setSyncInfo] = useState<{ page: number; total_pages: number; last_run: string } | null>(null);
+
   useEffect(() => {
     if (isAdmin) loadAll();
   }, [isAdmin]);
