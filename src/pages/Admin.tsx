@@ -88,8 +88,12 @@ const Admin = () => {
   const [newMedStrength, setNewMedStrength] = useState("");
   const [newMedCompany, setNewMedCompany] = useState("");
 
+  // Sync state
+  const [syncing, setSyncing] = useState(false);
+  const [syncInfo, setSyncInfo] = useState<{ page: number; total_pages: number; last_run: string } | null>(null);
+
   useEffect(() => {
-    if (isAdmin) loadAll();
+    if (isAdmin) { loadAll(); loadSyncInfo(); }
   }, [isAdmin]);
 
   const loadAll = async () => {
@@ -242,9 +246,46 @@ const Admin = () => {
   };
 
   const addAdminRole = async () => {
-    if (!newAdminUserId.trim()) return;
-    const { error } = await supabase.from("user_roles").insert({ user_id: newAdminUserId.trim(), role: "admin" as any });
-    if (error) { toast.error(error.message); } else { toast.success("Admin role assigned"); setNewAdminUserId(""); loadAll(); }
+    const uid = newAdminUserId.trim();
+    if (!uid) { toast.error("Select a doctor first"); return; }
+    if (roles.some((r) => r.user_id === uid && r.role === "admin")) {
+      toast.error("This user is already an admin"); return;
+    }
+    const { error } = await supabase.from("user_roles").insert({ user_id: uid, role: "admin" as any });
+    if (error) { toast.error(error.message); } else {
+      const docName = doctors.find((d) => d.user_id === uid)?.name || uid.slice(0, 8);
+      toast.success(`Admin role assigned to ${docName}`);
+      setNewAdminUserId("");
+      loadAll();
+    }
+  };
+
+  const runMedicineSync = async (reset = false) => {
+    setSyncing(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) { toast.error("Not authenticated"); return; }
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-medicines?pages=60${reset ? "&reset=1" : ""}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+      });
+      const json = await res.json();
+      if (!res.ok) { toast.error(json.error || `HTTP ${res.status}`); return; }
+      toast.success(`Synced pages ${json.fromPage}–${json.toPage} • ${json.upserted} medicines updated`);
+      loadAll();
+      loadSyncInfo();
+    } catch (e) {
+      toast.error(`Sync failed: ${(e as Error).message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const loadSyncInfo = async () => {
+    const { data } = await supabase.from("sync_state").select("value").eq("key", "medex_last_page").maybeSingle();
+    if (data?.value) setSyncInfo(data.value as any);
   };
 
   const removeRole = async (id: string) => {
@@ -620,8 +661,22 @@ const Admin = () => {
           <TabsContent value="medicines">
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm flex items-center justify-between">
+                <CardTitle className="text-sm flex items-center justify-between gap-2 flex-wrap">
                   <span>Medicine Database ({medicines.length}+)</span>
+                  <div className="flex items-center gap-2">
+                    {syncInfo && (
+                      <span className="text-[10px] font-normal text-muted-foreground">
+                        Last sync: {syncInfo.last_run ? new Date(syncInfo.last_run).toLocaleString() : "—"} • next page {((syncInfo.page || 0) + 1)}/{syncInfo.total_pages || "?"}
+                      </span>
+                    )}
+                    <Button size="sm" variant="outline" className="h-8 gap-1.5 text-xs" disabled={syncing} onClick={() => runMedicineSync(false)}>
+                      <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+                      {syncing ? "Syncing..." : "Sync from medex.com.bd"}
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 text-[10px]" disabled={syncing} onClick={() => runMedicineSync(true)} title="Restart sync from page 1">
+                      Reset
+                    </Button>
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -708,9 +763,26 @@ const Admin = () => {
             <Card>
               <CardHeader><CardTitle className="text-sm">Manage Admin Access</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input placeholder="User ID to assign admin role" value={newAdminUserId} onChange={(e) => setNewAdminUserId(e.target.value)} />
-                  <Button onClick={addAdminRole}>Assign Admin</Button>
+                <div className="space-y-2">
+                  <Label className="text-xs">Assign admin role to a registered doctor</Label>
+                  <div className="flex gap-2">
+                    <select
+                      value={newAdminUserId}
+                      onChange={(e) => setNewAdminUserId(e.target.value)}
+                      className="flex-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">— Select a doctor —</option>
+                      {doctors
+                        .filter((d) => !roles.some((r) => r.user_id === d.user_id && r.role === "admin"))
+                        .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+                        .map((d) => (
+                          <option key={d.user_id} value={d.user_id}>
+                            {d.name || "(no name)"} {d.bmdc_no ? `• BMDC ${d.bmdc_no}` : ""} {d.phone ? `• ${d.phone}` : ""}
+                          </option>
+                        ))}
+                    </select>
+                    <Button onClick={addAdminRole} disabled={!newAdminUserId}>Assign Admin</Button>
+                  </div>
                 </div>
                 <Table>
                   <TableHeader>
