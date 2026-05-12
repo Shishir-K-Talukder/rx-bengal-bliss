@@ -45,11 +45,14 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  // Authorize: either admin user OR cron call with service role bearer
+  // Authorize: admin user OR cron call with service role OR matching CRON_SECRET header
   const auth = req.headers.get("Authorization") || "";
   const token = auth.replace(/^Bearer\s+/i, "");
+  const cronSecret = req.headers.get("x-cron-secret") || "";
   let isAuthorized = false;
-  if (token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+  if (token && token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+    isAuthorized = true;
+  } else if (cronSecret && cronSecret === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
     isAuthorized = true;
   } else if (token) {
     const { data: { user } } = await supabase.auth.getUser(token);
