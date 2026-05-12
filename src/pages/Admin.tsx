@@ -763,9 +763,26 @@ const Admin = () => {
             <Card>
               <CardHeader><CardTitle className="text-sm">Manage Admin Access</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input placeholder="User ID to assign admin role" value={newAdminUserId} onChange={(e) => setNewAdminUserId(e.target.value)} />
-                  <Button onClick={addAdminRole}>Assign Admin</Button>
+                <div className="space-y-2">
+                  <Label className="text-xs">Assign admin role to a registered doctor</Label>
+                  <div className="flex gap-2">
+                    <select
+                      value={newAdminUserId}
+                      onChange={(e) => setNewAdminUserId(e.target.value)}
+                      className="flex-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">— Select a doctor —</option>
+                      {doctors
+                        .filter((d) => !roles.some((r) => r.user_id === d.user_id && r.role === "admin"))
+                        .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+                        .map((d) => (
+                          <option key={d.user_id} value={d.user_id}>
+                            {d.name || "(no name)"} {d.bmdc_no ? `• BMDC ${d.bmdc_no}` : ""} {d.phone ? `• ${d.phone}` : ""}
+                          </option>
+                        ))}
+                    </select>
+                    <Button onClick={addAdminRole} disabled={!newAdminUserId}>Assign Admin</Button>
+                  </div>
                 </div>
                 <Table>
                   <TableHeader>
