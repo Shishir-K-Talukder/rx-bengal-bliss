@@ -93,7 +93,7 @@ const Admin = () => {
   const [syncInfo, setSyncInfo] = useState<{ page: number; total_pages: number; last_run: string } | null>(null);
 
   useEffect(() => {
-    if (isAdmin) loadAll();
+    if (isAdmin) { loadAll(); loadSyncInfo(); }
   }, [isAdmin]);
 
   const loadAll = async () => {
