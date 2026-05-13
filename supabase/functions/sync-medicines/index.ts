@@ -94,14 +94,22 @@ Deno.serve(async (req) => {
       const { brands, totalPages: tp } = parsePage(html);
       if (tp > 1) totalPages = tp;
       if (brands.length === 0) { lastDone = p; break; }
+      // Dedupe within page (case-insensitive) so ON CONFLICT doesn't hit same row twice
+      const seen = new Map<string, Brand>();
+      for (const b of brands) {
+        const k = `${b.name.toLowerCase()}|${b.strength.toLowerCase()}|${b.company.toLowerCase()}`;
+        if (!seen.has(k)) seen.set(k, b);
+      }
+      const unique = [...seen.values()];
       // Upsert in chunks
-      for (let i = 0; i < brands.length; i += 100) {
-        const chunk = brands.slice(i, i + 100);
-        const { error } = await supabase
+      for (let i = 0; i < unique.length; i += 100) {
+        const chunk = unique.slice(i, i + 100);
+        const { error, data } = await supabase
           .from("medicines")
-          .upsert(chunk, { onConflict: "name,strength,company", ignoreDuplicates: false });
+          .upsert(chunk, { onConflict: "name,strength,company", ignoreDuplicates: false })
+          .select("id");
         if (error) errors.push(`page ${p}: ${error.message}`);
-        else totalUpserted += chunk.length;
+        else totalUpserted += data?.length ?? chunk.length;
       }
       lastDone = p;
     } catch (e) {
