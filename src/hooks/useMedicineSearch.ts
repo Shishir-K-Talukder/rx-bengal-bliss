@@ -608,7 +608,6 @@ const searchFromDb = async (query: string): Promise<MedicineSuggestion[]> => {
 
   const fallbackContext = await loadFallbackTypeContext();
   const refineMatches = (medicines: DbMedicine[]) => filterAndSortMatches(medicines, query, fallbackContext).map(toSuggestion);
-  const fallbackMatches = filterAndSortRankedMatches(await loadFallbackRanked(), query);
   const candidates: DbMedicine[] = [];
 
   const nameFilters = buildOrFilters(["name"], nameSearchTerms);
@@ -651,12 +650,14 @@ const searchFromDb = async (query: string): Promise<MedicineSuggestion[]> => {
     }
   }
 
-  const refined = refineMatches(dedupeMedicines([
-    ...candidates,
-    ...fallbackMatches.map(({ name, strength, generic, company }) => ({ name, strength, generic, company })),
-  ]));
-  if (refined.length > 0) return refined;
+  // Prefer DB results — source of truth, includes freshly synced medicines.
+  if (candidates.length > 0) {
+    const refined = refineMatches(dedupeMedicines(candidates));
+    if (refined.length > 0) return refined;
+  }
 
+  // Fall back to bundled static list only when DB returns nothing.
+  const fallbackMatches = filterAndSortRankedMatches(await loadFallbackRanked(), query);
   return fallbackMatches.map(toSuggestion);
 };
 
