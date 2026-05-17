@@ -198,8 +198,20 @@ const PatientInfo = ({ patient, onChange }: Props) => {
         </div>
         Patient Information
       </h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="col-span-2" id="patient-name">
+      <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
+        {/* Row 1: Patient ID, Name, Age, Sex */}
+        <div className="col-span-2 sm:col-span-2" id="patient-id">
+          <Label className="field-label">Patient ID</Label>
+          <PatientFieldWithSuggestions
+            value={patient.patientId || ""}
+            onChange={(v) => onChange({ ...patient, patientId: v })}
+            placeholder="ID"
+            className="h-9 text-sm"
+            suggestions={idSuggestions}
+            onSelect={handleSelectPatient}
+          />
+        </div>
+        <div className="col-span-2 sm:col-span-2" id="patient-name">
           <Label className="field-label">Patient Name</Label>
           <PatientFieldWithSuggestions
             value={patient.name}
@@ -229,26 +241,19 @@ const PatientInfo = ({ patient, onChange }: Props) => {
             </SelectContent>
           </Select>
         </div>
-        <div id="patient-id">
-          <Label className="field-label">Patient ID</Label>
-          <PatientFieldWithSuggestions
-            value={patient.patientId || ""}
-            onChange={(v) => onChange({ ...patient, patientId: v })}
-            placeholder="ID"
-            className="h-9 text-sm"
-            suggestions={idSuggestions}
-            onSelect={handleSelectPatient}
-          />
-        </div>
-        <div>
-          <Label className="field-label">Mobile</Label>
-          <Input value={patient.mobile} onChange={(e) => onChange({ ...patient, mobile: e.target.value })} placeholder="01XXXXXXXXX" className="h-9 text-sm" />
-        </div>
-        <div>
+
+        {/* Row 2: Date, Mobile */}
+        <div className="col-span-2 sm:col-span-3">
           <Label className="field-label">Date</Label>
           <Input type="date" value={patient.date} onChange={(e) => onChange({ ...patient, date: e.target.value })} className="h-9 text-sm" />
         </div>
-        <div className="col-span-2 sm:col-span-3 lg:col-span-6">
+        <div className="col-span-2 sm:col-span-3">
+          <Label className="field-label">Mobile</Label>
+          <Input value={patient.mobile} onChange={(e) => onChange({ ...patient, mobile: e.target.value })} placeholder="01XXXXXXXXX" className="h-9 text-sm" />
+        </div>
+
+        {/* Row 3: Address */}
+        <div className="col-span-2 sm:col-span-6">
           <Label className="field-label">Address</Label>
           <Input value={patient.address} onChange={(e) => onChange({ ...patient, address: e.target.value })} placeholder="ঠিকানা" className="h-9 text-sm" />
         </div>

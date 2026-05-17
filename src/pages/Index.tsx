@@ -42,6 +42,13 @@ const focusMissingField = (fieldId: string) => {
 
 const today = new Date().toISOString().split("T")[0];
 
+const generatePatientId = () => {
+  const d = new Date();
+  const ymd = `${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+  const rnd = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `P-${ymd}-${rnd}`;
+};
+
 const Index = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -56,7 +63,7 @@ const Index = () => {
   });
 
   const [patient, setPatient] = useState<PatientData>({
-    name: "", age: "", sex: "", mobile: "", address: "", date: today, patientId: "",
+    name: "", age: "", sex: "", mobile: "", address: "", date: today, patientId: generatePatientId(),
   });
 
   const [clinical, setClinical] = useState<ClinicalData>({
@@ -145,7 +152,7 @@ const Index = () => {
   };
 
   const handleNewPrescription = () => {
-    setPatient({ name: "", age: "", sex: "", mobile: "", address: "", date: today, patientId: "" });
+    setPatient({ name: "", age: "", sex: "", mobile: "", address: "", date: today, patientId: generatePatientId() });
     setClinical({ chiefComplaint: "", onExamination: { ...defaultOnExamination }, drugHistory: "", drugHistoryMedicines: [], diagnosis: "", investigation: "" });
     setMedicines([]);
     setAdvice({ advice: "", followUpDate: "" });
