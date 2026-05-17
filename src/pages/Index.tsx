@@ -152,7 +152,7 @@ const Index = () => {
   };
 
   const handleNewPrescription = () => {
-    setPatient({ name: "", age: "", sex: "", mobile: "", address: "", date: today, patientId: "" });
+    setPatient({ name: "", age: "", sex: "", mobile: "", address: "", date: today, patientId: generatePatientId() });
     setClinical({ chiefComplaint: "", onExamination: { ...defaultOnExamination }, drugHistory: "", drugHistoryMedicines: [], diagnosis: "", investigation: "" });
     setMedicines([]);
     setAdvice({ advice: "", followUpDate: "" });
