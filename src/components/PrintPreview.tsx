@@ -158,7 +158,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
       }}
     >
       {settings.showDoctorInfo && (
-        <div className="text-center border-b-2 border-black pb-3 mb-4 mx-auto w-full" style={{ minHeight: headerHeight, ...(headerWidth ? { maxWidth: headerWidth } : {}) }}>
+        <div className="text-center pb-3 mb-4 mx-auto w-full" style={{ minHeight: headerHeight, ...(headerWidth ? { maxWidth: headerWidth } : {}) }}>
           {settings.showDoctorText && doctorHasInfo ? (
             <>
               <h1 className={`font-bold ${headerTextClass[settings.headerSize]}`}>{doctor.name}</h1>
@@ -174,7 +174,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
       )}
 
       <div
-        className="flex flex-wrap justify-between mb-4 pb-2 border-b border-gray-300"
+        className="flex flex-wrap justify-between mb-4 pb-2 border-b border-black"
         style={{
           fontSize: settings.patientInfoFontSize ? `${settings.patientInfoFontSize}px` : '12px',
           ...(settings.patientInfoWidth ? { maxWidth: `${settings.patientInfoWidth}mm` } : {}),
