@@ -54,7 +54,7 @@ const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onCha
         onFocus={() => setShowSuggestions(true)}
         onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
         placeholder="Type medicine name..."
-        className="h-8 text-xs"
+        className="h-8 text-xs font-semibold text-primary placeholder:text-muted-foreground placeholder:font-normal"
       />
       {showSuggestions && (query.length >= 2) && (
         <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg max-h-[200px] overflow-y-auto">
