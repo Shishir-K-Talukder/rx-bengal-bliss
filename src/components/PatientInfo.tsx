@@ -170,6 +170,9 @@ const PatientInfo = ({ patient, onChange }: Props) => {
   }, []);
 
   const nameSuggestions = history.map((h) => ({ label: h.name, data: h }));
+  const idSuggestions = history
+    .filter((h) => h.patientId && h.patientId.trim())
+    .map((h) => ({ label: h.patientId as string, data: h }));
 
   // Merge cloud-synced ages + local history ages (cloud first, dedup)
   const localAges = Array.from(new Set(history.map((h) => h.age.trim()).filter(Boolean)));
@@ -183,6 +186,7 @@ const PatientInfo = ({ patient, onChange }: Props) => {
       sex: entry.sex,
       mobile: entry.mobile,
       address: entry.address,
+      patientId: entry.patientId || patient.patientId || "",
     });
   };
 
@@ -224,6 +228,17 @@ const PatientInfo = ({ patient, onChange }: Props) => {
               <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div id="patient-id">
+          <Label className="field-label">Patient ID</Label>
+          <PatientFieldWithSuggestions
+            value={patient.patientId || ""}
+            onChange={(v) => onChange({ ...patient, patientId: v })}
+            placeholder="ID"
+            className="h-9 text-sm"
+            suggestions={idSuggestions}
+            onSelect={handleSelectPatient}
+          />
         </div>
         <div>
           <Label className="field-label">Mobile</Label>
