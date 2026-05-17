@@ -111,6 +111,15 @@ const formatFollowUpBangla = (followUp: string): string => {
   return toBanglaDigits(followUp);
 };
 
+const formatDateDMY = (str: string): string => {
+  if (!str) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const [y, m, d] = str.split("-");
+    return `${d}-${m}-${y}`;
+  }
+  return str;
+};
+
 const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSettings }: Props) => {
   const settings = { ...defaultPrintSettings, ...printSettings };
 
