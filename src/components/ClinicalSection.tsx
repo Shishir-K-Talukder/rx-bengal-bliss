@@ -304,7 +304,7 @@ const DrugHistoryMedicineSelector = ({ selectedMedicines, onChange }: { selected
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             onKeyDown={handleKeyDown}
             placeholder="Search medicine name & strength..."
-            className="h-8 text-xs flex-1"
+            className="h-8 text-xs flex-1 font-semibold text-primary placeholder:text-muted-foreground placeholder:font-normal"
           />
           <Button
             variant="outline"
