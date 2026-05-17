@@ -12,6 +12,7 @@ export interface PatientData {
   mobile: string;
   address: string;
   date: string;
+  patientId?: string;
 }
 
 interface Props {
@@ -27,6 +28,7 @@ interface PatientHistoryEntry {
   sex: string;
   mobile: string;
   address: string;
+  patientId?: string;
 }
 
 const getPatientHistory = (): PatientHistoryEntry[] => {
@@ -36,21 +38,24 @@ const getPatientHistory = (): PatientHistoryEntry[] => {
 };
 
 export const savePatientToHistory = (patient: PatientData) => {
-  if (!patient.name.trim()) return;
+  if (!patient.name.trim() && !patient.patientId?.trim()) return;
   const history = getPatientHistory();
   const existing = history.findIndex(
-    (h) => h.name.toLowerCase() === patient.name.toLowerCase() && h.mobile === patient.mobile
+    (h) =>
+      (patient.patientId && h.patientId && h.patientId.toLowerCase() === patient.patientId.toLowerCase()) ||
+      (h.name.toLowerCase() === patient.name.toLowerCase() && h.mobile === patient.mobile)
   );
   const entry: PatientHistoryEntry = {
     name: patient.name, age: patient.age, sex: patient.sex,
     mobile: patient.mobile, address: patient.address,
+    patientId: patient.patientId || "",
   };
   if (existing >= 0) {
     history[existing] = entry;
   } else {
     history.unshift(entry);
   }
-  localStorage.setItem(PATIENT_HISTORY_KEY, JSON.stringify(history.slice(0, 50)));
+  localStorage.setItem(PATIENT_HISTORY_KEY, JSON.stringify(history.slice(0, 200)));
 };
 
 const PatientFieldWithSuggestions = ({
@@ -165,6 +170,9 @@ const PatientInfo = ({ patient, onChange }: Props) => {
   }, []);
 
   const nameSuggestions = history.map((h) => ({ label: h.name, data: h }));
+  const idSuggestions = history
+    .filter((h) => h.patientId && h.patientId.trim())
+    .map((h) => ({ label: h.patientId as string, data: h }));
 
   // Merge cloud-synced ages + local history ages (cloud first, dedup)
   const localAges = Array.from(new Set(history.map((h) => h.age.trim()).filter(Boolean)));
@@ -178,6 +186,7 @@ const PatientInfo = ({ patient, onChange }: Props) => {
       sex: entry.sex,
       mobile: entry.mobile,
       address: entry.address,
+      patientId: entry.patientId || patient.patientId || "",
     });
   };
 
@@ -219,6 +228,17 @@ const PatientInfo = ({ patient, onChange }: Props) => {
               <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div id="patient-id">
+          <Label className="field-label">Patient ID</Label>
+          <PatientFieldWithSuggestions
+            value={patient.patientId || ""}
+            onChange={(v) => onChange({ ...patient, patientId: v })}
+            placeholder="ID"
+            className="h-9 text-sm"
+            suggestions={idSuggestions}
+            onSelect={handleSelectPatient}
+          />
         </div>
         <div>
           <Label className="field-label">Mobile</Label>
