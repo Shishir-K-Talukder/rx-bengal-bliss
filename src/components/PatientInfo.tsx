@@ -28,6 +28,7 @@ interface PatientHistoryEntry {
   sex: string;
   mobile: string;
   address: string;
+  patientId?: string;
 }
 
 const getPatientHistory = (): PatientHistoryEntry[] => {
@@ -37,21 +38,24 @@ const getPatientHistory = (): PatientHistoryEntry[] => {
 };
 
 export const savePatientToHistory = (patient: PatientData) => {
-  if (!patient.name.trim()) return;
+  if (!patient.name.trim() && !patient.patientId?.trim()) return;
   const history = getPatientHistory();
   const existing = history.findIndex(
-    (h) => h.name.toLowerCase() === patient.name.toLowerCase() && h.mobile === patient.mobile
+    (h) =>
+      (patient.patientId && h.patientId && h.patientId.toLowerCase() === patient.patientId.toLowerCase()) ||
+      (h.name.toLowerCase() === patient.name.toLowerCase() && h.mobile === patient.mobile)
   );
   const entry: PatientHistoryEntry = {
     name: patient.name, age: patient.age, sex: patient.sex,
     mobile: patient.mobile, address: patient.address,
+    patientId: patient.patientId || "",
   };
   if (existing >= 0) {
     history[existing] = entry;
   } else {
     history.unshift(entry);
   }
-  localStorage.setItem(PATIENT_HISTORY_KEY, JSON.stringify(history.slice(0, 50)));
+  localStorage.setItem(PATIENT_HISTORY_KEY, JSON.stringify(history.slice(0, 200)));
 };
 
 const PatientFieldWithSuggestions = ({
