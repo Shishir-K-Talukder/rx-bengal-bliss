@@ -12,6 +12,7 @@ export interface PatientData {
   mobile: string;
   address: string;
   date: string;
+  patientId?: string;
 }
 
 interface Props {
