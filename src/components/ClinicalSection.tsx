@@ -275,7 +275,7 @@ const DrugHistoryMedicineSelector = ({ selectedMedicines, onChange }: { selected
         <div className="p-2.5 bg-accent/20 rounded-lg border border-border/50 space-y-1">
           {selectedMedicines.map((med) => (
             <div key={med} className="flex items-center justify-between group">
-              <span className="text-xs font-medium text-foreground">• {med}</span>
+              <span className="text-xs font-semibold text-primary">• {med}</span>
               <button type="button" onClick={() => removeMedicine(med)} className="opacity-0 group-hover:opacity-100 hover:text-destructive transition-all">
                 <X className="w-3.5 h-3.5" />
               </button>
