@@ -56,7 +56,7 @@ const Index = () => {
   });
 
   const [patient, setPatient] = useState<PatientData>({
-    name: "", age: "", sex: "", mobile: "", address: "", date: today,
+    name: "", age: "", sex: "", mobile: "", address: "", date: today, patientId: "",
   });
 
   const [clinical, setClinical] = useState<ClinicalData>({
