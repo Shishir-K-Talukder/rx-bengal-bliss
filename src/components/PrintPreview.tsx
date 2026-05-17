@@ -200,7 +200,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
       {/* Main content area - grows to fill available space */}
       <div className="flex flex-1 min-h-0">
         <div
-          className="w-[35%] border-r border-gray-300 pr-4 space-y-4"
+          className="w-[35%] border-r border-black pr-4 space-y-4"
           style={{
             fontSize: settings.clinicalNotesFontSize ? `${settings.clinicalNotesFontSize}px` : '12px',
             ...(settings.clinicalNotesWidth ? { width: `${settings.clinicalNotesWidth}mm`, flex: 'none' } : {}),
@@ -298,7 +298,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
             ))}
           </div>
           {(advice.advice || advice.followUpDate) && (
-            <div className="mt-8 pt-3 border-t border-gray-300 text-xs">
+            <div className="mt-8 pt-3 border-t border-black text-xs">
               {advice.advice && (
                 <div className="mb-2">
                   <p className="font-bold">Advice:</p>
@@ -322,7 +322,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
       {/* Footer pinned to bottom */}
       {settings.showFooter && settings.footerText && (
         <div
-          className="pt-4 border-t border-gray-300 mt-auto"
+          className="pt-4 border-t border-black mt-auto"
           style={settings.footerHeight ? { minHeight: `${settings.footerHeight}mm` } : {}}
         >
           <div
