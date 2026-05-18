@@ -195,7 +195,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
         <span><strong>Name :: </strong>{patient.name}</span>
         <span><strong>Age :: </strong>{patient.age}</span>
         <span><strong>Sex :: </strong>{patient.sex}</span>
-        {patient.patientId && <span><strong>Patient ID :: </strong>{patient.patientId}</span>}
+        {settings.showPatientId && patient.patientId && <span><strong>Patient ID :: </strong>{patient.patientId}</span>}
         <span><strong>Date :: </strong>{formatDateDMY(patient.date)}</span>
       </div>
 
