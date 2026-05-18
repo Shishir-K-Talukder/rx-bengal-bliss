@@ -16,6 +16,7 @@ const Profile = lazy(() => import("./pages/Profile.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
+const Tools = lazy(() => import("./pages/Tools.tsx"));
 
 const queryClient = new QueryClient();
 
