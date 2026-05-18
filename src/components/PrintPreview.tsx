@@ -25,6 +25,7 @@ export interface PrintSettings {
   showDiagnosis: boolean;
   showInvestigation: boolean;
   showFooter: boolean;
+  showPatientId: boolean;
   footerHeight?: string;
   footerText?: string;
   footerFontSize?: string;
