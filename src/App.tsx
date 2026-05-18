@@ -16,6 +16,7 @@ const Profile = lazy(() => import("./pages/Profile.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
+const Tools = lazy(() => import("./pages/Tools.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,7 @@ const App = () => {
                 <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
                 <Route path="/admin/login" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="/print" element={<PrintPage />} />
                 <Route path="*" element={<NotFound />} />
