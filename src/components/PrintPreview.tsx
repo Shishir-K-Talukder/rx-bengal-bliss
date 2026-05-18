@@ -50,6 +50,7 @@ export const defaultPrintSettings: PrintSettings = {
   showDiagnosis: true,
   showInvestigation: true,
   showFooter: true,
+  showPatientId: true,
   footerHeight: "",
   footerText: "",
   footerFontSize: "12",
