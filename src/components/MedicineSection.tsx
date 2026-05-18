@@ -33,6 +33,17 @@ interface Props {
   onOptionsChange: (o: MedicineOptions) => void;
 }
 
+const highlightMatch = (text: string, query: string) => {
+  if (!query.trim()) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escaped})`, "ig"));
+  return parts.map((part, i) =>
+    part.toLowerCase() === query.toLowerCase()
+      ? <mark key={i} className="bg-primary/20 text-primary font-bold rounded px-0.5">{part}</mark>
+      : <span key={i}>{part}</span>
+  );
+};
+
 const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onChange: (v: string) => void; onSelect: (fullName: string, detectedType: string) => void }) => {
   const [query, setQuery] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -54,7 +65,7 @@ const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onCha
         onFocus={() => setShowSuggestions(true)}
         onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
         placeholder="Type medicine name..."
-        className="h-8 text-xs font-semibold text-primary placeholder:text-muted-foreground placeholder:font-normal"
+        className="h-8 text-xs"
       />
       {showSuggestions && (query.length >= 2) && (
         <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg max-h-[200px] overflow-y-auto">
@@ -74,7 +85,7 @@ const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onCha
               onMouseDown={(e) => { e.preventDefault(); handleSelect(med); }}
             >
               <div className="text-xs font-medium text-foreground">
-                {med.name} {med.strength}
+                {highlightMatch(med.name, query)} <span className="text-muted-foreground">{med.strength}</span>
               </div>
               <div className="text-[10px] text-muted-foreground">{med.generic} • {med.company}</div>
             </button>
