@@ -304,7 +304,7 @@ const DrugHistoryMedicineSelector = ({ selectedMedicines, onChange }: { selected
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             onKeyDown={handleKeyDown}
             placeholder="Search medicine name & strength..."
-            className="h-8 text-xs flex-1 font-semibold text-primary placeholder:text-muted-foreground placeholder:font-normal"
+            className="h-8 text-xs flex-1"
           />
           <Button
             variant="outline"
@@ -320,21 +320,32 @@ const DrugHistoryMedicineSelector = ({ selectedMedicines, onChange }: { selected
         {/* Suggestions dropdown */}
         {showSuggestions && suggestions.length > 0 && (
           <div className="absolute z-50 top-full left-0 right-0 bg-popover border border-border rounded-md shadow-lg mt-1 max-h-[200px] overflow-y-auto">
-            {suggestions.map((s, i) => (
-              <button
-                key={`${s.name}-${s.strength}-${i}`}
-                type="button"
-                className="w-full text-left px-3 py-1.5 text-xs hover:bg-accent transition-colors flex items-center justify-between border-b border-border/30 last:border-0"
-                onMouseDown={(e) => { e.preventDefault(); addFromSuggestion(s); }}
-              >
-                <span>
-                  <span className="font-bold text-primary">{s.detectedType}.</span>{" "}
-                  <span className="font-medium">{s.name}</span>{" "}
-                  <span className="text-muted-foreground">{s.strength}</span>
-                </span>
-                <span className="text-[10px] text-muted-foreground ml-2">{s.generic}</span>
-              </button>
-            ))}
+            {suggestions.map((s, i) => {
+              const q = query.trim();
+              const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const parts = q ? s.name.split(new RegExp(`(${escaped})`, "ig")) : [s.name];
+              return (
+                <button
+                  key={`${s.name}-${s.strength}-${i}`}
+                  type="button"
+                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-accent transition-colors flex items-center justify-between border-b border-border/30 last:border-0"
+                  onMouseDown={(e) => { e.preventDefault(); addFromSuggestion(s); }}
+                >
+                  <span>
+                    <span className="font-bold text-primary">{s.detectedType}.</span>{" "}
+                    <span className="font-medium">
+                      {parts.map((p, pi) =>
+                        q && p.toLowerCase() === q.toLowerCase()
+                          ? <mark key={pi} className="bg-primary/20 text-primary font-bold rounded px-0.5">{p}</mark>
+                          : <span key={pi}>{p}</span>
+                      )}
+                    </span>{" "}
+                    <span className="text-muted-foreground">{s.strength}</span>
+                  </span>
+                  <span className="text-[10px] text-muted-foreground ml-2">{s.generic}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
