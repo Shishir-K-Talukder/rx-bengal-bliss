@@ -25,6 +25,7 @@ export interface PrintSettings {
   showDiagnosis: boolean;
   showInvestigation: boolean;
   showFooter: boolean;
+  showPatientId: boolean;
   footerHeight?: string;
   footerText?: string;
   footerFontSize?: string;
@@ -49,6 +50,7 @@ export const defaultPrintSettings: PrintSettings = {
   showDiagnosis: true,
   showInvestigation: true,
   showFooter: true,
+  showPatientId: true,
   footerHeight: "",
   footerText: "",
   footerFontSize: "12",
@@ -193,7 +195,7 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
         <span><strong>Name :: </strong>{patient.name}</span>
         <span><strong>Age :: </strong>{patient.age}</span>
         <span><strong>Sex :: </strong>{patient.sex}</span>
-        {patient.patientId && <span><strong>Patient ID :: </strong>{patient.patientId}</span>}
+        {settings.showPatientId && patient.patientId && <span><strong>Patient ID :: </strong>{patient.patientId}</span>}
         <span><strong>Date :: </strong>{formatDateDMY(patient.date)}</span>
       </div>
 
