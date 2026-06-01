@@ -3,11 +3,12 @@ import FloatingNav from "@/components/FloatingNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Baby, CalendarHeart, Scale, Pill } from "lucide-react";
+import { Baby, CalendarHeart, Scale, Pill, User, Activity, Syringe, Heart } from "lucide-react";
 import { PEDIATRIC_DRUGS, calculateDose, type PediatricDrug } from "@/lib/pediatricDrugs";
-import { addDays, differenceInDays, differenceInWeeks, format, parseISO } from "date-fns";
+import { ADULT_DRUGS, calculateAdultDose, type AdultDrug } from "@/lib/adultDrugs";
+import { addDays, differenceInDays, format, parseISO } from "date-fns";
 
 /* -------------------- EDD Calculator -------------------- */
 const EDDCalculator = () => {
@@ -31,11 +32,7 @@ const EDDCalculator = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <CalendarHeart className="w-4 h-4 text-primary" /> EDD Calculator (Naegele's rule)
-        </CardTitle>
-      </CardHeader>
+      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><CalendarHeart className="w-4 h-4 text-primary" /> EDD Calculator (Naegele's rule)</CardTitle></CardHeader>
       <CardContent className="space-y-3">
         <div>
           <Label className="text-xs">First day of LMP</Label>
@@ -49,6 +46,55 @@ const EDDCalculator = () => {
           </div>
         )}
         <p className="text-[11px] text-muted-foreground">EDD = LMP + 280 days (40 weeks).</p>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* -------------------- Ovulation Calculator -------------------- */
+const OvulationCalculator = () => {
+  const [lmp, setLmp] = useState("");
+  const [cycle, setCycle] = useState("28");
+
+  const result = useMemo(() => {
+    if (!lmp) return null;
+    try {
+      const d = parseISO(lmp);
+      const c = parseInt(cycle) || 28;
+      const ovDay = addDays(d, c - 14);
+      const fertileStart = addDays(ovDay, -5);
+      const fertileEnd = addDays(ovDay, 1);
+      const nextPeriod = addDays(d, c);
+      return {
+        ovulation: format(ovDay, "dd-MM-yyyy"),
+        fertileWindow: `${format(fertileStart, "dd MMM")} – ${format(fertileEnd, "dd MMM yyyy")}`,
+        nextPeriod: format(nextPeriod, "dd-MM-yyyy"),
+      };
+    } catch { return null; }
+  }, [lmp, cycle]);
+
+  return (
+    <Card>
+      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Heart className="w-4 h-4 text-primary" /> Ovulation Date Calculator</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs">First day of LMP</Label>
+            <Input type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} className="h-9" />
+          </div>
+          <div>
+            <Label className="text-xs">Cycle length (days)</Label>
+            <Input type="number" value={cycle} onChange={(e) => setCycle(e.target.value)} className="h-9" placeholder="28" />
+          </div>
+        </div>
+        {result && (
+          <div className="rounded-lg border bg-accent/30 p-3 text-sm space-y-1">
+            <div className="flex justify-between"><span className="text-muted-foreground">Ovulation date</span><span className="font-bold text-primary">{result.ovulation}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Fertile window</span><span className="font-semibold text-xs">{result.fertileWindow}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Next period</span><span className="font-semibold">{result.nextPeriod}</span></div>
+          </div>
+        )}
+        <p className="text-[11px] text-muted-foreground">Ovulation ≈ LMP + (cycle − 14 days). Fertile window: 5 days before to 1 day after.</p>
       </CardContent>
     </Card>
   );
@@ -75,29 +121,16 @@ const BMICalculator = () => {
   const peds = useMemo(() => {
     const a = parseFloat(age);
     if (!a || a < 1 || a > 12) return null;
-    // Standard pediatric formulas
-    const expectedWt = 2 * a + 8;            // kg (1–10 yr)
-    const expectedHt = 6 * a + 77;           // cm
-    return { wt: expectedWt.toFixed(1), ht: expectedHt.toFixed(0) };
+    return { wt: (2 * a + 8).toFixed(1), ht: (6 * a + 77).toFixed(0) };
   }, [age]);
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Scale className="w-4 h-4 text-primary" /> BMI & Pediatric Weight Chart
-        </CardTitle>
-      </CardHeader>
+      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Scale className="w-4 h-4 text-primary" /> BMI & Pediatric Weight</CardTitle></CardHeader>
       <CardContent className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label className="text-xs">Weight (kg)</Label>
-            <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-9" />
-          </div>
-          <div>
-            <Label className="text-xs">Height (cm)</Label>
-            <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} className="h-9" />
-          </div>
+          <div><Label className="text-xs">Weight (kg)</Label><Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-9" /></div>
+          <div><Label className="text-xs">Height (cm)</Label><Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} className="h-9" /></div>
         </div>
         {bmi && (
           <div className="rounded-lg border bg-accent/30 p-3 text-sm flex justify-between">
@@ -112,7 +145,7 @@ const BMICalculator = () => {
             <div className="mt-2 rounded-lg border bg-muted/40 p-3 text-sm space-y-1">
               <div className="flex justify-between"><span className="text-muted-foreground">Expected Weight</span><span className="font-semibold">{peds.wt} kg</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Expected Height</span><span className="font-semibold">{peds.ht} cm</span></div>
-              <p className="text-[10px] text-muted-foreground italic">Formulas: Wt = 2×age+8 kg • Ht = 6×age+77 cm</p>
+              <p className="text-[10px] text-muted-foreground italic">Wt = 2×age+8 kg • Ht = 6×age+77 cm</p>
             </div>
           )}
         </div>
@@ -131,40 +164,25 @@ const PediatricDose = () => {
   const suggestions = useMemo(() => {
     if (query.length < 1) return [];
     const q = query.toLowerCase();
-    return PEDIATRIC_DRUGS.filter(
-      (d) => d.name.toLowerCase().includes(q) || d.generic.toLowerCase().includes(q)
-    ).slice(0, 12);
+    return PEDIATRIC_DRUGS.filter((d) => d.name.toLowerCase().includes(q) || d.generic.toLowerCase().includes(q)).slice(0, 12);
   }, [query]);
 
   const result = selected && weight ? calculateDose(selected, parseFloat(weight)) : null;
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Baby className="w-4 h-4 text-primary" /> Pediatric Dose Calculator
-        </CardTitle>
-      </CardHeader>
+      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Baby className="w-4 h-4 text-primary" /> Pediatric Dose Calculator</CardTitle></CardHeader>
       <CardContent className="space-y-3">
         <div className="relative">
           <Label className="text-xs">Medicine / Generic Name</Label>
-          <Input
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setSelected(null); setOpen(true); }}
-            onFocus={() => setOpen(true)}
-            onBlur={() => setTimeout(() => setOpen(false), 200)}
-            placeholder="e.g. Paracetamol, Amoxicillin..."
-            className="h-9"
-          />
+          <Input value={query} onChange={(e) => { setQuery(e.target.value); setSelected(null); setOpen(true); }}
+            onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 200)}
+            placeholder="e.g. Paracetamol, Amoxicillin..." className="h-9" />
           {open && suggestions.length > 0 && (
             <div className="absolute z-50 left-0 right-0 mt-1 bg-card border rounded-lg shadow-lg max-h-64 overflow-y-auto">
               {suggestions.map((d, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className="w-full text-left px-3 py-2 hover:bg-accent border-b last:border-0 text-xs"
-                  onMouseDown={(e) => { e.preventDefault(); setSelected(d); setQuery(d.name); setOpen(false); }}
-                >
+                <button key={i} type="button" className="w-full text-left px-3 py-2 hover:bg-accent border-b last:border-0 text-xs"
+                  onMouseDown={(e) => { e.preventDefault(); setSelected(d); setQuery(d.name); setOpen(false); }}>
                   <div className="font-medium text-foreground">{d.name} <span className="text-muted-foreground">• {d.strength}</span></div>
                   <div className="text-[10px] text-muted-foreground">{d.generic} • {d.frequency}{d.dailyDose ? ` • ${d.dailyDose}` : ""}</div>
                 </button>
@@ -172,19 +190,13 @@ const PediatricDose = () => {
             </div>
           )}
         </div>
-
-        <div>
-          <Label className="text-xs">Baby Weight (kg)</Label>
-          <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-9" placeholder="e.g. 8" />
-        </div>
-
+        <div><Label className="text-xs">Baby Weight (kg)</Label><Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-9" placeholder="e.g. 8" /></div>
         {selected && (
           <div className="rounded-lg border bg-muted/40 p-3 text-xs space-y-1">
             <div className="flex justify-between"><span className="text-muted-foreground">Strength</span><span className="font-semibold">{selected.strength}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Std dose</span><span className="font-semibold">{selected.dailyDose || "—"}</span></div>
           </div>
         )}
-
         {result && (
           <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-4 text-center">
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Prescription Dose</p>
@@ -193,10 +205,185 @@ const PediatricDose = () => {
             {selected?.notes && <p className="text-[11px] text-foreground mt-1 italic">{selected.notes}</p>}
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+};
 
-        <p className="text-[10px] text-muted-foreground italic">
-          Reference: Paediatrics Dose (Dr. Sumon) & QuickRx Pediatric Drug Dose. Always cross-check before prescribing.
-        </p>
+/* -------------------- Adult Dose Calculator -------------------- */
+const AdultDose = () => {
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<AdultDrug | null>(null);
+  const [weight, setWeight] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const suggestions = useMemo(() => {
+    if (query.length < 1) return [];
+    const q = query.toLowerCase();
+    return ADULT_DRUGS.filter((d) => d.name.toLowerCase().includes(q) || d.generic.toLowerCase().includes(q)).slice(0, 15);
+  }, [query]);
+
+  const result = selected ? calculateAdultDose(selected, weight ? parseFloat(weight) : undefined) : null;
+  const needsWeight = selected?.kind === "mg/kg";
+
+  return (
+    <Card>
+      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><User className="w-4 h-4 text-primary" /> Adult Dose Calculator</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        <div className="relative">
+          <Label className="text-xs">Medicine / Generic Name</Label>
+          <Input value={query} onChange={(e) => { setQuery(e.target.value); setSelected(null); setOpen(true); }}
+            onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 200)}
+            placeholder="e.g. Paracetamol, Amoxicillin..." className="h-9" />
+          {open && suggestions.length > 0 && (
+            <div className="absolute z-50 left-0 right-0 mt-1 bg-card border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+              {suggestions.map((d, i) => (
+                <button key={i} type="button" className="w-full text-left px-3 py-2 hover:bg-accent border-b last:border-0 text-xs"
+                  onMouseDown={(e) => { e.preventDefault(); setSelected(d); setQuery(d.name); setOpen(false); }}>
+                  <div className="font-medium text-foreground">{d.name} <span className="text-muted-foreground">• {d.dose}</span></div>
+                  <div className="text-[10px] text-muted-foreground">{d.generic} • {d.frequency}{d.route ? ` • ${d.route}` : ""}{d.kind === "mg/kg" ? " • mg/kg" : ""}</div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        {needsWeight && (
+          <div><Label className="text-xs">Patient Weight (kg) <span className="text-primary">— required</span></Label><Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-9" placeholder="kg" /></div>
+        )}
+        {selected && (
+          <div className="rounded-lg border bg-muted/40 p-3 text-xs space-y-1">
+            <div className="flex justify-between"><span className="text-muted-foreground">Standard</span><span className="font-semibold">{selected.dose} {selected.frequency}</span></div>
+            {selected.maxDaily && <div className="flex justify-between"><span className="text-muted-foreground">Max</span><span className="font-semibold">{selected.maxDaily}</span></div>}
+          </div>
+        )}
+        {result && (!needsWeight || weight) && (
+          <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-4 text-center">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Prescription Dose</p>
+            <p className="text-2xl font-bold text-primary">{result.prescription}</p>
+            <p className="text-[11px] text-muted-foreground mt-2">{result.details}</p>
+            {selected?.notes && <p className="text-[11px] text-foreground mt-1 italic">{selected.notes}</p>}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+/* -------------------- GFR Calculator (Cockcroft-Gault + CKD-EPI) -------------------- */
+const GFRCalculator = () => {
+  const [age, setAge] = useState("");
+  const [weight, setWeight] = useState("");
+  const [creatinine, setCreatinine] = useState(""); // mg/dL
+  const [sex, setSex] = useState<"male" | "female">("male");
+  const [race, setRace] = useState<"other" | "black">("other");
+
+  const result = useMemo(() => {
+    const a = parseFloat(age), w = parseFloat(weight), s = parseFloat(creatinine);
+    if (!a || !w || !s) return null;
+    // Cockcroft-Gault: CrCl = ((140-age) × weight) / (72 × Scr) × (0.85 if female)
+    const cg = ((140 - a) * w) / (72 * s) * (sex === "female" ? 0.85 : 1);
+
+    // CKD-EPI 2009 (simplified):
+    const k = sex === "female" ? 0.7 : 0.9;
+    const alpha = sex === "female" ? -0.329 : -0.411;
+    const minScrK = Math.min(s / k, 1);
+    const maxScrK = Math.max(s / k, 1);
+    let ckdepi = 141 * Math.pow(minScrK, alpha) * Math.pow(maxScrK, -1.209) * Math.pow(0.993, a);
+    if (sex === "female") ckdepi *= 1.018;
+    if (race === "black") ckdepi *= 1.159;
+
+    const stage = (g: number) => {
+      if (g >= 90) return "G1 — Normal";
+      if (g >= 60) return "G2 — Mildly decreased";
+      if (g >= 45) return "G3a — Mild–moderate";
+      if (g >= 30) return "G3b — Moderate–severe";
+      if (g >= 15) return "G4 — Severely decreased";
+      return "G5 — Kidney failure";
+    };
+    return { cg: cg.toFixed(1), ckdepi: ckdepi.toFixed(1), stage: stage(ckdepi) };
+  }, [age, weight, creatinine, sex, race]);
+
+  return (
+    <Card>
+      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Activity className="w-4 h-4 text-primary" /> GFR / Creatinine Clearance</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          <div><Label className="text-xs">Age (yr)</Label><Input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="h-9" /></div>
+          <div><Label className="text-xs">Weight (kg)</Label><Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-9" /></div>
+          <div><Label className="text-xs">Serum Creatinine (mg/dL)</Label><Input type="number" step="0.01" value={creatinine} onChange={(e) => setCreatinine(e.target.value)} className="h-9" placeholder="e.g. 1.1" /></div>
+          <div>
+            <Label className="text-xs">Sex</Label>
+            <Select value={sex} onValueChange={(v) => setSex(v as any)}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="male">Male</SelectItem><SelectItem value="female">Female</SelectItem></SelectContent>
+            </Select>
+          </div>
+          <div className="col-span-2">
+            <Label className="text-xs">Race</Label>
+            <Select value={race} onValueChange={(v) => setRace(v as any)}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="other">Other</SelectItem><SelectItem value="black">Black / African</SelectItem></SelectContent>
+            </Select>
+          </div>
+        </div>
+        {result && (
+          <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3 space-y-2 text-sm">
+            <div className="flex justify-between"><span className="text-muted-foreground">CrCl (Cockcroft-Gault)</span><span className="font-bold text-primary">{result.cg} mL/min</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">eGFR (CKD-EPI)</span><span className="font-bold text-primary">{result.ckdepi} mL/min/1.73m²</span></div>
+            <div className="flex justify-between border-t pt-2"><span className="text-muted-foreground">CKD Stage</span><span className="font-semibold">{result.stage}</span></div>
+          </div>
+        )}
+        <p className="text-[10px] text-muted-foreground italic">Cockcroft-Gault: ((140−age)×wt)/(72×Scr) × 0.85♀ • CKD-EPI 2009 formula.</p>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* -------------------- Insulin Calculator -------------------- */
+const InsulinCalc = () => {
+  const [weight, setWeight] = useState("");
+  const [type, setType] = useState<"type1" | "type2">("type2");
+  const [sensitivity, setSensitivity] = useState<"normal" | "sensitive" | "resistant">("normal");
+
+  const w = parseFloat(weight) || 0;
+  const mult = type === "type1"
+    ? (sensitivity === "sensitive" ? 0.3 : sensitivity === "resistant" ? 0.6 : 0.5)
+    : (sensitivity === "sensitive" ? 0.3 : sensitivity === "resistant" ? 0.7 : 0.5);
+  const tdd = w > 0 ? Math.round(w * mult * 10) / 10 : 0;
+  const basal = Math.round(tdd * 0.5 * 10) / 10;
+  const bolus = Math.round(tdd * 0.5 * 10) / 10;
+  const perMeal = Math.round((bolus / 3) * 10) / 10;
+
+  return (
+    <Card>
+      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Syringe className="w-4 h-4 text-primary" /> Insulin Dose Calculator</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-3 gap-2">
+          <div><Label className="text-xs">Weight (kg)</Label><Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-9" /></div>
+          <div>
+            <Label className="text-xs">Type</Label>
+            <Select value={type} onValueChange={(v) => setType(v as any)}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="type1">Type 1</SelectItem><SelectItem value="type2">Type 2</SelectItem></SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs">Sensitivity</Label>
+            <Select value={sensitivity} onValueChange={(v) => setSensitivity(v as any)}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="sensitive">Sensitive</SelectItem><SelectItem value="normal">Normal</SelectItem><SelectItem value="resistant">Resistant</SelectItem></SelectContent>
+            </Select>
+          </div>
+        </div>
+        {w > 0 && (
+          <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3 space-y-1.5 text-sm">
+            <div className="flex justify-between"><span className="text-muted-foreground">Total Daily Dose</span><span className="font-bold text-primary">{tdd} units</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Basal (50%)</span><span className="font-semibold">{basal} units</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Bolus (50%)</span><span className="font-semibold">{bolus} units</span></div>
+            <div className="flex justify-between border-t pt-1.5"><span className="text-muted-foreground">Per meal (÷3)</span><span className="font-bold text-primary">{perMeal} units</span></div>
+            <p className="text-[10px] text-muted-foreground italic pt-1">TDD = Weight × {mult} U/kg ({sensitivity})</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -213,13 +400,21 @@ const Tools = () => {
           <p className="text-sm text-muted-foreground">Quick calculators for daily practice.</p>
         </div>
         <Tabs defaultValue="pedidose" className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="pedidose">Pediatric Dose</TabsTrigger>
-            <TabsTrigger value="edd">EDD</TabsTrigger>
-            <TabsTrigger value="bmi">BMI / Weight</TabsTrigger>
+          <TabsList className="flex flex-wrap h-auto gap-1 mb-4 justify-start">
+            <TabsTrigger value="pedidose" className="text-xs">Pediatric Dose</TabsTrigger>
+            <TabsTrigger value="adultdose" className="text-xs">Adult Dose</TabsTrigger>
+            <TabsTrigger value="gfr" className="text-xs">GFR</TabsTrigger>
+            <TabsTrigger value="insulin" className="text-xs">Insulin</TabsTrigger>
+            <TabsTrigger value="edd" className="text-xs">EDD</TabsTrigger>
+            <TabsTrigger value="ovulation" className="text-xs">Ovulation</TabsTrigger>
+            <TabsTrigger value="bmi" className="text-xs">BMI</TabsTrigger>
           </TabsList>
           <TabsContent value="pedidose"><PediatricDose /></TabsContent>
+          <TabsContent value="adultdose"><AdultDose /></TabsContent>
+          <TabsContent value="gfr"><GFRCalculator /></TabsContent>
+          <TabsContent value="insulin"><InsulinCalc /></TabsContent>
           <TabsContent value="edd"><EDDCalculator /></TabsContent>
+          <TabsContent value="ovulation"><OvulationCalculator /></TabsContent>
           <TabsContent value="bmi"><BMICalculator /></TabsContent>
         </Tabs>
       </main>
