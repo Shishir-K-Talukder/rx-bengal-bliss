@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      adult_dose_rules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dose: string
+          frequency: string
+          generic: string
+          id: string
+          kind: string
+          max_daily: string
+          mg_per_kg: number | null
+          name: string
+          notes: string
+          route: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dose?: string
+          frequency?: string
+          generic?: string
+          id?: string
+          kind?: string
+          max_daily?: string
+          mg_per_kg?: number | null
+          name?: string
+          notes?: string
+          route?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dose?: string
+          frequency?: string
+          generic?: string
+          id?: string
+          kind?: string
+          max_daily?: string
+          mg_per_kg?: number | null
+          name?: string
+          notes?: string
+          route?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -157,6 +205,51 @@ export type Database = {
           sex?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      pediatric_dose_rules: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          daily_dose: string
+          drop_ratio: number | null
+          frequency: string
+          generic: string
+          id: string
+          name: string
+          notes: string
+          strength: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          daily_dose?: string
+          drop_ratio?: number | null
+          frequency?: string
+          generic?: string
+          id?: string
+          name?: string
+          notes?: string
+          strength?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          daily_dose?: string
+          drop_ratio?: number | null
+          frequency?: string
+          generic?: string
+          id?: string
+          name?: string
+          notes?: string
+          strength?: string
+          updated_at?: string
         }
         Relationships: []
       }
