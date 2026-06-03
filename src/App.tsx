@@ -7,6 +7,9 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { lazy, Suspense } from "react";
 import NotFound from "./pages/NotFound.tsx";
 
+const Home = lazy(() => import("./pages/Home.tsx"));
+const About = lazy(() => import("./pages/About.tsx"));
+const Contact = lazy(() => import("./pages/Contact.tsx"));
 const Index = lazy(() => import("./pages/Index.tsx"));
 const PrintPage = lazy(() => import("./pages/PrintPage.tsx"));
 const Login = lazy(() => import("./pages/Login.tsx"));
@@ -21,34 +24,25 @@ const Tools = lazy(() => import("./pages/Tools.tsx"));
 const queryClient = new QueryClient();
 
 type RedirectState = {
-  from?: {
-    pathname: string;
-    search?: string;
-    hash?: string;
-  };
+  from?: { pathname: string; search?: string; hash?: string };
 };
 
 const getRouterBasename = () => {
   if (typeof window === "undefined") return undefined;
-
   if (window.location.hostname.endsWith("github.io")) {
     const [firstPathSegment] = window.location.pathname.split("/").filter(Boolean);
     return firstPathSegment ? `/${firstPathSegment}` : undefined;
   }
-
   return undefined;
 };
 
 const getRedirectPath = (location: { search: string; state: unknown }) => {
   const redirectParam = new URLSearchParams(location.search).get("redirect");
-
   if (redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")) {
     return redirectParam;
   }
-
   const from = (location.state as RedirectState | null)?.from;
   if (!from?.pathname) return null;
-
   return `${from.pathname}${from.search ?? ""}${from.hash ?? ""}`;
 };
 
@@ -59,30 +53,21 @@ const Loading = () => (
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
-
   if (loading) return <Loading />;
-
   if (!user) {
     const redirectPath = `${location.pathname}${location.search}${location.hash}`;
     return (
-      <Navigate
-        to={`/login?redirect=${encodeURIComponent(redirectPath)}`}
-        replace
-        state={{ from: location }}
-      />
+      <Navigate to={`/login?redirect=${encodeURIComponent(redirectPath)}`} replace state={{ from: location }} />
     );
   }
-
   return <>{children}</>;
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
-
   if (loading) return <Loading />;
-  if (user) return <Navigate to={getRedirectPath(location) ?? "/dashboard"} replace />;
-
+  if (user) return <Navigate to={getRedirectPath(location) ?? "/app"} replace />;
   return <>{children}</>;
 };
 
@@ -98,11 +83,19 @@ const App = () => {
           <BrowserRouter basename={routerBasename}>
             <Suspense fallback={<Loading />}>
               <Routes>
+                {/* Public marketing routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+
+                {/* Auth routes */}
                 <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
                 <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
                 <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+
+                {/* Protected app routes */}
+                <Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
