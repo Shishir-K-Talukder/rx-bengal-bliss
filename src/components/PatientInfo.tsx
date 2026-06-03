@@ -13,6 +13,7 @@ export interface PatientData {
   address: string;
   date: string;
   patientId?: string;
+  referredBy?: string;
 }
 
 interface Props {
