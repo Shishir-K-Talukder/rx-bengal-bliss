@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import {
   Users, Stethoscope, FileText, Shield, Search, Trash2, Eye, UserCheck, UserX,
   ArrowLeft, Pill, CalendarDays, Database, RefreshCw, Settings, Plus, Download,
-  BarChart3, Activity, Clock, Timer, Calculator,
+  BarChart3, Activity, Clock, Timer, Calculator, Mail,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
