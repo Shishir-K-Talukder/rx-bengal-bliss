@@ -66,6 +66,13 @@ const PediatricRulesManager = () => {
     <Card>
       <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Baby className="w-4 h-4 text-primary" /> Pediatric Dose Rules ({rules.length})</CardTitle></CardHeader>
       <CardContent className="space-y-4">
+        <MedexLookup kind="pediatric" onPick={(r: MedexResult) => setForm(f => ({
+          ...f,
+          name: r.brand || f.name,
+          generic: r.generic || f.generic,
+          strength: r.strength || f.strength,
+          notes: (r.pediatric || r.dose || "").slice(0, 500),
+        }))} />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 rounded-lg border bg-muted/30">
           <Input placeholder="Brand name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="h-9 text-xs" />
           <Input placeholder="Generic name" value={form.generic} onChange={e => setForm({ ...form, generic: e.target.value })} className="h-9 text-xs" />
