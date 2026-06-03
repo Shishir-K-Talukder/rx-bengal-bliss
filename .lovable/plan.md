@@ -1,40 +1,61 @@
+# Plan: Digital Rx — Public Site + App Enhancements
 
+Large request — splitting into 6 deliverables. Confirm or adjust before I build.
 
-# Backend Fixes — Attach Missing Database Triggers
+## 1. Public Marketing Home (`/`)
+- Move current app from `/` → `/app` (still protected). New public `/` = marketing page (no auth required).
+- Sections: Hero (slogan + 3D effect), Features, About, Pricing, Contact, Footer.
+- Header matches app header style; includes **About**, **Contact**, **Login** buttons.
+- **Slogan suggestion** (pick one or give your own):
+  - "Digital Rx — Prescribe Smarter, Heal Faster."
+  - "Digital Rx — Bangladesh's Modern Prescription Pad."
+- **3D effect**: subtle CSS 3D tilt on hero card + floating prescription mockup (no heavy three.js, keeps it fast & SEO-friendly).
+- **SEO**: title, meta description, OG tags, JSON-LD (SoftwareApplication), sitemap.xml updated, robots.txt allows `/`.
 
-## Current State
-Your database tables (`profiles`, `patients`, `prescriptions`, `doctor_settings`) and functions (`handle_new_user`, `update_updated_at_column`) already exist with proper RLS policies. However, **no triggers are attached**, meaning:
+## 2. Pricing Table
+| Plan | Price | Setup |
+|---|---|---|
+| Basic | 500 BDT / month | 1000 BDT |
+| Standard | 2000 BDT / year | 500 BDT |
+| Lifetime | 5000 BDT one-time | Free |
+- "Contact us for better price & demo" CTA below table.
 
-1. **New signups don't auto-create a profile** — the `handle_new_user` function exists but isn't wired to fire on `auth.users` inserts
-2. **`updated_at` columns don't auto-update** — the function exists but no trigger fires it
+## 3. Contact Form + Admin SMTP Config
+- Public Contact page/section with name/email/phone/message form.
+- New table `contact_messages` (stores submissions; admin viewable).
+- New table `smtp_settings` (admin-only): provider (Google SMTP / SendGrid / Custom SMTP), host, port, username, password, from-email.
+- New admin tab **"Contact"**: configure SMTP + view messages.
+- Edge function `send-contact-email` uses configured SMTP to notify admin on new submission.
 
-## What Will Be Done
+## 4. App Tweaks
+- **PatientInfo**: add "Referred By" field (text + autocomplete from history).
+- **PrintSetup**: toggle to show/hide Referred By on print.
+- **ClinicalNotes**: when LMP date is entered, auto-calculate EDD (LMP + 280 days); EDD field stays manually editable.
 
-### Migration: Attach triggers
+## 5. Medex.com.bd Dose Scraper
+- In Admin → Doses tab, add **"Sync from Medex"** button for both Pediatric and Adult rule managers.
+- Input: brand or generic name → edge function scrapes medex.com.bd's "Indication & Dose" section → pre-fills the add-rule form for admin review before saving.
+- (Note: medex doesn't expose structured dose data; we pull raw text and admin edits before save.)
 
-```sql
--- Auto-create profile on signup
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+## 6. Routing / Auth changes
+- `/` → public Home (no auth)
+- `/app` → current prescription editor (protected)
+- `/login`, `/signup`, `/about`, `/contact` → public
+- Logged-in users clicking logo from `/` → redirect to `/app`.
 
--- Auto-update updated_at on profiles, patients, prescriptions, doctor_settings
-CREATE TRIGGER update_profiles_updated_at
-  BEFORE UPDATE ON public.profiles
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+---
 
-CREATE TRIGGER update_patients_updated_at
-  BEFORE UPDATE ON public.patients
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+## Technical notes
+- New tables: `contact_messages`, `smtp_settings` (admin-only RLS).
+- New edge function: `send-contact-email` (uses nodemailer-style SMTP via `npm:nodemailer`).
+- New edge function: `scrape-medex-dose`.
+- Update `FloatingNav` and `Index.tsx` route.
+- `react-helmet-async` for per-route SEO.
 
-CREATE TRIGGER update_prescriptions_updated_at
-  BEFORE UPDATE ON public.prescriptions
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+---
 
-CREATE TRIGGER update_doctor_settings_updated_at
-  BEFORE UPDATE ON public.doctor_settings
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-```
-
-No code changes needed — just this one migration to wire up the existing functions.
-
+## Questions before I start
+1. **Order**: Build all 6 in one shot, or phase it? (recommend: Phase A = Home+Pricing+SEO+App tweaks, Phase B = Contact+SMTP, Phase C = Medex scraper)
+2. **Slogan**: pick one above or provide your own.
+3. **Logo/brand color**: keep current app theme, or want a new accent for marketing site?
+4. **Admin email**: where should contact-form notifications be sent? (one email address)

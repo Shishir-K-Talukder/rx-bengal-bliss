@@ -415,8 +415,18 @@ const InvestigationResultsTab = ({ value, onChange }: { value: string; onChange:
 
 const ClinicalSection = ({ data, onChange, options }: Props) => {
   const updateOE = (key: keyof OnExaminationData, value: string) => {
-    onChange({ ...data, onExamination: { ...data.onExamination, [key]: value } });
+    const next = { ...data.onExamination, [key]: value };
+    // Auto-calculate EDD when LMP is set (Naegele's rule: LMP + 280 days)
+    if (key === "lmp" && value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      const lmpDate = new Date(value);
+      if (!isNaN(lmpDate.getTime())) {
+        const edd = new Date(lmpDate.getTime() + 280 * 24 * 60 * 60 * 1000);
+        next.edd = edd.toISOString().split("T")[0];
+      }
+    }
+    onChange({ ...data, onExamination: next });
   };
+
 
   const oeFields: { key: keyof OnExaminationData; label: string; placeholder: string; type: "text" | "select" | "date" }[] = [
     { key: "bp", label: "BP", placeholder: "120/80", type: "text" },

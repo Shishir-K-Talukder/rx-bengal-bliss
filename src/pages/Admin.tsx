@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import {
   Users, Stethoscope, FileText, Shield, Search, Trash2, Eye, UserCheck, UserX,
   ArrowLeft, Pill, CalendarDays, Database, RefreshCw, Settings, Plus, Download,
-  BarChart3, Activity, Clock, Timer, Calculator,
+  BarChart3, Activity, Clock, Timer, Calculator, Mail,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Navigate, useNavigate } from "react-router-dom";
 import FloatingNav from "@/components/FloatingNav";
 import DoseRulesManager from "@/components/DoseRulesManager";
+import ContactManager from "@/components/ContactManager";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 
@@ -366,7 +367,7 @@ const Admin = () => {
 
   // ─── Guards ───
   if (adminLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin) return <Navigate to="/app" replace />;
 
   return (
     <div className="min-h-screen bg-background pt-16 pb-8">
@@ -417,7 +418,7 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4 w-full grid grid-cols-3 md:grid-cols-9 h-auto bg-muted/60 p-1 rounded-xl border border-border gap-1">
+          <TabsList className="mb-4 w-full grid grid-cols-3 md:grid-cols-10 h-auto bg-muted/60 p-1 rounded-xl border border-border gap-1">
             <TabsTrigger value="overview" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><BarChart3 className="w-3.5 h-3.5" /> Overview</TabsTrigger>
             <TabsTrigger value="doctors" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Stethoscope className="w-3.5 h-3.5" /> Doctors</TabsTrigger>
             <TabsTrigger value="patients" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Users className="w-3.5 h-3.5" /> Patients</TabsTrigger>
@@ -426,10 +427,12 @@ const Admin = () => {
             <TabsTrigger value="medicines" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Pill className="w-3.5 h-3.5" /> Medicines</TabsTrigger>
             <TabsTrigger value="doserules" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Calculator className="w-3.5 h-3.5" /> Doses</TabsTrigger>
             <TabsTrigger value="templates" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Settings className="w-3.5 h-3.5" /> Templates</TabsTrigger>
+            <TabsTrigger value="contact" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Mail className="w-3.5 h-3.5" /> Contact</TabsTrigger>
             <TabsTrigger value="roles" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Shield className="w-3.5 h-3.5" /> Access</TabsTrigger>
           </TabsList>
 
           <TabsContent value="doserules"><DoseRulesManager /></TabsContent>
+          <TabsContent value="contact"><ContactManager /></TabsContent>
 
           {/* ═══ OVERVIEW ═══ */}
           <TabsContent value="overview">

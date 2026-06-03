@@ -118,6 +118,39 @@ export type Database = {
           },
         ]
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+          status?: string
+          subject?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       doctor_settings: {
         Row: {
           created_at: string
@@ -342,6 +375,48 @@ export type Database = {
           specialization?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      smtp_settings: {
+        Row: {
+          from_email: string
+          from_name: string
+          host: string
+          id: string
+          notification_email: string
+          password: string
+          port: number
+          provider: string
+          updated_at: string
+          use_tls: boolean
+          username: string
+        }
+        Insert: {
+          from_email?: string
+          from_name?: string
+          host?: string
+          id?: string
+          notification_email?: string
+          password?: string
+          port?: number
+          provider?: string
+          updated_at?: string
+          use_tls?: boolean
+          username?: string
+        }
+        Update: {
+          from_email?: string
+          from_name?: string
+          host?: string
+          id?: string
+          notification_email?: string
+          password?: string
+          port?: number
+          provider?: string
+          updated_at?: string
+          use_tls?: boolean
+          username?: string
         }
         Relationships: []
       }
