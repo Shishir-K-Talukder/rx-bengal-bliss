@@ -366,7 +366,7 @@ const Admin = () => {
 
   // ─── Guards ───
   if (adminLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin) return <Navigate to="/app" replace />;
 
   return (
     <div className="min-h-screen bg-background pt-16 pb-8">
