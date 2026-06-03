@@ -258,6 +258,17 @@ const PatientInfo = ({ patient, onChange }: Props) => {
           <Label className="field-label">Address</Label>
           <Input value={patient.address} onChange={(e) => onChange({ ...patient, address: e.target.value })} placeholder="ঠিকানা" className="h-9 text-sm" />
         </div>
+
+        {/* Row 4: Referred By */}
+        <div className="col-span-2 sm:col-span-6">
+          <Label className="field-label">Referred By</Label>
+          <Input
+            value={patient.referredBy || ""}
+            onChange={(e) => onChange({ ...patient, referredBy: e.target.value })}
+            placeholder="Dr. Name / Hospital / Self"
+            className="h-9 text-sm"
+          />
+        </div>
       </div>
     </div>
   );
