@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trash2, Plus, Baby, User, Search } from "lucide-react";
 import { toast } from "sonner";
+import MedexLookup, { MedexResult } from "./MedexLookup";
 
 // Use as any until generated types include the new tables
 const db = supabase as any;
