@@ -199,6 +199,9 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
         <span><strong>Sex :: </strong>{patient.sex}</span>
         {settings.showPatientId && patient.patientId && <span><strong>Patient ID :: </strong>{patient.patientId}</span>}
         <span><strong>Date :: </strong>{formatDateDMY(patient.date)}</span>
+        {settings.showReferredBy && patient.referredBy && (
+          <span className="w-full mt-1"><strong>Referred By :: </strong>{patient.referredBy}</span>
+        )}
       </div>
 
       {/* Main content area - grows to fill available space */}
