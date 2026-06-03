@@ -20,7 +20,7 @@ const FloatingNav = ({ actions }: { actions?: NavAction[] }) => {
   const { signOut } = useAuth();
   const { isAdmin } = useAdmin();
   const navItems = [
-    { icon: <Stethoscope className="w-5 h-5" />, label: "Write Rx", path: "/" },
+    { icon: <Stethoscope className="w-5 h-5" />, label: "Write Rx", path: "/app" },
     { icon: <LayoutDashboard className="w-5 h-5" />, label: "Dashboard", path: "/dashboard" },
     { icon: <Calculator className="w-5 h-5" />, label: "Tools", path: "/tools" },
     { icon: <User className="w-5 h-5" />, label: "Profile", path: "/profile" },
