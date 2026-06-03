@@ -173,6 +173,7 @@ const PrintSetup = ({ settings, onChange }: Props) => {
             { key: "showInvestigation", label: "Investigation", id: "show-inv" },
             { key: "showInvestigationResults", label: "IX Results", id: "show-ix-results" },
             { key: "showPatientId", label: "Patient ID", id: "show-patient-id" },
+            { key: "showReferredBy", label: "Referred By", id: "show-referred-by" },
             { key: "showFooter", label: "Footer", id: "show-footer" },
           ].map(({ key, label, id }) => (
             <div key={key} className="flex items-center gap-2.5 bg-muted/30 rounded-lg px-3 py-2">
