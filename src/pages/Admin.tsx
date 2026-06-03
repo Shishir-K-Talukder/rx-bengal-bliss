@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Navigate, useNavigate } from "react-router-dom";
 import FloatingNav from "@/components/FloatingNav";
 import DoseRulesManager from "@/components/DoseRulesManager";
+import ContactManager from "@/components/ContactManager";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 
