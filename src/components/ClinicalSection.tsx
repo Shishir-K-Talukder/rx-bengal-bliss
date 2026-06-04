@@ -413,15 +413,29 @@ const InvestigationResultsTab = ({ value, onChange }: { value: string; onChange:
   );
 };
 
+// Parse DD-MM-YYYY into a Date (returns null if invalid)
+const parseDMY = (v: string): Date | null => {
+  const m = v.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (!m) return null;
+  const [, d, mo, y] = m;
+  const date = new Date(`${y}-${mo}-${d}T00:00:00`);
+  return isNaN(date.getTime()) ? null : date;
+};
+const formatDMY = (date: Date): string => {
+  const d = String(date.getDate()).padStart(2, "0");
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  return `${d}-${m}-${date.getFullYear()}`;
+};
+
 const ClinicalSection = ({ data, onChange, options }: Props) => {
   const updateOE = (key: keyof OnExaminationData, value: string) => {
     const next = { ...data.onExamination, [key]: value };
-    // Auto-calculate EDD when LMP is set (Naegele's rule: LMP + 280 days)
-    if (key === "lmp" && value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      const lmpDate = new Date(value);
-      if (!isNaN(lmpDate.getTime())) {
+    // Auto-calculate EDD when LMP is valid DD-MM-YYYY (Naegele's rule: LMP + 280 days)
+    if (key === "lmp") {
+      const lmpDate = parseDMY(value);
+      if (lmpDate) {
         const edd = new Date(lmpDate.getTime() + 280 * 24 * 60 * 60 * 1000);
-        next.edd = edd.toISOString().split("T")[0];
+        next.edd = formatDMY(edd);
       }
     }
     onChange({ ...data, onExamination: next });
@@ -442,8 +456,8 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
     { key: "oedema", label: "Oedema", placeholder: "Absent", type: "select" },
     { key: "rr", label: "RR", placeholder: "RR", type: "text" },
     { key: "spo2", label: "SPO2", placeholder: "SPO2", type: "text" },
-    { key: "lmp", label: "LMP", placeholder: "Date", type: "date" },
-    { key: "edd", label: "EDD", placeholder: "Date", type: "date" },
+    { key: "lmp", label: "LMP", placeholder: "DD-MM-YYYY", type: "date" },
+    { key: "edd", label: "EDD", placeholder: "DD-MM-YYYY", type: "date" },
     { key: "fm", label: "FM", placeholder: "Present/Absent", type: "select" },
     { key: "fhr", label: "FHR", placeholder: "FHR", type: "text" },
     { key: "gravida", label: "GRAVIDA", placeholder: "Primi", type: "text" },
@@ -537,7 +551,23 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
                       </SelectContent>
                     </Select>
                   ) : f.type === "date" ? (
-                    <Input type="date" value={data.onExamination[f.key]} onChange={(e) => updateOE(f.key, e.target.value)} className="h-7 text-xs border-0 shadow-none bg-transparent" />
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={10}
+                      value={data.onExamination[f.key]}
+                      onChange={(e) => {
+                        // Auto-format: insert dashes as user types (DD-MM-YYYY)
+                        let v = e.target.value.replace(/[^\d-]/g, "");
+                        const digits = v.replace(/-/g, "");
+                        let formatted = digits.slice(0, 2);
+                        if (digits.length >= 3) formatted += "-" + digits.slice(2, 4);
+                        if (digits.length >= 5) formatted += "-" + digits.slice(4, 8);
+                        updateOE(f.key, formatted);
+                      }}
+                      placeholder={f.placeholder}
+                      className="h-7 text-xs border-0 shadow-none bg-transparent"
+                    />
                   ) : (
                     <OEInputWithSuggestions fieldKey={f.key} value={data.onExamination[f.key]} placeholder={f.placeholder} onChange={(v) => updateOE(f.key, v)} />
                   )}
