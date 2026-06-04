@@ -68,7 +68,7 @@ const Home = () => {
         <MarketingHeader />
 
         {/* HERO */}
-        <section className="relative overflow-hidden pt-16 pb-24 sm:pt-24 sm:pb-32">
+        <section className="relative overflow-hidden pt-28 pb-24 sm:pt-36 sm:pb-32">
           {/* 3D background gradients */}
           <div className="absolute inset-0 -z-10">
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
