@@ -378,6 +378,48 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          contact_email: string
+          contact_phone: string
+          facebook_url: string
+          id: string
+          instagram_url: string
+          linkedin_url: string
+          tiktok_url: string
+          twitter_url: string
+          updated_at: string
+          whatsapp_url: string
+          youtube_url: string
+        }
+        Insert: {
+          contact_email?: string
+          contact_phone?: string
+          facebook_url?: string
+          id?: string
+          instagram_url?: string
+          linkedin_url?: string
+          tiktok_url?: string
+          twitter_url?: string
+          updated_at?: string
+          whatsapp_url?: string
+          youtube_url?: string
+        }
+        Update: {
+          contact_email?: string
+          contact_phone?: string
+          facebook_url?: string
+          id?: string
+          instagram_url?: string
+          linkedin_url?: string
+          tiktok_url?: string
+          twitter_url?: string
+          updated_at?: string
+          whatsapp_url?: string
+          youtube_url?: string
+        }
+        Relationships: []
+      }
       smtp_settings: {
         Row: {
           from_email: string
