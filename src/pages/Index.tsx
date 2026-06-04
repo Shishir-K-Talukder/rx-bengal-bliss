@@ -122,9 +122,9 @@ const Index = () => {
     const printData = { doctor, patient, clinical, medicines, advice, printSettings };
     sessionStorage.setItem("prescription-print-data", JSON.stringify(printData));
 
-    const currentLocation = `${window.location.origin}${window.location.pathname.endsWith("/") ? window.location.pathname : `${window.location.pathname}/`}`;
-    const printUrl = new URL("print", currentLocation);
-    window.open(printUrl.toString(), "_blank");
+    const baseUrl = import.meta.env.BASE_URL || "/";
+    const printUrl = `${window.location.origin}${baseUrl}${baseUrl.endsWith("/") ? "" : "/"}print`.replace(/\/+/g, "/").replace(":/", "://");
+    window.open(printUrl, "_blank");
   };
 
   const handleSave = () => {
