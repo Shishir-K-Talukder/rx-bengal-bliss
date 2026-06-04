@@ -423,21 +423,33 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4 w-full grid grid-cols-3 md:grid-cols-10 h-auto bg-muted/60 p-1 rounded-xl border border-border gap-1">
-            <TabsTrigger value="overview" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><BarChart3 className="w-3.5 h-3.5" /> Overview</TabsTrigger>
-            <TabsTrigger value="doctors" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Stethoscope className="w-3.5 h-3.5" /> Doctors</TabsTrigger>
-            <TabsTrigger value="patients" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Users className="w-3.5 h-3.5" /> Patients</TabsTrigger>
-            <TabsTrigger value="prescriptions" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><FileText className="w-3.5 h-3.5" /> Rx</TabsTrigger>
-            <TabsTrigger value="appointments" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><CalendarDays className="w-3.5 h-3.5" /> Appts</TabsTrigger>
-            <TabsTrigger value="medicines" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Pill className="w-3.5 h-3.5" /> Medicines</TabsTrigger>
-            <TabsTrigger value="doserules" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Calculator className="w-3.5 h-3.5" /> Doses</TabsTrigger>
-            <TabsTrigger value="templates" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Settings className="w-3.5 h-3.5" /> Templates</TabsTrigger>
-            <TabsTrigger value="contact" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Mail className="w-3.5 h-3.5" /> Contact</TabsTrigger>
-            <TabsTrigger value="roles" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Shield className="w-3.5 h-3.5" /> Access</TabsTrigger>
+          <TabsList className="mb-5 w-full grid grid-cols-3 sm:grid-cols-4 md:grid-cols-11 h-auto bg-card border border-border/60 p-1.5 rounded-2xl shadow-sm gap-1">
+            {[
+              { v: "overview", icon: BarChart3, label: "Overview" },
+              { v: "doctors", icon: Stethoscope, label: "Doctors" },
+              { v: "patients", icon: Users, label: "Patients" },
+              { v: "prescriptions", icon: FileText, label: "Rx" },
+              { v: "appointments", icon: CalendarDays, label: "Appts" },
+              { v: "medicines", icon: Pill, label: "Medicines" },
+              { v: "doserules", icon: Calculator, label: "Doses" },
+              { v: "templates", icon: Settings, label: "Templates" },
+              { v: "contact", icon: Mail, label: "Contact" },
+              { v: "site", icon: Globe, label: "Site" },
+              { v: "roles", icon: Shield, label: "Access" },
+            ].map((t) => (
+              <TabsTrigger
+                key={t.v}
+                value={t.v}
+                className="text-[11px] gap-1 rounded-xl py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+              >
+                <t.icon className="w-3.5 h-3.5" /> {t.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           <TabsContent value="doserules"><DoseRulesManager /></TabsContent>
           <TabsContent value="contact"><ContactManager /></TabsContent>
+          <TabsContent value="site"><SiteSettingsManager /></TabsContent>
 
           {/* ═══ OVERVIEW ═══ */}
           <TabsContent value="overview">
