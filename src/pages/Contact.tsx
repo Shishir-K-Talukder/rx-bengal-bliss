@@ -53,7 +53,7 @@ const Contact = () => {
       </Helmet>
       <div className="min-h-screen bg-background">
         <MarketingHeader />
-        <section className="py-16 container mx-auto px-4 max-w-5xl">
+        <section className="pt-28 pb-16 container mx-auto px-4 max-w-5xl">
           <h1 className="text-4xl sm:text-5xl font-bold mb-3 text-center">Contact Us</h1>
           <p className="text-muted-foreground text-center mb-12">
             Have a question or want a demo? Drop us a line.
