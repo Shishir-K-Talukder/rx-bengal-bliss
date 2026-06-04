@@ -371,41 +371,45 @@ const Admin = () => {
   if (!isAdmin) return <Navigate to="/app" replace />;
 
   return (
-    <div className="min-h-screen bg-background pt-16 pb-8">
+    <div className="min-h-screen bg-gradient-to-b from-muted/40 via-background to-background pt-16 pb-8">
       <FloatingNav />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <Shield className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
-          <Badge variant="outline" className="text-xs">Full Control</Badge>
-          <div className="ml-auto flex gap-2">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={exportData}>
-              <Download className="w-3.5 h-3.5" /> Export JSON
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-card border border-border/60 shadow-sm">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
+            <Shield className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">Admin Panel</h1>
+            <p className="text-xs text-muted-foreground">Manage doctors, patients, prescriptions and site settings</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs rounded-full" onClick={exportData}>
+              <Download className="w-3.5 h-3.5" /> Export
             </Button>
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={loadAll} disabled={loading}>
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs rounded-full" onClick={loadAll} disabled={loading}>
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
             </Button>
           </div>
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-3 md:grid-cols-7 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-3 mb-6">
           {[
-            { icon: <Stethoscope className="w-5 h-5 text-primary" />, label: "Doctors", value: doctors.length },
-            { icon: <UserCheck className="w-5 h-5 text-primary" />, label: "Active", value: activeDoctors },
-            { icon: <UserX className="w-5 h-5 text-destructive" />, label: "Inactive", value: inactiveDoctors },
-            { icon: <Users className="w-5 h-5 text-primary" />, label: "Patients", value: patients.length },
-            { icon: <FileText className="w-5 h-5 text-primary" />, label: "Prescriptions", value: prescriptions.length },
-            { icon: <CalendarDays className="w-5 h-5 text-primary" />, label: "Appointments", value: appointments.length },
-            { icon: <Pill className="w-5 h-5 text-primary" />, label: "Medicines", value: medicines.length },
+            { icon: <Stethoscope className="w-4 h-4 text-primary" />, label: "Doctors", value: doctors.length },
+            { icon: <UserCheck className="w-4 h-4 text-emerald-500" />, label: "Active", value: activeDoctors },
+            { icon: <UserX className="w-4 h-4 text-destructive" />, label: "Inactive", value: inactiveDoctors },
+            { icon: <Users className="w-4 h-4 text-primary" />, label: "Patients", value: patients.length },
+            { icon: <FileText className="w-4 h-4 text-primary" />, label: "Prescriptions", value: prescriptions.length },
+            { icon: <CalendarDays className="w-4 h-4 text-primary" />, label: "Appointments", value: appointments.length },
+            { icon: <Pill className="w-4 h-4 text-primary" />, label: "Medicines", value: medicines.length },
           ].map((s) => (
-            <Card key={s.label}>
-              <CardContent className="p-3 flex items-center gap-2">
-                {s.icon}
-                <div>
-                  <p className="text-xl font-bold">{s.value}</p>
-                  <p className="text-[10px] text-muted-foreground">{s.label}</p>
+            <Card key={s.label} className="border-border/60 hover:shadow-md transition-shadow">
+              <CardContent className="p-3 flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">{s.icon}</div>
+                <div className="min-w-0">
+                  <p className="text-lg font-bold leading-tight">{s.value}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">{s.label}</p>
                 </div>
               </CardContent>
             </Card>
