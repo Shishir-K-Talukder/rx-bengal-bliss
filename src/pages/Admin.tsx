@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import {
   Users, Stethoscope, FileText, Shield, Search, Trash2, Eye, UserCheck, UserX,
   ArrowLeft, Pill, CalendarDays, Database, RefreshCw, Settings, Plus, Download,
-  BarChart3, Activity, Clock, Timer, Calculator, Mail,
+  BarChart3, Activity, Clock, Timer, Calculator, Mail, Globe,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -25,6 +25,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import FloatingNav from "@/components/FloatingNav";
 import DoseRulesManager from "@/components/DoseRulesManager";
 import ContactManager from "@/components/ContactManager";
+import SiteSettingsManager from "@/components/SiteSettingsManager";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 
