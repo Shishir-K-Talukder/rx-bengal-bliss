@@ -13,7 +13,7 @@ const About = () => (
     </Helmet>
     <div className="min-h-screen bg-background">
       <MarketingHeader />
-      <section className="py-16 container mx-auto px-4 max-w-4xl">
+      <section className="pt-28 pb-16 container mx-auto px-4 max-w-4xl">
         <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-center">About Digital Rx</h1>
         <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
           We're on a mission to modernize how doctors in Bangladesh write, manage, and deliver prescriptions.

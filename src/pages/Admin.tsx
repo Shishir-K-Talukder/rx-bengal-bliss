@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import {
   Users, Stethoscope, FileText, Shield, Search, Trash2, Eye, UserCheck, UserX,
   ArrowLeft, Pill, CalendarDays, Database, RefreshCw, Settings, Plus, Download,
-  BarChart3, Activity, Clock, Timer, Calculator, Mail,
+  BarChart3, Activity, Clock, Timer, Calculator, Mail, Globe,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -25,6 +25,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import FloatingNav from "@/components/FloatingNav";
 import DoseRulesManager from "@/components/DoseRulesManager";
 import ContactManager from "@/components/ContactManager";
+import SiteSettingsManager from "@/components/SiteSettingsManager";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 
@@ -370,41 +371,45 @@ const Admin = () => {
   if (!isAdmin) return <Navigate to="/app" replace />;
 
   return (
-    <div className="min-h-screen bg-background pt-16 pb-8">
+    <div className="min-h-screen bg-gradient-to-b from-muted/40 via-background to-background pt-16 pb-8">
       <FloatingNav />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <Shield className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
-          <Badge variant="outline" className="text-xs">Full Control</Badge>
-          <div className="ml-auto flex gap-2">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={exportData}>
-              <Download className="w-3.5 h-3.5" /> Export JSON
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-card border border-border/60 shadow-sm">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
+            <Shield className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">Admin Panel</h1>
+            <p className="text-xs text-muted-foreground">Manage doctors, patients, prescriptions and site settings</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs rounded-full" onClick={exportData}>
+              <Download className="w-3.5 h-3.5" /> Export
             </Button>
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={loadAll} disabled={loading}>
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs rounded-full" onClick={loadAll} disabled={loading}>
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
             </Button>
           </div>
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-3 md:grid-cols-7 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-3 mb-6">
           {[
-            { icon: <Stethoscope className="w-5 h-5 text-primary" />, label: "Doctors", value: doctors.length },
-            { icon: <UserCheck className="w-5 h-5 text-primary" />, label: "Active", value: activeDoctors },
-            { icon: <UserX className="w-5 h-5 text-destructive" />, label: "Inactive", value: inactiveDoctors },
-            { icon: <Users className="w-5 h-5 text-primary" />, label: "Patients", value: patients.length },
-            { icon: <FileText className="w-5 h-5 text-primary" />, label: "Prescriptions", value: prescriptions.length },
-            { icon: <CalendarDays className="w-5 h-5 text-primary" />, label: "Appointments", value: appointments.length },
-            { icon: <Pill className="w-5 h-5 text-primary" />, label: "Medicines", value: medicines.length },
+            { icon: <Stethoscope className="w-4 h-4 text-primary" />, label: "Doctors", value: doctors.length },
+            { icon: <UserCheck className="w-4 h-4 text-emerald-500" />, label: "Active", value: activeDoctors },
+            { icon: <UserX className="w-4 h-4 text-destructive" />, label: "Inactive", value: inactiveDoctors },
+            { icon: <Users className="w-4 h-4 text-primary" />, label: "Patients", value: patients.length },
+            { icon: <FileText className="w-4 h-4 text-primary" />, label: "Prescriptions", value: prescriptions.length },
+            { icon: <CalendarDays className="w-4 h-4 text-primary" />, label: "Appointments", value: appointments.length },
+            { icon: <Pill className="w-4 h-4 text-primary" />, label: "Medicines", value: medicines.length },
           ].map((s) => (
-            <Card key={s.label}>
-              <CardContent className="p-3 flex items-center gap-2">
-                {s.icon}
-                <div>
-                  <p className="text-xl font-bold">{s.value}</p>
-                  <p className="text-[10px] text-muted-foreground">{s.label}</p>
+            <Card key={s.label} className="border-border/60 hover:shadow-md transition-shadow">
+              <CardContent className="p-3 flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">{s.icon}</div>
+                <div className="min-w-0">
+                  <p className="text-lg font-bold leading-tight">{s.value}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">{s.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -418,21 +423,33 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4 w-full grid grid-cols-3 md:grid-cols-10 h-auto bg-muted/60 p-1 rounded-xl border border-border gap-1">
-            <TabsTrigger value="overview" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><BarChart3 className="w-3.5 h-3.5" /> Overview</TabsTrigger>
-            <TabsTrigger value="doctors" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Stethoscope className="w-3.5 h-3.5" /> Doctors</TabsTrigger>
-            <TabsTrigger value="patients" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Users className="w-3.5 h-3.5" /> Patients</TabsTrigger>
-            <TabsTrigger value="prescriptions" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><FileText className="w-3.5 h-3.5" /> Rx</TabsTrigger>
-            <TabsTrigger value="appointments" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><CalendarDays className="w-3.5 h-3.5" /> Appts</TabsTrigger>
-            <TabsTrigger value="medicines" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Pill className="w-3.5 h-3.5" /> Medicines</TabsTrigger>
-            <TabsTrigger value="doserules" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Calculator className="w-3.5 h-3.5" /> Doses</TabsTrigger>
-            <TabsTrigger value="templates" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Settings className="w-3.5 h-3.5" /> Templates</TabsTrigger>
-            <TabsTrigger value="contact" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Mail className="w-3.5 h-3.5" /> Contact</TabsTrigger>
-            <TabsTrigger value="roles" className="text-[11px] gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><Shield className="w-3.5 h-3.5" /> Access</TabsTrigger>
+          <TabsList className="mb-5 w-full grid grid-cols-3 sm:grid-cols-4 md:grid-cols-11 h-auto bg-card border border-border/60 p-1.5 rounded-2xl shadow-sm gap-1">
+            {[
+              { v: "overview", icon: BarChart3, label: "Overview" },
+              { v: "doctors", icon: Stethoscope, label: "Doctors" },
+              { v: "patients", icon: Users, label: "Patients" },
+              { v: "prescriptions", icon: FileText, label: "Rx" },
+              { v: "appointments", icon: CalendarDays, label: "Appts" },
+              { v: "medicines", icon: Pill, label: "Medicines" },
+              { v: "doserules", icon: Calculator, label: "Doses" },
+              { v: "templates", icon: Settings, label: "Templates" },
+              { v: "contact", icon: Mail, label: "Contact" },
+              { v: "site", icon: Globe, label: "Site" },
+              { v: "roles", icon: Shield, label: "Access" },
+            ].map((t) => (
+              <TabsTrigger
+                key={t.v}
+                value={t.v}
+                className="text-[11px] gap-1 rounded-xl py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+              >
+                <t.icon className="w-3.5 h-3.5" /> {t.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           <TabsContent value="doserules"><DoseRulesManager /></TabsContent>
           <TabsContent value="contact"><ContactManager /></TabsContent>
+          <TabsContent value="site"><SiteSettingsManager /></TabsContent>
 
           {/* ═══ OVERVIEW ═══ */}
           <TabsContent value="overview">
