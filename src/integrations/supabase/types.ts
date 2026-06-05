@@ -333,6 +333,7 @@ export type Database = {
       profiles: {
         Row: {
           bmdc_no: string
+          can_print: boolean
           chamber_address: string
           created_at: string
           degrees: string
@@ -348,6 +349,7 @@ export type Database = {
         }
         Insert: {
           bmdc_no?: string
+          can_print?: boolean
           chamber_address?: string
           created_at?: string
           degrees?: string
@@ -363,6 +365,7 @@ export type Database = {
         }
         Update: {
           bmdc_no?: string
+          can_print?: boolean
           chamber_address?: string
           created_at?: string
           degrees?: string
