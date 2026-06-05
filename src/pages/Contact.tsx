@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -21,6 +22,7 @@ const schema = z.object({
 });
 
 const Contact = () => {
+  const { settings } = useSiteSettings();
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
   const [sending, setSending] = useState(false);
 
@@ -62,17 +64,21 @@ const Contact = () => {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="space-y-4">
               {[
-                { icon: Mail, label: "Email", value: "hello@digitalrx.app" },
-                { icon: Phone, label: "Phone", value: "+880 1XXX-XXXXXX" },
-                { icon: MapPin, label: "Location", value: "Dhaka, Bangladesh" },
+                { icon: Mail, label: "Email", value: settings.contact_email || "hello@digitalrx.app", href: `mailto:${settings.contact_email || "hello@digitalrx.app"}` },
+                { icon: Phone, label: "Phone", value: settings.contact_phone || "+880 1XXX-XXXXXX", href: `tel:${settings.contact_phone || ""}` },
+                { icon: MapPin, label: "Location", value: "Dhaka, Bangladesh", href: undefined as string | undefined },
               ].map((c) => (
                 <Card key={c.label} className="p-4 flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <c.icon className="w-4 h-4 text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="text-xs text-muted-foreground">{c.label}</div>
-                    <div className="text-sm font-medium">{c.value}</div>
+                    {c.href ? (
+                      <a href={c.href} className="text-sm font-medium hover:text-primary break-all">{c.value}</a>
+                    ) : (
+                      <div className="text-sm font-medium">{c.value}</div>
+                    )}
                   </div>
                 </Card>
               ))}
