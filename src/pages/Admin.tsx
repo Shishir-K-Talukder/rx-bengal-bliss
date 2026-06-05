@@ -923,15 +923,30 @@ const Admin = () => {
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">Doctor: <strong>{expiryDoctor.name || expiryDoctor.user_id.slice(0, 8)}</strong></p>
                 <div>
-                  <Label className="text-xs">Expiry Date</Label>
-                  <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} className="mt-1 h-9 text-sm" />
+                  <Label className="text-xs">Expiry Date (DD-MM-YYYY)</Label>
+                  <Input
+                    inputMode="numeric"
+                    placeholder="DD-MM-YYYY"
+                    value={expiryDate}
+                    maxLength={10}
+                    onChange={(e) => {
+                      let v = e.target.value.replace(/[^\d-]/g, "");
+                      const digits = v.replace(/-/g, "").slice(0, 8);
+                      let out = digits;
+                      if (digits.length > 4) out = `${digits.slice(0,2)}-${digits.slice(2,4)}-${digits.slice(4)}`;
+                      else if (digits.length > 2) out = `${digits.slice(0,2)}-${digits.slice(2)}`;
+                      setExpiryDate(out);
+                    }}
+                    className="mt-1 h-9 text-sm"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">Leave empty & click "Set Lifetime" for unlimited access</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 gap-1.5 text-sm" onClick={setPanelExpiry}>
-                    <Clock className="w-3.5 h-3.5" /> {expiryDate ? "Set Expiry" : "Set Lifetime"}
+                  <Button className="flex-1 gap-1.5 text-sm" onClick={() => setPanelExpiry(false)}>
+                    <Clock className="w-3.5 h-3.5" /> Set Expiry
                   </Button>
-                  <Button variant="outline" className="text-sm" onClick={() => { setExpiryDate(""); }}>
-                    Clear (Lifetime)
+                  <Button variant="outline" className="flex-1 text-sm gap-1.5" onClick={() => setPanelExpiry(true)}>
+                    ♾ Lifetime
                   </Button>
                 </div>
               </div>
