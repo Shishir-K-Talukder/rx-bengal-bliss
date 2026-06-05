@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogIn, LayoutDashboard, Menu, X } from "lucide-react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { LogIn, LayoutDashboard, Menu, X, Facebook, Twitter, Instagram, Linkedin, Youtube, MessageCircle, Music2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const MarketingHeader = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { settings } = useSiteSettings();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -23,6 +25,16 @@ const MarketingHeader = () => {
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
+
+  const socials = [
+    { url: settings.facebook_url, icon: Facebook, label: "Facebook" },
+    { url: settings.twitter_url, icon: Twitter, label: "Twitter" },
+    { url: settings.instagram_url, icon: Instagram, label: "Instagram" },
+    { url: settings.linkedin_url, icon: Linkedin, label: "LinkedIn" },
+    { url: settings.youtube_url, icon: Youtube, label: "YouTube" },
+    { url: settings.whatsapp_url, icon: MessageCircle, label: "WhatsApp" },
+    { url: settings.tiktok_url, icon: Music2, label: "TikTok" },
+  ].filter((s) => s.url);
 
   return (
     <header className="fixed top-3 left-0 right-0 z-50 px-3 sm:px-4">
@@ -52,6 +64,22 @@ const MarketingHeader = () => {
           </nav>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            {socials.length > 0 && (
+              <div className="hidden lg:flex items-center gap-0.5 mr-1 pr-2 border-r border-border/60">
+                {socials.slice(0, 5).map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                  >
+                    <s.icon className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </div>
+            )}
             {user ? (
               <Button size="sm" onClick={() => navigate("/app")} className="gap-1.5 rounded-full h-9">
                 <LayoutDashboard className="w-3.5 h-3.5" /> Open App
@@ -85,6 +113,22 @@ const MarketingHeader = () => {
                 {l.label}
               </Link>
             ))}
+            {socials.length > 0 && (
+              <div className="flex items-center gap-1.5 px-3 pt-3 mt-1 border-t border-border/60">
+                {socials.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                  >
+                    <s.icon className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
