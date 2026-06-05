@@ -305,13 +305,35 @@ const Admin = () => {
     toast.success("Role removed");
   };
 
-  const setPanelExpiry = async () => {
+  // Parse DD-MM-YYYY -> ISO; returns null if invalid/empty
+  const parseDMYToISO = (s: string): string | null => {
+    const m = s.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    if (!m) return null;
+    const [, dd, mm, yyyy] = m;
+    const d = new Date(`${yyyy}-${mm}-${dd}T23:59:59`);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+  const formatISOToDMY = (iso: string | null): string => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    return `${dd}-${mm}-${d.getFullYear()}`;
+  };
+
+  const setPanelExpiry = async (lifetime = false) => {
     if (!expiryDoctor) return;
-    const val = expiryDate ? new Date(expiryDate).toISOString() : null;
+    let val: string | null = null;
+    if (!lifetime) {
+      if (!expiryDate.trim()) { toast.error("Enter expiry date as DD-MM-YYYY or choose Lifetime"); return; }
+      val = parseDMYToISO(expiryDate);
+      if (!val) { toast.error("Invalid date — use DD-MM-YYYY format"); return; }
+    }
     const { error } = await supabase.from("profiles").update({ panel_expires_at: val } as any).eq("user_id", expiryDoctor.user_id);
     if (error) { toast.error("Failed to set expiry"); return; }
     setDoctors((prev) => prev.map((d) => d.user_id === expiryDoctor.user_id ? { ...d, panel_expires_at: val } : d));
-    toast.success(val ? `Expiry set to ${expiryDate}` : "Expiry removed (lifetime)");
+    toast.success(val ? `Expiry set to ${formatISOToDMY(val)}` : "Lifetime access granted");
     setExpiryDoctor(null); setExpiryDate("");
   };
 
