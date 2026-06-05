@@ -589,7 +589,7 @@ const Admin = () => {
                           <TableCell className="text-[10px] text-muted-foreground">{new Date(doc.created_at).toLocaleDateString()}</TableCell>
                           <TableCell className="flex gap-1">
                             <Switch checked={doc.is_active !== false} onCheckedChange={() => toggleUserActive(doc.user_id, doc.is_active !== false)} />
-                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setExpiryDoctor(doc); setExpiryDate(doc.panel_expires_at ? doc.panel_expires_at.split("T")[0] : ""); }}>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setExpiryDoctor(doc); setExpiryDate(formatISOToDMY(doc.panel_expires_at)); }}>
                               <Timer className="w-3.5 h-3.5" />
                             </Button>
                             <Button
