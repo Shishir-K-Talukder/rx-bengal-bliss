@@ -305,13 +305,35 @@ const Admin = () => {
     toast.success("Role removed");
   };
 
-  const setPanelExpiry = async () => {
+  // Parse DD-MM-YYYY -> ISO; returns null if invalid/empty
+  const parseDMYToISO = (s: string): string | null => {
+    const m = s.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    if (!m) return null;
+    const [, dd, mm, yyyy] = m;
+    const d = new Date(`${yyyy}-${mm}-${dd}T23:59:59`);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+  const formatISOToDMY = (iso: string | null): string => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    return `${dd}-${mm}-${d.getFullYear()}`;
+  };
+
+  const setPanelExpiry = async (lifetime = false) => {
     if (!expiryDoctor) return;
-    const val = expiryDate ? new Date(expiryDate).toISOString() : null;
+    let val: string | null = null;
+    if (!lifetime) {
+      if (!expiryDate.trim()) { toast.error("Enter expiry date as DD-MM-YYYY or choose Lifetime"); return; }
+      val = parseDMYToISO(expiryDate);
+      if (!val) { toast.error("Invalid date — use DD-MM-YYYY format"); return; }
+    }
     const { error } = await supabase.from("profiles").update({ panel_expires_at: val } as any).eq("user_id", expiryDoctor.user_id);
     if (error) { toast.error("Failed to set expiry"); return; }
     setDoctors((prev) => prev.map((d) => d.user_id === expiryDoctor.user_id ? { ...d, panel_expires_at: val } : d));
-    toast.success(val ? `Expiry set to ${expiryDate}` : "Expiry removed (lifetime)");
+    toast.success(val ? `Expiry set to ${formatISOToDMY(val)}` : "Lifetime access granted");
     setExpiryDoctor(null); setExpiryDate("");
   };
 
@@ -465,19 +487,37 @@ const Admin = () => {
               <Card>
                 <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Activity className="w-4 h-4" /> Monthly Activity (6 Months)</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {monthlyData.map((m) => (
-                      <div key={m.name} className="flex items-center gap-3 text-xs">
-                        <span className="w-14 text-muted-foreground font-medium">{m.name}</span>
-                        <div className="flex-1 flex gap-1 items-center">
-                          <div className="h-4 bg-primary/80 rounded" style={{ width: `${Math.max(4, m.prescriptions * 8)}px` }} />
-                          <span className="text-muted-foreground">{m.prescriptions} Rx</span>
+                  {(() => {
+                    const maxVal = Math.max(1, ...monthlyData.flatMap((m) => [m.prescriptions, m.patients, m.appointments]));
+                    return (
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-primary" /> Rx</span>
+                          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Patients</span>
+                          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-500" /> Appts</span>
                         </div>
-                        <span className="text-muted-foreground">{m.patients} pts</span>
-                        <span className="text-muted-foreground">{m.appointments} appts</span>
+                        {monthlyData.map((m) => (
+                          <div key={m.name} className="space-y-1">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-medium text-foreground">{m.name}</span>
+                              <span className="text-muted-foreground">{m.prescriptions} Rx · {m.patients} pts · {m.appointments} appts</span>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(m.prescriptions / maxVal) * 100}%` }} />
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${(m.patients / maxVal) * 100}%` }} />
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-amber-500 rounded-full transition-all" style={{ width: `${(m.appointments / maxVal) * 100}%` }} />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
               <Card>
@@ -556,7 +596,7 @@ const Admin = () => {
                               const days = Math.ceil((exp.getTime() - Date.now()) / 86400000);
                               const expired = days < 0;
                               return (
-                                <button onClick={() => { setExpiryDoctor(doc); setExpiryDate(doc.panel_expires_at ? doc.panel_expires_at.split("T")[0] : ""); }}>
+                                <button onClick={() => { setExpiryDoctor(doc); setExpiryDate(formatISOToDMY(doc.panel_expires_at)); }}>
                                   <Badge variant={expired ? "destructive" : days <= 7 ? "destructive" : "secondary"} className="text-[10px] cursor-pointer">
                                     {expired ? "Expired" : `${days}d left`}
                                   </Badge>
@@ -567,7 +607,7 @@ const Admin = () => {
                           <TableCell className="text-[10px] text-muted-foreground">{new Date(doc.created_at).toLocaleDateString()}</TableCell>
                           <TableCell className="flex gap-1">
                             <Switch checked={doc.is_active !== false} onCheckedChange={() => toggleUserActive(doc.user_id, doc.is_active !== false)} />
-                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setExpiryDoctor(doc); setExpiryDate(doc.panel_expires_at ? doc.panel_expires_at.split("T")[0] : ""); }}>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setExpiryDoctor(doc); setExpiryDate(formatISOToDMY(doc.panel_expires_at)); }}>
                               <Timer className="w-3.5 h-3.5" />
                             </Button>
                             <Button
@@ -901,15 +941,30 @@ const Admin = () => {
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">Doctor: <strong>{expiryDoctor.name || expiryDoctor.user_id.slice(0, 8)}</strong></p>
                 <div>
-                  <Label className="text-xs">Expiry Date</Label>
-                  <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} className="mt-1 h-9 text-sm" />
+                  <Label className="text-xs">Expiry Date (DD-MM-YYYY)</Label>
+                  <Input
+                    inputMode="numeric"
+                    placeholder="DD-MM-YYYY"
+                    value={expiryDate}
+                    maxLength={10}
+                    onChange={(e) => {
+                      let v = e.target.value.replace(/[^\d-]/g, "");
+                      const digits = v.replace(/-/g, "").slice(0, 8);
+                      let out = digits;
+                      if (digits.length > 4) out = `${digits.slice(0,2)}-${digits.slice(2,4)}-${digits.slice(4)}`;
+                      else if (digits.length > 2) out = `${digits.slice(0,2)}-${digits.slice(2)}`;
+                      setExpiryDate(out);
+                    }}
+                    className="mt-1 h-9 text-sm"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">Leave empty & click "Set Lifetime" for unlimited access</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 gap-1.5 text-sm" onClick={setPanelExpiry}>
-                    <Clock className="w-3.5 h-3.5" /> {expiryDate ? "Set Expiry" : "Set Lifetime"}
+                  <Button className="flex-1 gap-1.5 text-sm" onClick={() => setPanelExpiry(false)}>
+                    <Clock className="w-3.5 h-3.5" /> Set Expiry
                   </Button>
-                  <Button variant="outline" className="text-sm" onClick={() => { setExpiryDate(""); }}>
-                    Clear (Lifetime)
+                  <Button variant="outline" className="flex-1 text-sm gap-1.5" onClick={() => setPanelExpiry(true)}>
+                    ♾ Lifetime
                   </Button>
                 </div>
               </div>

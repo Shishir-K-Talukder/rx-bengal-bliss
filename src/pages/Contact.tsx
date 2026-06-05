@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Facebook, Twitter, Instagram, Linkedin, Youtube, MessageCircle, Music2 } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const schema = z.object({
@@ -82,6 +82,37 @@ const Contact = () => {
                   </div>
                 </Card>
               ))}
+              {(() => {
+                const socials = [
+                  { url: settings.facebook_url, icon: Facebook, label: "Facebook" },
+                  { url: settings.twitter_url, icon: Twitter, label: "Twitter" },
+                  { url: settings.instagram_url, icon: Instagram, label: "Instagram" },
+                  { url: settings.linkedin_url, icon: Linkedin, label: "LinkedIn" },
+                  { url: settings.youtube_url, icon: Youtube, label: "YouTube" },
+                  { url: settings.whatsapp_url, icon: MessageCircle, label: "WhatsApp" },
+                  { url: settings.tiktok_url, icon: Music2, label: "TikTok" },
+                ].filter((s) => s.url);
+                if (socials.length === 0) return null;
+                return (
+                  <Card className="p-4">
+                    <div className="text-xs text-muted-foreground mb-3 font-medium">Follow us</div>
+                    <div className="flex flex-wrap gap-2">
+                      {socials.map((s) => (
+                        <a
+                          key={s.label}
+                          href={s.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={s.label}
+                          className="w-9 h-9 rounded-full bg-muted/60 border border-border/60 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-110 transition-all"
+                        >
+                          <s.icon className="w-4 h-4" />
+                        </a>
+                      ))}
+                    </div>
+                  </Card>
+                );
+              })()}
             </div>
 
             <Card className="p-6 md:col-span-2">
