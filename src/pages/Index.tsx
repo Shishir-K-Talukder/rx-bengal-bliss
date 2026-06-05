@@ -15,6 +15,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useDoctorSettings } from "@/hooks/useDoctorSettings";
 import { usePrescriptions, PrescriptionRecord } from "@/hooks/usePrescriptions";
+import { useAdmin } from "@/hooks/useAdmin";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import IndexSkeleton from "@/components/skeletons/IndexSkeleton";
 import { toast } from "sonner";
@@ -50,11 +52,21 @@ const generatePatientId = () => {
 };
 
 const Index = () => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const { profile, saveProfile, loading: profileLoading } = useProfile();
   const { printSettings, savePrintSettings, medicineOptions, saveMedicineOptions, loading: settingsLoading } = useDoctorSettings();
   const { prescriptions, savePrescription, deletePrescription, loading: rxLoading } = usePrescriptions();
+  const { isAdmin } = useAdmin();
+  const [canPrint, setCanPrint] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await (supabase as any).from("profiles").select("can_print").eq("user_id", user.id).maybeSingle();
+      setCanPrint(!!data?.can_print);
+    })();
+  }, [user]);
 
   const [activeTab, setActiveTab] = useState("write");
 
