@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Facebook, Twitter, Instagram, Linkedin, Youtube, MessageCircle, Music2 } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const schema = z.object({
