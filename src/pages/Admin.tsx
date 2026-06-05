@@ -35,6 +35,7 @@ interface DoctorProfile {
   bmdc_no: string; phone: string; chamber_address: string; is_active: boolean;
   profile_photo_url: string; created_at: string; updated_at: string;
   panel_expires_at: string | null;
+  can_print?: boolean;
 }
 interface Patient {
   id: string; user_id: string; name: string; age: string; sex: string;
@@ -187,6 +188,13 @@ const Admin = () => {
     if (error) { toast.error("Failed to update user status"); return; }
     setDoctors((prev) => prev.map((d) => (d.user_id === userId ? { ...d, is_active: !currentActive } : d)));
     toast.success(!currentActive ? "User activated" : "User deactivated");
+  };
+
+  const togglePrintPermission = async (userId: string, current: boolean) => {
+    const { error } = await (supabase as any).from("profiles").update({ can_print: !current }).eq("user_id", userId);
+    if (error) { toast.error("Failed to update print permission"); return; }
+    setDoctors((prev) => prev.map((d) => (d.user_id === userId ? { ...d, can_print: !current } : d)));
+    toast.success(!current ? "Print permission granted" : "Print permission revoked");
   };
 
   const deletePatient = async (id: string) => {
@@ -512,6 +520,7 @@ const Admin = () => {
                         <TableHead className="text-center">Rx</TableHead>
                          <TableHead className="text-center">Patients</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead className="text-center">Print</TableHead>
                         <TableHead>Expiry</TableHead>
                         <TableHead>Joined</TableHead>
                         <TableHead>Actions</TableHead>
@@ -532,6 +541,13 @@ const Admin = () => {
                             <Badge variant={doc.is_active !== false ? "default" : "destructive"} className="text-[10px]">
                               {doc.is_active !== false ? "Active" : "Inactive"}
                             </Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Switch
+                              checked={!!doc.can_print}
+                              onCheckedChange={() => togglePrintPermission(doc.user_id, !!doc.can_print)}
+                              aria-label="Toggle print permission"
+                            />
                           </TableCell>
                           <TableCell>
                             {(() => {
