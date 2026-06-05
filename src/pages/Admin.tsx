@@ -578,7 +578,7 @@ const Admin = () => {
                               const days = Math.ceil((exp.getTime() - Date.now()) / 86400000);
                               const expired = days < 0;
                               return (
-                                <button onClick={() => { setExpiryDoctor(doc); setExpiryDate(doc.panel_expires_at ? doc.panel_expires_at.split("T")[0] : ""); }}>
+                                <button onClick={() => { setExpiryDoctor(doc); setExpiryDate(formatISOToDMY(doc.panel_expires_at)); }}>
                                   <Badge variant={expired ? "destructive" : days <= 7 ? "destructive" : "secondary"} className="text-[10px] cursor-pointer">
                                     {expired ? "Expired" : `${days}d left`}
                                   </Badge>
