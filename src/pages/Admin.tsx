@@ -487,19 +487,37 @@ const Admin = () => {
               <Card>
                 <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Activity className="w-4 h-4" /> Monthly Activity (6 Months)</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {monthlyData.map((m) => (
-                      <div key={m.name} className="flex items-center gap-3 text-xs">
-                        <span className="w-14 text-muted-foreground font-medium">{m.name}</span>
-                        <div className="flex-1 flex gap-1 items-center">
-                          <div className="h-4 bg-primary/80 rounded" style={{ width: `${Math.max(4, m.prescriptions * 8)}px` }} />
-                          <span className="text-muted-foreground">{m.prescriptions} Rx</span>
+                  {(() => {
+                    const maxVal = Math.max(1, ...monthlyData.flatMap((m) => [m.prescriptions, m.patients, m.appointments]));
+                    return (
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-primary" /> Rx</span>
+                          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Patients</span>
+                          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-500" /> Appts</span>
                         </div>
-                        <span className="text-muted-foreground">{m.patients} pts</span>
-                        <span className="text-muted-foreground">{m.appointments} appts</span>
+                        {monthlyData.map((m) => (
+                          <div key={m.name} className="space-y-1">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-medium text-foreground">{m.name}</span>
+                              <span className="text-muted-foreground">{m.prescriptions} Rx · {m.patients} pts · {m.appointments} appts</span>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(m.prescriptions / maxVal) * 100}%` }} />
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${(m.patients / maxVal) * 100}%` }} />
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-amber-500 rounded-full transition-all" style={{ width: `${(m.appointments / maxVal) * 100}%` }} />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
               <Card>
