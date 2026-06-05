@@ -118,6 +118,10 @@ const Index = () => {
   };
 
   const handlePrint = () => {
+    if (!isAdmin && !canPrint) {
+      toast.error("Printing is disabled for your account. Please contact an admin to enable print permission.");
+      return;
+    }
     const missing = getMissingFields(patient, advice);
     if (missing.length > 0) {
       setActiveTab("write");
