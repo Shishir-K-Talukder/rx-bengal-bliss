@@ -444,6 +444,11 @@ const formatDMY = (date: Date): string => {
 };
 
 const ClinicalSection = ({ data, onChange, options }: Props) => {
+  const pv = data.pvExamination || defaultPVExamination;
+  const updatePV = (key: keyof PVExaminationData, value: string) => {
+    onChange({ ...data, pvExamination: { ...pv, [key]: value } });
+  };
+
   const updateOE = (key: keyof OnExaminationData, value: string) => {
     const next = { ...data.onExamination, [key]: value };
     // Auto-calculate EDD when LMP is valid DD-MM-YYYY (Naegele's rule: LMP + 280 days)
@@ -477,6 +482,16 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
     { key: "fm", label: "FM", placeholder: "Present/Absent", type: "select" },
     { key: "fhr", label: "FHR", placeholder: "FHR", type: "text" },
     { key: "gravida", label: "GRAVIDA", placeholder: "Primi", type: "text" },
+    { key: "para", label: "PARA", placeholder: "Para", type: "text" },
+  ];
+
+  const pvFields: { key: keyof PVExaminationData; label: string; placeholder: string }[] = [
+    { key: "vulvaVagina", label: "Vulva & Vagina", placeholder: "Findings..." },
+    { key: "cervix", label: "Cervix", placeholder: "Findings..." },
+    { key: "uterus", label: "Uterus", placeholder: "Size, position..." },
+    { key: "adnexa", label: "Adnexa", placeholder: "Findings..." },
+    { key: "cmt", label: "Cervical Motion Tenderness (CMT)", placeholder: "Present / Absent" },
+    { key: "pod", label: "Pouch of Douglas (POD)", placeholder: "Findings..." },
   ];
 
   return (
