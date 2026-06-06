@@ -561,20 +561,17 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="oe" className="mt-0">
-          <div className="rounded-lg border border-border overflow-hidden">
-            {oeFields.map((f, idx) => (
-              <div
-                key={f.key}
-                className={`flex items-center text-sm ${idx % 2 === 0 ? "bg-card" : "bg-muted/20"} ${idx < oeFields.length - 1 ? "border-b border-border/50" : ""}`}
-              >
-                <div className="w-[72px] px-2.5 py-1.5 font-semibold text-xs text-primary border-r border-border/50 shrink-0 bg-accent/30">
+        <TabsContent value="oe" className="mt-0 space-y-4">
+          <div className="rounded-lg border border-border/70 overflow-hidden divide-y divide-border/40">
+            {oeFields.map((f) => (
+              <div key={f.key} className="flex items-center text-sm bg-card hover:bg-muted/30 transition-colors">
+                <div className="w-[88px] px-2.5 py-1.5 font-semibold text-[11px] tracking-wide text-muted-foreground shrink-0">
                   {f.label}
                 </div>
                 <div className="flex-1 px-1.5 py-0.5">
                   {f.type === "select" ? (
                     <Select value={data.onExamination[f.key] || "Absent"} onValueChange={(v) => updateOE(f.key, v)}>
-                      <SelectTrigger className="h-7 text-xs border-0 shadow-none bg-transparent"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-7 text-xs border-0 shadow-none bg-transparent focus:ring-0 focus:ring-offset-0"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {presentAbsentOptions.map((opt) => (
                           <SelectItem key={opt} value={opt} className="text-xs">{opt}</SelectItem>
@@ -582,29 +579,71 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
                       </SelectContent>
                     </Select>
                   ) : f.type === "date" ? (
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={10}
-                      value={data.onExamination[f.key]}
-                      onChange={(e) => {
-                        // Auto-format: insert dashes as user types (DD-MM-YYYY)
-                        let v = e.target.value.replace(/[^\d-]/g, "");
-                        const digits = v.replace(/-/g, "");
-                        let formatted = digits.slice(0, 2);
-                        if (digits.length >= 3) formatted += "-" + digits.slice(2, 4);
-                        if (digits.length >= 5) formatted += "-" + digits.slice(4, 8);
-                        updateOE(f.key, formatted);
-                      }}
-                      placeholder={f.placeholder}
-                      className="h-7 text-xs border-0 shadow-none bg-transparent"
-                    />
+                    <div className="flex items-center gap-1">
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={10}
+                        value={data.onExamination[f.key]}
+                        onChange={(e) => {
+                          let v = e.target.value.replace(/[^\d-]/g, "");
+                          const digits = v.replace(/-/g, "");
+                          let formatted = digits.slice(0, 2);
+                          if (digits.length >= 3) formatted += "-" + digits.slice(2, 4);
+                          if (digits.length >= 5) formatted += "-" + digits.slice(4, 8);
+                          updateOE(f.key, formatted);
+                        }}
+                        placeholder={f.placeholder}
+                        className="h-7 text-xs border-0 shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1"
+                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button type="button" variant="ghost" size="icon" className="h-6 w-6 shrink-0 text-muted-foreground hover:text-primary">
+                            <CalendarIcon className="w-3.5 h-3.5" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                          <Calendar
+                            mode="single"
+                            selected={parseDMY(data.onExamination[f.key]) || undefined}
+                            onSelect={(d) => d && updateOE(f.key, formatDMY(d))}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   ) : (
                     <OEInputWithSuggestions fieldKey={f.key} value={data.onExamination[f.key]} placeholder={f.placeholder} onChange={(v) => updateOE(f.key, v)} />
                   )}
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* PV Examination Notes — placed after O/E */}
+          <div className="rounded-lg border border-border/70 overflow-hidden">
+            <div className="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border/50">
+              <Stethoscope className="w-3.5 h-3.5 text-primary" />
+              <p className="text-xs font-semibold text-foreground">PV Examination Notes</p>
+            </div>
+            <div className="divide-y divide-border/40">
+              {pvFields.map((f) => (
+                <div key={f.key} className="flex items-start text-sm bg-card hover:bg-muted/30 transition-colors">
+                  <div className="w-[160px] px-2.5 py-2 font-medium text-[11px] text-muted-foreground shrink-0 leading-tight">
+                    {f.label}
+                  </div>
+                  <div className="flex-1 px-1.5 py-1">
+                    <Input
+                      value={pv[f.key]}
+                      onChange={(e) => updatePV(f.key, e.target.value)}
+                      placeholder={f.placeholder}
+                      className="h-7 text-xs border-0 shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </TabsContent>
 
