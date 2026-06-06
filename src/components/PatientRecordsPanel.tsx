@@ -16,13 +16,14 @@ const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  // Group prescriptions by patient (name + mobile)
+  // Group prescriptions by patient (name + mobile, fallback to patientId)
   const patients = useMemo(() => {
-    const map = new Map<string, { name: string; mobile: string; prescriptions: PrescriptionRecord[] }>();
+    const map = new Map<string, { name: string; mobile: string; patientId: string; prescriptions: PrescriptionRecord[] }>();
     prescriptions.forEach((rx) => {
-      const key = `${rx.patient_data.name || "Unknown"}|${rx.patient_data.mobile || ""}`;
+      const pid = (rx.patient_data as any).patientId || "";
+      const key = `${rx.patient_data.name || "Unknown"}|${rx.patient_data.mobile || ""}|${pid}`;
       if (!map.has(key)) {
-        map.set(key, { name: rx.patient_data.name || "Unknown", mobile: rx.patient_data.mobile || "", prescriptions: [] });
+        map.set(key, { name: rx.patient_data.name || "Unknown", mobile: rx.patient_data.mobile || "", patientId: pid, prescriptions: [] });
       }
       map.get(key)!.prescriptions.push(rx);
     });
@@ -36,11 +37,14 @@ const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
   const filtered = useMemo(() => {
     if (!search.trim()) return patients;
     const q = search.toLowerCase();
-    return patients.filter((p) => p.name.toLowerCase().includes(q) || p.mobile.includes(q));
+    return patients.filter((p) =>
+      p.name.toLowerCase().includes(q) ||
+      p.mobile.includes(q) ||
+      (p.patientId && p.patientId.toLowerCase().includes(q))
+    );
   }, [patients, search]);
 
   const handlePrintRx = (rx: PrescriptionRecord) => {
-    // Store print data and open print page
     const printData = {
       doctor: {},
       patient: rx.patient_data,
@@ -53,6 +57,11 @@ const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
     window.open(`${window.location.origin}${window.location.pathname.replace(/\/[^/]*$/, "")}/print`, "_blank");
   };
 
+  const handleEditRx = (rx: PrescriptionRecord) => {
+    sessionStorage.setItem("edit-prescription", JSON.stringify(rx));
+    navigate("/app");
+  };
+
   if (loading) return <p className="text-sm text-muted-foreground text-center py-6">Loading records...</p>;
 
   return (
@@ -60,7 +69,7 @@ const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or mobile..." className="h-9 text-sm pl-8" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by Patient ID, name or mobile..." className="h-9 text-sm pl-8" />
         </div>
         <Badge variant="secondary" className="shrink-0">{patients.length} patients</Badge>
       </div>
@@ -82,11 +91,14 @@ const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">{patient.name}</p>
-                      {patient.mobile && (
-                        <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-                          <Phone className="w-2.5 h-2.5" /> {patient.mobile}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                        {patient.patientId && <span className="font-mono">{patient.patientId}</span>}
+                        {patient.mobile && (
+                          <span className="flex items-center gap-1">
+                            <Phone className="w-2.5 h-2.5" /> {patient.mobile}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-[10px]">
@@ -104,6 +116,9 @@ const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
                       <span className="text-muted-foreground">{(rx.medicines as any[])?.length || 0} medicines</span>
                     </div>
                     <div className="flex items-center gap-1">
+                      <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2" onClick={() => handleEditRx(rx)}>
+                        <Pencil className="w-3 h-3 mr-1" /> Edit
+                      </Button>
                       {onLoadPrescription && (
                         <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2" onClick={() => onLoadPrescription(rx)}>
                           <FileText className="w-3 h-3 mr-1" /> Load
