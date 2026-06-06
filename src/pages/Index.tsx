@@ -111,6 +111,21 @@ const Index = () => {
       } catch {}
       sessionStorage.removeItem("appointment-patient");
     }
+
+    // Load prescription for editing
+    const editStored = sessionStorage.getItem("edit-prescription");
+    if (editStored) {
+      try {
+        const rx = JSON.parse(editStored) as PrescriptionRecord;
+        setEditingRxId(rx.id);
+        setPatient({ ...rx.patient_data, date: rx.patient_data.date || today });
+        setClinical(rx.clinical_data);
+        setMedicines(rx.medicines);
+        setAdvice(rx.advice);
+        toast.info("Editing existing prescription. Save to update.");
+      } catch {}
+      sessionStorage.removeItem("edit-prescription");
+    }
   }, []);
 
   const handleDoctorChange = (d: DoctorInfo) => {
