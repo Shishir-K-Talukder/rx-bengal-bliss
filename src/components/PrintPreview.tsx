@@ -242,6 +242,24 @@ const PrintPreview = ({ doctor, patient, clinical, medicines, advice, printSetti
               </div>
             </div>
           )}
+          {settings.showOE && (clinical as any).pvExamination && (() => {
+            const pv = (clinical as any).pvExamination as Record<string, string>;
+            const items = Object.entries(pv).filter(([_, v]) => v && v.trim());
+            if (!items.length) return null;
+            return (
+              <div>
+                <p className="font-bold underline">PV Examination</p>
+                <div className="mt-1 space-y-0.5">
+                  {items.map(([k, v]) => (
+                    <p key={k}>
+                      <span className="font-bold">{PV_LABELS[k] || k}</span>
+                      <span className="ml-2">: {v}</span>
+                    </p>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
           {(clinical.drugHistory || (clinical as any).drugHistoryMedicines?.length > 0) && (
             <div>
               <p className="font-bold underline">D/H</p>
