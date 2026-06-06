@@ -16,15 +16,6 @@ const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-interface Props {
-  onLoadPrescription?: (rx: PrescriptionRecord) => void;
-}
-
-const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
-  const { prescriptions, loading } = usePrescriptions();
-  const [search, setSearch] = useState("");
-  const navigate = useNavigate();
-
   // Group prescriptions by patient (name + mobile)
   const patients = useMemo(() => {
     const map = new Map<string, { name: string; mobile: string; prescriptions: PrescriptionRecord[] }>();
