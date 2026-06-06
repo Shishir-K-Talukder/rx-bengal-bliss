@@ -3,9 +3,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { usePrescriptions, PrescriptionRecord } from "@/hooks/usePrescriptions";
-import { Search, User, FileText, Printer, CalendarDays, Phone } from "lucide-react";
+import { Search, User, FileText, Printer, CalendarDays, Phone, Pencil } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useNavigate } from "react-router-dom";
+
+interface Props {
+  onLoadPrescription?: (rx: PrescriptionRecord) => void;
+}
+
+const PatientRecordsPanel = ({ onLoadPrescription }: Props) => {
+  const { prescriptions, loading } = usePrescriptions();
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
 interface Props {
   onLoadPrescription?: (rx: PrescriptionRecord) => void;
