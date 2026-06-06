@@ -76,7 +76,16 @@ const OE_LABELS: Record<keyof OnExaminationData, string> = {
   heart: "Heart", lungs: "Lungs", abd: "Abd", anaemia: "Anaemia",
   jaundice: "Jaundice", cyanosis: "Cyanosis", oedema: "Oedema",
   rr: "RR", spo2: "SPO2", lmp: "LMP", edd: "EDD",
-  fm: "FM", fhr: "FHR", gravida: "GRAVIDA",
+  fm: "FM", fhr: "FHR", gravida: "GRAVIDA", para: "PARA",
+};
+
+const PV_LABELS: Record<string, string> = {
+  vulvaVagina: "Vulva & Vagina",
+  cervix: "Cervix",
+  uterus: "Uterus",
+  adnexa: "Adnexa",
+  cmt: "Cervical Motion Tenderness (CMT)",
+  pod: "Pouch of Douglas (POD)",
 };
 
 const headerSizeMap: Record<string, number> = {
