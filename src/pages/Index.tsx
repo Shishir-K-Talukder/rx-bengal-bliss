@@ -56,9 +56,10 @@ const Index = () => {
   const navigate = useNavigate();
   const { profile, saveProfile, loading: profileLoading } = useProfile();
   const { printSettings, savePrintSettings, medicineOptions, saveMedicineOptions, loading: settingsLoading } = useDoctorSettings();
-  const { prescriptions, savePrescription, deletePrescription, loading: rxLoading } = usePrescriptions();
+  const { prescriptions, savePrescription, updatePrescription, deletePrescription, loading: rxLoading } = usePrescriptions();
   const { isAdmin } = useAdmin();
   const [canPrint, setCanPrint] = useState<boolean>(false);
+  const [editingRxId, setEditingRxId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
