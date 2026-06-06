@@ -109,11 +109,33 @@ export const usePrescriptions = () => {
     }
   };
 
+  const updatePrescription = async (
+    id: string,
+    patient: PatientData,
+    clinical: ClinicalData,
+    medicines: Medicine[],
+    advice: AdviceData
+  ) => {
+    if (!user) return;
+    const { error } = await supabase.from("prescriptions").update({
+      patient_data: patient as unknown as Json,
+      clinical_data: clinical as unknown as Json,
+      medicines: medicines as unknown as Json,
+      advice: advice as unknown as Json,
+    }).eq("id", id).eq("user_id", user.id);
+    if (error) {
+      toast.error("Failed to update prescription");
+    } else {
+      toast.success("Prescription updated!");
+      loadPrescriptions();
+    }
+  };
+
   const deletePrescription = async (id: string) => {
     await supabase.from("prescriptions").delete().eq("id", id);
     setPrescriptions((prev) => prev.filter((p) => p.id !== id));
     toast.success("Prescription deleted");
   };
 
-  return { prescriptions, savePrescription, deletePrescription, loading, reload: loadPrescriptions };
+  return { prescriptions, savePrescription, updatePrescription, deletePrescription, loading, reload: loadPrescriptions };
 };

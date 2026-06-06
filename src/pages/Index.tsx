@@ -56,9 +56,10 @@ const Index = () => {
   const navigate = useNavigate();
   const { profile, saveProfile, loading: profileLoading } = useProfile();
   const { printSettings, savePrintSettings, medicineOptions, saveMedicineOptions, loading: settingsLoading } = useDoctorSettings();
-  const { prescriptions, savePrescription, deletePrescription, loading: rxLoading } = usePrescriptions();
+  const { prescriptions, savePrescription, updatePrescription, deletePrescription, loading: rxLoading } = usePrescriptions();
   const { isAdmin } = useAdmin();
   const [canPrint, setCanPrint] = useState<boolean>(false);
+  const [editingRxId, setEditingRxId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -110,6 +111,21 @@ const Index = () => {
       } catch {}
       sessionStorage.removeItem("appointment-patient");
     }
+
+    // Load prescription for editing
+    const editStored = sessionStorage.getItem("edit-prescription");
+    if (editStored) {
+      try {
+        const rx = JSON.parse(editStored) as PrescriptionRecord;
+        setEditingRxId(rx.id);
+        setPatient({ ...rx.patient_data, date: rx.patient_data.date || today });
+        setClinical(rx.clinical_data);
+        setMedicines(rx.medicines);
+        setAdvice(rx.advice);
+        toast.info("Editing existing prescription. Save to update.");
+      } catch {}
+      sessionStorage.removeItem("edit-prescription");
+    }
   }, []);
 
   const handleDoctorChange = (d: DoctorInfo) => {
@@ -131,9 +147,13 @@ const Index = () => {
       focusMissingField(missing[0].fieldId);
       return;
     }
-    // Auto-save prescription when printing
+    // Auto-save / update prescription when printing
     savePatientToHistory(patient);
-    savePrescription(patient, clinical, medicines, advice);
+    if (editingRxId) {
+      updatePrescription(editingRxId, patient, clinical, medicines, advice);
+    } else {
+      savePrescription(patient, clinical, medicines, advice);
+    }
 
     const printData = { doctor, patient, clinical, medicines, advice, printSettings };
     sessionStorage.setItem("prescription-print-data", JSON.stringify(printData));
@@ -154,12 +174,16 @@ const Index = () => {
       return;
     }
     savePatientToHistory(patient);
-    savePrescription(patient, clinical, medicines, advice);
-    toast.success("Prescription saved.");
+    if (editingRxId) {
+      updatePrescription(editingRxId, patient, clinical, medicines, advice);
+    } else {
+      savePrescription(patient, clinical, medicines, advice);
+    }
   };
 
 
   const handleLoadPrescription = (rx: PrescriptionRecord) => {
+    setEditingRxId(rx.id);
     setPatient({ ...rx.patient_data, date: today });
     setClinical(rx.clinical_data);
     setMedicines(rx.medicines);
@@ -168,6 +192,7 @@ const Index = () => {
   };
 
   const handleNewPrescription = () => {
+    setEditingRxId(null);
     setPatient({ name: "", age: "", sex: "", mobile: "", address: "", date: today, patientId: generatePatientId() });
     setClinical({ chiefComplaint: "", onExamination: { ...defaultOnExamination }, drugHistory: "", drugHistoryMedicines: [], diagnosis: "", investigation: "" });
     setMedicines([]);

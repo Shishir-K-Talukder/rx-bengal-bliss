@@ -5,7 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ClipboardList, Plus, X, Pill } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { ClipboardList, Plus, X, Pill, CalendarIcon, Stethoscope } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MedicineOptions } from "@/components/MedicineSettings";
 import { useMedicineSearch, MedicineSuggestion } from "@/hooks/useMedicineSearch";
@@ -13,12 +15,22 @@ import { useMedicineSearch, MedicineSuggestion } from "@/hooks/useMedicineSearch
 export interface OnExaminationData {
   bp: string; weight: string; temp: string; pulse: string; heart: string; lungs: string; abd: string;
   anaemia: string; jaundice: string; cyanosis: string; oedema: string;
-  rr: string; spo2: string; lmp: string; edd: string; fm: string; fhr: string; gravida: string;
+  rr: string; spo2: string; lmp: string; edd: string; fm: string; fhr: string; gravida: string; para: string;
+}
+
+export interface PVExaminationData {
+  vulvaVagina: string;
+  cervix: string;
+  uterus: string;
+  adnexa: string;
+  cmt: string;
+  pod: string;
 }
 
 export interface ClinicalData {
   chiefComplaint: string;
   onExamination: OnExaminationData;
+  pvExamination?: PVExaminationData;
   drugHistory: string;
   drugHistoryMedicines?: string[];
   diagnosis: string;
@@ -29,7 +41,11 @@ export interface ClinicalData {
 export const defaultOnExamination: OnExaminationData = {
   bp: "", weight: "", temp: "", pulse: "", heart: "", lungs: "", abd: "",
   anaemia: "Absent", jaundice: "Absent", cyanosis: "Absent", oedema: "Absent",
-  rr: "", spo2: "", lmp: "", edd: "", fm: "", fhr: "Absent", gravida: "",
+  rr: "", spo2: "", lmp: "", edd: "", fm: "", fhr: "Absent", gravida: "", para: "",
+};
+
+export const defaultPVExamination: PVExaminationData = {
+  vulvaVagina: "", cervix: "", uterus: "", adnexa: "", cmt: "", pod: "",
 };
 
 const COMMON_INVESTIGATIONS = [
@@ -428,6 +444,11 @@ const formatDMY = (date: Date): string => {
 };
 
 const ClinicalSection = ({ data, onChange, options }: Props) => {
+  const pv = data.pvExamination || defaultPVExamination;
+  const updatePV = (key: keyof PVExaminationData, value: string) => {
+    onChange({ ...data, pvExamination: { ...pv, [key]: value } });
+  };
+
   const updateOE = (key: keyof OnExaminationData, value: string) => {
     const next = { ...data.onExamination, [key]: value };
     // Auto-calculate EDD when LMP is valid DD-MM-YYYY (Naegele's rule: LMP + 280 days)
@@ -461,6 +482,16 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
     { key: "fm", label: "FM", placeholder: "Present/Absent", type: "select" },
     { key: "fhr", label: "FHR", placeholder: "FHR", type: "text" },
     { key: "gravida", label: "GRAVIDA", placeholder: "Primi", type: "text" },
+    { key: "para", label: "PARA", placeholder: "Para", type: "text" },
+  ];
+
+  const pvFields: { key: keyof PVExaminationData; label: string; placeholder: string }[] = [
+    { key: "vulvaVagina", label: "Vulva & Vagina", placeholder: "Findings..." },
+    { key: "cervix", label: "Cervix", placeholder: "Findings..." },
+    { key: "uterus", label: "Uterus", placeholder: "Size, position..." },
+    { key: "adnexa", label: "Adnexa", placeholder: "Findings..." },
+    { key: "cmt", label: "Cervical Motion Tenderness (CMT)", placeholder: "Present / Absent" },
+    { key: "pod", label: "Pouch of Douglas (POD)", placeholder: "Findings..." },
   ];
 
   return (
@@ -530,20 +561,17 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="oe" className="mt-0">
-          <div className="rounded-lg border border-border overflow-hidden">
-            {oeFields.map((f, idx) => (
-              <div
-                key={f.key}
-                className={`flex items-center text-sm ${idx % 2 === 0 ? "bg-card" : "bg-muted/20"} ${idx < oeFields.length - 1 ? "border-b border-border/50" : ""}`}
-              >
-                <div className="w-[72px] px-2.5 py-1.5 font-semibold text-xs text-primary border-r border-border/50 shrink-0 bg-accent/30">
+        <TabsContent value="oe" className="mt-0 space-y-4">
+          <div className="rounded-lg border border-border/70 overflow-hidden divide-y divide-border/40">
+            {oeFields.map((f) => (
+              <div key={f.key} className="flex items-center text-sm bg-card hover:bg-muted/30 transition-colors">
+                <div className="w-[88px] px-2.5 py-1.5 font-semibold text-[11px] tracking-wide text-muted-foreground shrink-0">
                   {f.label}
                 </div>
                 <div className="flex-1 px-1.5 py-0.5">
                   {f.type === "select" ? (
                     <Select value={data.onExamination[f.key] || "Absent"} onValueChange={(v) => updateOE(f.key, v)}>
-                      <SelectTrigger className="h-7 text-xs border-0 shadow-none bg-transparent"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-7 text-xs border-0 shadow-none bg-transparent focus:ring-0 focus:ring-offset-0"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {presentAbsentOptions.map((opt) => (
                           <SelectItem key={opt} value={opt} className="text-xs">{opt}</SelectItem>
@@ -551,29 +579,71 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
                       </SelectContent>
                     </Select>
                   ) : f.type === "date" ? (
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={10}
-                      value={data.onExamination[f.key]}
-                      onChange={(e) => {
-                        // Auto-format: insert dashes as user types (DD-MM-YYYY)
-                        let v = e.target.value.replace(/[^\d-]/g, "");
-                        const digits = v.replace(/-/g, "");
-                        let formatted = digits.slice(0, 2);
-                        if (digits.length >= 3) formatted += "-" + digits.slice(2, 4);
-                        if (digits.length >= 5) formatted += "-" + digits.slice(4, 8);
-                        updateOE(f.key, formatted);
-                      }}
-                      placeholder={f.placeholder}
-                      className="h-7 text-xs border-0 shadow-none bg-transparent"
-                    />
+                    <div className="flex items-center gap-1">
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={10}
+                        value={data.onExamination[f.key]}
+                        onChange={(e) => {
+                          let v = e.target.value.replace(/[^\d-]/g, "");
+                          const digits = v.replace(/-/g, "");
+                          let formatted = digits.slice(0, 2);
+                          if (digits.length >= 3) formatted += "-" + digits.slice(2, 4);
+                          if (digits.length >= 5) formatted += "-" + digits.slice(4, 8);
+                          updateOE(f.key, formatted);
+                        }}
+                        placeholder={f.placeholder}
+                        className="h-7 text-xs border-0 shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1"
+                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button type="button" variant="ghost" size="icon" className="h-6 w-6 shrink-0 text-muted-foreground hover:text-primary">
+                            <CalendarIcon className="w-3.5 h-3.5" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                          <Calendar
+                            mode="single"
+                            selected={parseDMY(data.onExamination[f.key]) || undefined}
+                            onSelect={(d) => d && updateOE(f.key, formatDMY(d))}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   ) : (
                     <OEInputWithSuggestions fieldKey={f.key} value={data.onExamination[f.key]} placeholder={f.placeholder} onChange={(v) => updateOE(f.key, v)} />
                   )}
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* PV Examination Notes — placed after O/E */}
+          <div className="rounded-lg border border-border/70 overflow-hidden">
+            <div className="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border/50">
+              <Stethoscope className="w-3.5 h-3.5 text-primary" />
+              <p className="text-xs font-semibold text-foreground">PV Examination Notes</p>
+            </div>
+            <div className="divide-y divide-border/40">
+              {pvFields.map((f) => (
+                <div key={f.key} className="flex items-start text-sm bg-card hover:bg-muted/30 transition-colors">
+                  <div className="w-[160px] px-2.5 py-2 font-medium text-[11px] text-muted-foreground shrink-0 leading-tight">
+                    {f.label}
+                  </div>
+                  <div className="flex-1 px-1.5 py-1">
+                    <Input
+                      value={pv[f.key]}
+                      onChange={(e) => updatePV(f.key, e.target.value)}
+                      placeholder={f.placeholder}
+                      className="h-7 text-xs border-0 shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </TabsContent>
 
