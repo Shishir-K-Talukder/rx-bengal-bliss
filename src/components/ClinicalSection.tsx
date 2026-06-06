@@ -15,12 +15,22 @@ import { useMedicineSearch, MedicineSuggestion } from "@/hooks/useMedicineSearch
 export interface OnExaminationData {
   bp: string; weight: string; temp: string; pulse: string; heart: string; lungs: string; abd: string;
   anaemia: string; jaundice: string; cyanosis: string; oedema: string;
-  rr: string; spo2: string; lmp: string; edd: string; fm: string; fhr: string; gravida: string;
+  rr: string; spo2: string; lmp: string; edd: string; fm: string; fhr: string; gravida: string; para: string;
+}
+
+export interface PVExaminationData {
+  vulvaVagina: string;
+  cervix: string;
+  uterus: string;
+  adnexa: string;
+  cmt: string;
+  pod: string;
 }
 
 export interface ClinicalData {
   chiefComplaint: string;
   onExamination: OnExaminationData;
+  pvExamination?: PVExaminationData;
   drugHistory: string;
   drugHistoryMedicines?: string[];
   diagnosis: string;
@@ -31,7 +41,11 @@ export interface ClinicalData {
 export const defaultOnExamination: OnExaminationData = {
   bp: "", weight: "", temp: "", pulse: "", heart: "", lungs: "", abd: "",
   anaemia: "Absent", jaundice: "Absent", cyanosis: "Absent", oedema: "Absent",
-  rr: "", spo2: "", lmp: "", edd: "", fm: "", fhr: "Absent", gravida: "",
+  rr: "", spo2: "", lmp: "", edd: "", fm: "", fhr: "Absent", gravida: "", para: "",
+};
+
+export const defaultPVExamination: PVExaminationData = {
+  vulvaVagina: "", cervix: "", uterus: "", adnexa: "", cmt: "", pod: "",
 };
 
 const COMMON_INVESTIGATIONS = [
