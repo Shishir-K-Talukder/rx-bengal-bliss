@@ -261,6 +261,18 @@ const Index = () => {
             <PrintPreview doctor={doctor} patient={patient} clinical={clinical} medicines={medicines} advice={advice} printSettings={printSettings} />
           </TabsContent>
 
+          <TabsContent value="record" className="mt-0">
+            <div className="section-card p-5">
+              <h3 className="section-header mb-4">
+                <div className="section-header-icon flex items-center justify-center">
+                  <FolderOpen className="w-3.5 h-3.5" />
+                </div>
+                Patient Records
+              </h3>
+              <PatientRecordsPanel onLoadPrescription={handleLoadPrescription} />
+            </div>
+          </TabsContent>
+
           <TabsContent value="history" className="mt-0">
             <div className="section-card p-5">
               <h3 className="section-header mb-4">
