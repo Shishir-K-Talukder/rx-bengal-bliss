@@ -625,7 +625,7 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
           <div className="rounded-lg border border-border/70 overflow-hidden">
             <div className="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border/50">
               <Stethoscope className="w-3.5 h-3.5 text-primary" />
-              <p className="text-xs font-semibold text-foreground">PV Examination Notes</p>
+              <p className="text-xs font-semibold text-foreground">P/V</p>
             </div>
             <div className="divide-y divide-border/40">
               {pvFields.map((f) => (
