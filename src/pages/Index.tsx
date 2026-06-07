@@ -225,6 +225,9 @@ const Index = () => {
               <TabsTrigger value="preview" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
                 <Eye className="w-4 h-4" /> Preview
               </TabsTrigger>
+              <TabsTrigger value="record" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
+                <FolderOpen className="w-4 h-4" /> Record
+              </TabsTrigger>
               <TabsTrigger value="history" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
                 <History className="w-4 h-4" /> History
               </TabsTrigger>
