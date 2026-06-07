@@ -59,7 +59,6 @@ const Contact = () => {
       </Helmet>
       <div className="min-h-screen bg-background">
         <MarketingHeader />
-        <section className="pt-28 pb-16 container mx-auto px-4 max-w-5xl">
         <main>
         <section className="pt-28 pb-16 container mx-auto px-4 max-w-5xl">
           <h1 className="text-4xl sm:text-5xl font-bold mb-3 text-center">Contact Us</h1>
