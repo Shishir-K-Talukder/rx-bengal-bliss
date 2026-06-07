@@ -94,7 +94,7 @@ const MarketingHeader = () => {
                 </Button>
               </>
             )}
-            <Button size="icon" variant="ghost" className="md:hidden rounded-full h-9 w-9" onClick={() => setOpen(!open)}>
+            <Button size="icon" variant="ghost" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} className="md:hidden rounded-full h-9 w-9" onClick={() => setOpen(!open)}>
               {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </Button>
           </div>

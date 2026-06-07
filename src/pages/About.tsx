@@ -29,7 +29,7 @@ const About = () => (
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
                 <v.icon className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="font-semibold mb-1">{v.title}</h3>
+              <h2 className="font-semibold mb-1 text-base">{v.title}</h2>
               <p className="text-xs text-muted-foreground leading-relaxed">{v.desc}</p>
             </Card>
           ))}
