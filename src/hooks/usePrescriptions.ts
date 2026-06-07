@@ -59,37 +59,66 @@ export const usePrescriptions = () => {
   ) => {
     if (!user) return;
 
-    // Upsert patient record
+    // Upsert patient record - dedupe by patientId first, then by name+mobile, then name+age+sex
     let patientId: string | null = null;
-    if (patient.name) {
+    const humanPid = (patient as any).patientId?.trim?.() || "";
+
+    if (humanPid) {
+      // Find any existing prescription with same human patientId and reuse its patient_id link
+      const { data: existingRx } = await supabase
+        .from("prescriptions")
+        .select("patient_id")
+        .eq("user_id", user.id)
+        .filter("patient_data->>patientId", "eq", humanPid)
+        .not("patient_id", "is", null)
+        .limit(1)
+        .maybeSingle();
+      if (existingRx?.patient_id) patientId = existingRx.patient_id;
+    }
+
+    if (!patientId && patient.name) {
       const { data: existingPatient } = await supabase
         .from("patients")
         .select("id")
         .eq("user_id", user.id)
         .eq("name", patient.name)
         .eq("mobile", patient.mobile || "")
-        .single();
+        .maybeSingle();
 
       if (existingPatient) {
         patientId = existingPatient.id;
-        await supabase.from("patients").update({
-          age: patient.age, sex: patient.sex, address: patient.address,
-        }).eq("id", patientId);
       } else {
-        const { data: newPatient } = await supabase
+        // Secondary dedupe: name + age + sex
+        const { data: altMatch } = await supabase
           .from("patients")
-          .insert({
-            user_id: user.id,
-            name: patient.name,
-            age: patient.age,
-            sex: patient.sex,
-            mobile: patient.mobile || "",
-            address: patient.address || "",
-          })
           .select("id")
-          .single();
-        patientId = newPatient?.id ?? null;
+          .eq("user_id", user.id)
+          .eq("name", patient.name)
+          .eq("age", patient.age || "")
+          .eq("sex", patient.sex || "")
+          .maybeSingle();
+        if (altMatch) patientId = altMatch.id;
       }
+    }
+
+    if (patientId) {
+      await supabase.from("patients").update({
+        age: patient.age, sex: patient.sex, address: patient.address, mobile: patient.mobile || "",
+      }).eq("id", patientId);
+    } else if (patient.name) {
+      const { data: newPatient } = await supabase
+        .from("patients")
+        .insert({
+          user_id: user.id,
+          name: patient.name,
+          age: patient.age,
+          sex: patient.sex,
+          mobile: patient.mobile || "",
+          address: patient.address || "",
+        })
+        .select("id")
+        .single();
+      patientId = newPatient?.id ?? null;
     }
 
     const { error } = await supabase.from("prescriptions").insert({

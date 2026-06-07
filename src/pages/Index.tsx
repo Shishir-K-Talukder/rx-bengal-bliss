@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Printer, FileText, Stethoscope, Eye, Save, History, LogOut, LayoutDashboard, User } from "lucide-react";
+import { Printer, FileText, Stethoscope, Eye, Save, History, LogOut, LayoutDashboard, User, FolderOpen } from "lucide-react";
 import FloatingNav from "@/components/FloatingNav";
 import DoctorHeader, { DoctorInfo } from "@/components/DoctorHeader";
 import PatientInfo, { PatientData, savePatientToHistory } from "@/components/PatientInfo";
@@ -10,6 +10,7 @@ import MedicineSection, { Medicine } from "@/components/MedicineSection";
 import AdviceSection, { AdviceData } from "@/components/AdviceSection";
 import PrintPreview from "@/components/PrintPreview";
 import PrescriptionHistory from "@/components/PrescriptionHistory";
+import PatientRecordsPanel from "@/components/PatientRecordsPanel";
 import PatientDocuments from "@/components/PatientDocuments";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -224,6 +225,9 @@ const Index = () => {
               <TabsTrigger value="preview" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
                 <Eye className="w-4 h-4" /> Preview
               </TabsTrigger>
+              <TabsTrigger value="record" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
+                <FolderOpen className="w-4 h-4" /> Record
+              </TabsTrigger>
               <TabsTrigger value="history" className="gap-2 text-sm font-medium rounded-lg px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
                 <History className="w-4 h-4" /> History
               </TabsTrigger>
@@ -255,6 +259,18 @@ const Index = () => {
 
           <TabsContent value="preview" className="mt-0">
             <PrintPreview doctor={doctor} patient={patient} clinical={clinical} medicines={medicines} advice={advice} printSettings={printSettings} />
+          </TabsContent>
+
+          <TabsContent value="record" className="mt-0">
+            <div className="section-card p-5">
+              <h3 className="section-header mb-4">
+                <div className="section-header-icon flex items-center justify-center">
+                  <FolderOpen className="w-3.5 h-3.5" />
+                </div>
+                Patient Records
+              </h3>
+              <PatientRecordsPanel onLoadPrescription={handleLoadPrescription} />
+            </div>
           </TabsContent>
 
           <TabsContent value="history" className="mt-0">
