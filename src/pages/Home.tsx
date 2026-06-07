@@ -231,6 +231,7 @@ const Home = () => {
             </Button>
           </Card>
         </section>
+        </main>
 
         <MarketingFooter />
       </div>
