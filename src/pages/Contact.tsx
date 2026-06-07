@@ -52,9 +52,14 @@ const Contact = () => {
         <title>Contact Digital Rx — Get in Touch</title>
         <meta name="description" content="Contact the Digital Rx team for demos, pricing, or support. We'd love to hear from you." />
         <link rel="canonical" href="https://digital-prescription-app.lovable.app/contact" />
+        <meta property="og:title" content="Contact Digital Rx — Demos, Pricing & Support" />
+        <meta property="og:description" content="Reach the Digital Rx team for a demo, custom pricing, or support — we reply within one business day." />
+        <meta property="og:url" content="https://digital-prescription-app.lovable.app/contact" />
+        <meta property="og:type" content="website" />
       </Helmet>
       <div className="min-h-screen bg-background">
         <MarketingHeader />
+        <main>
         <section className="pt-28 pb-16 container mx-auto px-4 max-w-5xl">
           <h1 className="text-4xl sm:text-5xl font-bold mb-3 text-center">Contact Us</h1>
           <p className="text-muted-foreground text-center mb-12">
@@ -148,6 +153,7 @@ const Contact = () => {
             </Card>
           </div>
         </section>
+        </main>
         <MarketingFooter />
       </div>
     </>

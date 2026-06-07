@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useMemo, useState } from "react";
 import FloatingNav from "@/components/FloatingNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -393,6 +394,15 @@ const InsulinCalc = () => {
 const Tools = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Clinical Calculators — Digital Rx Tools</title>
+        <meta name="description" content="Quick pediatric & adult dose, GFR, BMI, EDD, ovulation, and insulin calculators for daily clinical practice." />
+        <link rel="canonical" href="https://digital-prescription-app.lovable.app/tools" />
+        <meta property="og:title" content="Clinical Calculators — Digital Rx Tools" />
+        <meta property="og:description" content="Dose, GFR, BMI, EDD, ovulation, and insulin calculators built for daily practice." />
+        <meta property="og:url" content="https://digital-prescription-app.lovable.app/tools" />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <FloatingNav />
       <main className="max-w-5xl mx-auto px-4 pt-20 pb-12">
         <div className="mb-6">
