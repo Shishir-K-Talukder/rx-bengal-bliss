@@ -71,7 +71,7 @@ const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onCha
         <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg max-h-[200px] overflow-y-auto">
           {loading && (
             <div className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground">
-              <Loader2 className="w-3 h-3 animate-spin" /> Searching medex.com.bd...
+              <Loader2 className="w-3 h-3 animate-spin" /> Searching...
             </div>
           )}
           {!loading && suggestions.length === 0 && query.length >= 2 && (
