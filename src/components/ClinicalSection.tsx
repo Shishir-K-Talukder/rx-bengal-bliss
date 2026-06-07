@@ -504,12 +504,15 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
       </h3>
 
       <Tabs defaultValue="cc" className="w-full">
-        <TabsList className="mb-4 w-full grid grid-cols-6 h-10 bg-muted/60 p-1 rounded-lg">
+        <TabsList className="mb-4 w-full grid grid-cols-7 h-10 bg-muted/60 p-1 rounded-lg">
           <TabsTrigger value="cc" className="text-xs font-semibold rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
             C/C
           </TabsTrigger>
           <TabsTrigger value="oe" className="text-xs font-semibold rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
             O/E
+          </TabsTrigger>
+          <TabsTrigger value="pv" className="text-xs font-semibold rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
+            P/V
           </TabsTrigger>
           <TabsTrigger value="dh" className="text-xs font-semibold rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all">
             D/H
@@ -621,11 +624,13 @@ const ClinicalSection = ({ data, onChange, options }: Props) => {
             ))}
           </div>
 
-          {/* PV Examination Notes — placed after O/E */}
+        </TabsContent>
+
+        <TabsContent value="pv" className="mt-0">
           <div className="rounded-lg border border-border/70 overflow-hidden">
             <div className="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border/50">
               <Stethoscope className="w-3.5 h-3.5 text-primary" />
-              <p className="text-xs font-semibold text-foreground">P/V</p>
+              <p className="text-xs font-semibold text-foreground">PV Examination</p>
             </div>
             <div className="divide-y divide-border/40">
               {pvFields.map((f) => (
