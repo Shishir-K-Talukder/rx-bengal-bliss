@@ -66,6 +66,7 @@ const Home = () => {
 
       <div className="min-h-screen bg-background">
         <MarketingHeader />
+        <main>
 
         {/* HERO */}
         <section className="relative overflow-hidden pt-28 pb-24 sm:pt-36 sm:pb-32">
