@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,12 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/30 flex items-center justify-center px-4 relative overflow-hidden">
+      <Helmet>
+        <title>Create your Digital Rx account</title>
+        <meta name="description" content="Register for Digital Rx — Bangladesh's modern digital prescription platform for doctors. Free to start." />
+        <link rel="canonical" href="https://digital-prescription-app.lovable.app/signup" />
+        <meta name="robots" content="noindex,follow" />
+      </Helmet>
       {/* Decorative medical elements */}
       <div className="absolute top-10 right-10 opacity-[0.06]">
         <Stethoscope className="w-40 h-40 text-primary" strokeWidth={1} />
