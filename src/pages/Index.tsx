@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Printer, FileText, Stethoscope, Eye, Save, History, LogOut, LayoutDashboard, User } from "lucide-react";
+import { Printer, FileText, Stethoscope, Eye, Save, History, LogOut, LayoutDashboard, User, FolderOpen } from "lucide-react";
 import FloatingNav from "@/components/FloatingNav";
 import DoctorHeader, { DoctorInfo } from "@/components/DoctorHeader";
 import PatientInfo, { PatientData, savePatientToHistory } from "@/components/PatientInfo";
@@ -10,6 +10,7 @@ import MedicineSection, { Medicine } from "@/components/MedicineSection";
 import AdviceSection, { AdviceData } from "@/components/AdviceSection";
 import PrintPreview from "@/components/PrintPreview";
 import PrescriptionHistory from "@/components/PrescriptionHistory";
+import PatientRecordsPanel from "@/components/PatientRecordsPanel";
 import PatientDocuments from "@/components/PatientDocuments";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
