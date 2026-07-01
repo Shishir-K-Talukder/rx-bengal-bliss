@@ -33,8 +33,7 @@ export const usePrescriptions = () => {
       .from("prescriptions")
       .select("*")
       .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(50);
+      .order("created_at", { ascending: false });
 
     if (data) {
       setPrescriptions(
