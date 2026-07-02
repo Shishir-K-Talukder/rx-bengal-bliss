@@ -745,7 +745,7 @@ const Admin = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm flex items-center justify-between gap-2 flex-wrap">
-                  <span>Medicine Database ({medicines.length}+)</span>
+                  <span>Medicine Database ({(medicinesTotal || medicines.length).toLocaleString()})</span>
                   <div className="flex items-center gap-2">
                     {syncInfo && (
                       <span className="text-[10px] font-normal text-muted-foreground">
