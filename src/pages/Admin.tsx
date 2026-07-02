@@ -435,7 +435,7 @@ const Admin = () => {
             { icon: <Users className="w-4 h-4 text-primary" />, label: "Patients", value: patients.length },
             { icon: <FileText className="w-4 h-4 text-primary" />, label: "Prescriptions", value: prescriptions.length },
             { icon: <CalendarDays className="w-4 h-4 text-primary" />, label: "Appointments", value: appointments.length },
-            { icon: <Pill className="w-4 h-4 text-primary" />, label: "Medicines", value: medicines.length },
+            { icon: <Pill className="w-4 h-4 text-primary" />, label: "Medicines", value: medicinesTotal || medicines.length },
           ].map((s) => (
             <Card key={s.label} className="border-border/60 hover:shadow-md transition-shadow">
               <CardContent className="p-3 flex items-center gap-2.5">
