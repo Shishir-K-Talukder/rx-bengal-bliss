@@ -532,7 +532,7 @@ const Admin = () => {
                       { label: "Patients", count: patients.length },
                       { label: "Prescriptions", count: prescriptions.length },
                       { label: "Appointments", count: appointments.length },
-                      { label: "Medicines in DB", count: medicines.length + "+" },
+                      { label: "Medicines in DB", count: medicinesTotal || medicines.length },
                       { label: "Treatment Templates", count: templates.length },
                       { label: "Admin Roles", count: roles.length },
                     ].map((r) => (
