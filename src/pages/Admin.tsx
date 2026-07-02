@@ -70,6 +70,7 @@ const Admin = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [medicines, setMedicines] = useState<MedicineRow[]>([]);
+  const [medicinesTotal, setMedicinesTotal] = useState<number>(0);
   const [templates, setTemplates] = useState<TreatmentTemplate[]>([]);
 
   const [search, setSearch] = useState("");
