@@ -103,7 +103,7 @@ const Admin = () => {
 
   const loadAll = async () => {
     setLoading(true);
-    const [docRes, patRes, rxRes, roleRes, apptRes, medRes, tmplRes] = await Promise.all([
+    const [docRes, patRes, rxRes, roleRes, apptRes, medRes, tmplRes, medCountRes] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("patients").select("*").order("created_at", { ascending: false }),
       supabase.from("prescriptions").select("*").order("created_at", { ascending: false }),
@@ -111,6 +111,7 @@ const Admin = () => {
       supabase.from("appointments").select("*").order("appointment_date", { ascending: false }),
       supabase.from("medicines").select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("treatment_templates").select("*").order("created_at", { ascending: false }),
+      supabase.from("medicines").select("*", { count: "exact", head: true }),
     ]);
     if (docRes.data) setDoctors(docRes.data as any);
     if (patRes.data) setPatients(patRes.data);
@@ -119,6 +120,7 @@ const Admin = () => {
     if (apptRes.data) setAppointments(apptRes.data as any);
     if (medRes.data) setMedicines(medRes.data as any);
     if (tmplRes.data) setTemplates(tmplRes.data as any);
+    if (typeof medCountRes.count === "number") setMedicinesTotal(medCountRes.count);
     setLoading(false);
   };
 
