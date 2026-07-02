@@ -684,7 +684,7 @@ export const useMedicineSearch = (query: string, customMedicines: DbMedicine[] =
     const requestId = ++requestIdRef.current;
 
     debounceRef.current = setTimeout(async () => {
-      const results = await searchFromDb(query);
+      const results = await searchFromDb(query, customMedicines);
       if (requestId === requestIdRef.current) {
         setSuggestions(results);
         setLoading(false);
@@ -694,7 +694,7 @@ export const useMedicineSearch = (query: string, customMedicines: DbMedicine[] =
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+  }, [query, customMedicines]);
 
   return { suggestions, loading };
 };
