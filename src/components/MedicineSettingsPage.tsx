@@ -209,6 +209,17 @@ const MedicineSettingsPage = ({ options, onChange }: Props) => {
         />
       ),
     },
+    {
+      value: "customMedicines",
+      label: "Medicines",
+      icon: Package,
+      content: (
+        <CustomMedicineEditor
+          items={options.customMedicines || []}
+          onChange={(items) => onChange({ ...options, customMedicines: items })}
+        />
+      ),
+    },
     { value: "templates", label: "Templates", icon: BookTemplate, content: <TreatmentTemplateManager /> },
   ];
 
