@@ -44,10 +44,10 @@ const highlightMatch = (text: string, query: string) => {
   );
 };
 
-const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onChange: (v: string) => void; onSelect: (fullName: string, detectedType: string) => void }) => {
+const MedicineNameInput = ({ value, onChange, onSelect, customMedicines }: { value: string; onChange: (v: string) => void; onSelect: (fullName: string, detectedType: string) => void; customMedicines?: { name: string; strength: string; generic: string; company: string }[] }) => {
   const [query, setQuery] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const { suggestions, loading } = useMedicineSearch(query);
+  const { suggestions, loading } = useMedicineSearch(query, customMedicines || []);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (med: { name: string; strength: string; detectedType: string }) => {
@@ -277,7 +277,7 @@ const MedicineSection = ({ medicines, onChange, options, onOptionsChange }: Prop
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-6 gap-2">
                   <div className="col-span-2">
                     <Label className="text-[11px] text-muted-foreground">Medicine Name</Label>
-                    <MedicineNameInput value={med.name} onChange={(v) => updateMedicine(med.id, "name", v)} onSelect={(fullName, detectedType) => handleMedicineSelect(med.id, fullName, detectedType)} />
+                    <MedicineNameInput value={med.name} onChange={(v) => updateMedicine(med.id, "name", v)} onSelect={(fullName, detectedType) => handleMedicineSelect(med.id, fullName, detectedType)} customMedicines={options.customMedicines} />
                   </div>
                   <div>
                     <Label className="text-[11px] text-muted-foreground">Formulation</Label>

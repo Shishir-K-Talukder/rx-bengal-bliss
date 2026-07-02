@@ -602,13 +602,16 @@ const loadFallbackRanked = async (): Promise<RankedMedicine[]> => {
   return fallbackRankedData;
 };
 
-const searchFromDb = async (query: string): Promise<MedicineSuggestion[]> => {
+const searchFromDb = async (query: string, customMedicines: DbMedicine[] = []): Promise<MedicineSuggestion[]> => {
   const { nameSearchTerms, searchTerms } = getSearchParts(query);
   if (nameSearchTerms.length === 0 && searchTerms.length === 0) return [];
 
   const fallbackContext = await loadFallbackTypeContext();
   const refineMatches = (medicines: DbMedicine[]) => filterAndSortMatches(medicines, query, fallbackContext).map(toSuggestion);
   const candidates: DbMedicine[] = [];
+
+  // Doctor's custom medicines take highest priority
+  if (customMedicines.length > 0) candidates.push(...customMedicines);
 
   const nameFilters = buildOrFilters(["name"], nameSearchTerms);
   if (nameFilters) {
@@ -650,7 +653,7 @@ const searchFromDb = async (query: string): Promise<MedicineSuggestion[]> => {
     }
   }
 
-  // Prefer DB results — source of truth, includes freshly synced medicines.
+  // Prefer DB + custom results — source of truth, includes freshly synced medicines.
   if (candidates.length > 0) {
     const refined = refineMatches(dedupeMedicines(candidates));
     if (refined.length > 0) return refined;
@@ -661,7 +664,7 @@ const searchFromDb = async (query: string): Promise<MedicineSuggestion[]> => {
   return fallbackMatches.map(toSuggestion);
 };
 
-export const useMedicineSearch = (query: string) => {
+export const useMedicineSearch = (query: string, customMedicines: DbMedicine[] = []) => {
   // Eagerly preload fallback data on first mount
   useEffect(() => { loadFallbackRanked(); }, []);
   const [suggestions, setSuggestions] = useState<MedicineSuggestion[]>([]);
@@ -681,7 +684,7 @@ export const useMedicineSearch = (query: string) => {
     const requestId = ++requestIdRef.current;
 
     debounceRef.current = setTimeout(async () => {
-      const results = await searchFromDb(query);
+      const results = await searchFromDb(query, customMedicines);
       if (requestId === requestIdRef.current) {
         setSuggestions(results);
         setLoading(false);
@@ -691,7 +694,7 @@ export const useMedicineSearch = (query: string) => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+  }, [query, customMedicines]);
 
   return { suggestions, loading };
 };

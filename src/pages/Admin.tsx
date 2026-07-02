@@ -70,6 +70,7 @@ const Admin = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [medicines, setMedicines] = useState<MedicineRow[]>([]);
+  const [medicinesTotal, setMedicinesTotal] = useState<number>(0);
   const [templates, setTemplates] = useState<TreatmentTemplate[]>([]);
 
   const [search, setSearch] = useState("");
@@ -102,7 +103,7 @@ const Admin = () => {
 
   const loadAll = async () => {
     setLoading(true);
-    const [docRes, patRes, rxRes, roleRes, apptRes, medRes, tmplRes] = await Promise.all([
+    const [docRes, patRes, rxRes, roleRes, apptRes, medRes, tmplRes, medCountRes] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("patients").select("*").order("created_at", { ascending: false }),
       supabase.from("prescriptions").select("*").order("created_at", { ascending: false }),
@@ -110,6 +111,7 @@ const Admin = () => {
       supabase.from("appointments").select("*").order("appointment_date", { ascending: false }),
       supabase.from("medicines").select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("treatment_templates").select("*").order("created_at", { ascending: false }),
+      supabase.from("medicines").select("*", { count: "exact", head: true }),
     ]);
     if (docRes.data) setDoctors(docRes.data as any);
     if (patRes.data) setPatients(patRes.data);
@@ -118,6 +120,7 @@ const Admin = () => {
     if (apptRes.data) setAppointments(apptRes.data as any);
     if (medRes.data) setMedicines(medRes.data as any);
     if (tmplRes.data) setTemplates(tmplRes.data as any);
+    if (typeof medCountRes.count === "number") setMedicinesTotal(medCountRes.count);
     setLoading(false);
   };
 
@@ -432,7 +435,7 @@ const Admin = () => {
             { icon: <Users className="w-4 h-4 text-primary" />, label: "Patients", value: patients.length },
             { icon: <FileText className="w-4 h-4 text-primary" />, label: "Prescriptions", value: prescriptions.length },
             { icon: <CalendarDays className="w-4 h-4 text-primary" />, label: "Appointments", value: appointments.length },
-            { icon: <Pill className="w-4 h-4 text-primary" />, label: "Medicines", value: medicines.length },
+            { icon: <Pill className="w-4 h-4 text-primary" />, label: "Medicines", value: medicinesTotal || medicines.length },
           ].map((s) => (
             <Card key={s.label} className="border-border/60 hover:shadow-md transition-shadow">
               <CardContent className="p-3 flex items-center gap-2.5">
@@ -529,7 +532,7 @@ const Admin = () => {
                       { label: "Patients", count: patients.length },
                       { label: "Prescriptions", count: prescriptions.length },
                       { label: "Appointments", count: appointments.length },
-                      { label: "Medicines in DB", count: medicines.length + "+" },
+                      { label: "Medicines in DB", count: medicinesTotal || medicines.length },
                       { label: "Treatment Templates", count: templates.length },
                       { label: "Admin Roles", count: roles.length },
                     ].map((r) => (
@@ -742,7 +745,7 @@ const Admin = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm flex items-center justify-between gap-2 flex-wrap">
-                  <span>Medicine Database ({medicines.length}+)</span>
+                  <span>Medicine Database ({(medicinesTotal || medicines.length).toLocaleString()})</span>
                   <div className="flex items-center gap-2">
                     {syncInfo && (
                       <span className="text-[10px] font-normal text-muted-foreground">

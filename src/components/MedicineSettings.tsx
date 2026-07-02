@@ -7,6 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Trash2, Settings, Pencil, Check, X, Pill, Clock, Utensils, MessageSquare, CalendarDays, Layers } from "lucide-react";
 import type { PediatricDoseRule } from "@/lib/pediatricDose";
 
+export interface CustomMedicine {
+  name: string;
+  strength: string;
+  generic: string;
+  company: string;
+}
+
 export interface MedicineOptions {
   types: string[];
   doses: string[];
@@ -17,6 +24,7 @@ export interface MedicineOptions {
   investigations: string[];
   chiefComplaints: string[];
   pediatricRules: PediatricDoseRule[];
+  customMedicines?: CustomMedicine[];
 }
 
 const STORAGE_KEY = "medicine-options";
