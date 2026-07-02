@@ -44,10 +44,10 @@ const highlightMatch = (text: string, query: string) => {
   );
 };
 
-const MedicineNameInput = ({ value, onChange, onSelect }: { value: string; onChange: (v: string) => void; onSelect: (fullName: string, detectedType: string) => void }) => {
+const MedicineNameInput = ({ value, onChange, onSelect, customMedicines }: { value: string; onChange: (v: string) => void; onSelect: (fullName: string, detectedType: string) => void; customMedicines?: { name: string; strength: string; generic: string; company: string }[] }) => {
   const [query, setQuery] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const { suggestions, loading } = useMedicineSearch(query);
+  const { suggestions, loading } = useMedicineSearch(query, customMedicines || []);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (med: { name: string; strength: string; detectedType: string }) => {
