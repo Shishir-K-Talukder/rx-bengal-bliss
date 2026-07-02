@@ -2,10 +2,66 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, Settings, Pencil, Check, X, Pill, Clock, Utensils, MessageSquare, CalendarDays, Layers, ClipboardList, Search, GripVertical, BookTemplate, Baby } from "lucide-react";
-import { MedicineOptions } from "@/components/MedicineSettings";
+import { Plus, Trash2, Settings, Pencil, Check, X, Pill, Clock, Utensils, MessageSquare, CalendarDays, Layers, ClipboardList, Search, GripVertical, BookTemplate, Baby, Package } from "lucide-react";
+import { MedicineOptions, CustomMedicine } from "@/components/MedicineSettings";
 import TreatmentTemplateManager from "@/components/TreatmentTemplateManager";
 import PediatricDoseRuleManager from "@/components/PediatricDoseRuleManager";
+
+interface CustomMedicineEditorProps {
+  items: CustomMedicine[];
+  onChange: (items: CustomMedicine[]) => void;
+}
+
+const CustomMedicineEditor = ({ items, onChange }: CustomMedicineEditorProps) => {
+  const [name, setName] = useState("");
+  const [strength, setStrength] = useState("");
+  const [generic, setGeneric] = useState("");
+  const [company, setCompany] = useState("");
+
+  const add = () => {
+    const n = name.trim();
+    if (!n) return;
+    if (items.some((m) => m.name.toLowerCase() === n.toLowerCase() && m.strength.trim().toLowerCase() === strength.trim().toLowerCase())) return;
+    onChange([...items, { name: n, strength: strength.trim(), generic: generic.trim(), company: company.trim() }]);
+    setName(""); setStrength(""); setGeneric(""); setCompany("");
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Brand name *" className="h-12 rounded-xl border-2" />
+        <Input value={strength} onChange={(e) => setStrength(e.target.value)} placeholder="Strength (e.g. 500 mg)" className="h-12 rounded-xl border-2" />
+        <Input value={generic} onChange={(e) => setGeneric(e.target.value)} placeholder="Generic" className="h-12 rounded-xl border-2" />
+        <Input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company" className="h-12 rounded-xl border-2" />
+      </div>
+      <Button size="lg" variant="default" className="h-12 gap-2 px-6 font-bold rounded-xl shadow-md" onClick={add}>
+        <Plus className="w-5 h-5" /> Add Custom Medicine
+      </Button>
+      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+        {items.length === 0 && (
+          <p className="text-sm text-muted-foreground py-6 text-center">No custom medicines yet. Add your own brand + strength to include it in the prescription search.</p>
+        )}
+        {items.map((m, idx) => (
+          <div key={idx} className="flex items-center gap-3 bg-muted/40 rounded-xl px-4 py-3 group border-2 border-transparent hover:border-border">
+            <div className="flex-1 min-w-0">
+              <div className="text-[15px] font-semibold text-foreground truncate">
+                {m.name} <span className="text-muted-foreground font-normal">{m.strength}</span>
+              </div>
+              <div className="text-xs text-muted-foreground truncate">
+                {m.generic || "—"}{m.company ? ` • ${m.company}` : ""}
+              </div>
+            </div>
+            <Button size="icon" variant="outline" className="h-11 w-11 shrink-0 rounded-xl border-2 hover:bg-destructive/10 hover:border-destructive hover:text-destructive" onClick={() => onChange(items.filter((_, i) => i !== idx))}>
+              <Trash2 className="w-5 h-5" />
+            </Button>
+          </div>
+        ))}
+      </div>
+      <p className="text-sm text-muted-foreground font-semibold">{items.length} custom medicines</p>
+    </div>
+  );
+};
+
 
 interface ListEditorProps {
   items: string[];
