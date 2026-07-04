@@ -959,14 +959,146 @@ const Admin = () => {
         </Dialog>
 
         <Dialog open={!!selectedPrescription} onOpenChange={() => setSelectedPrescription(null)}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
-            <DialogHeader><DialogTitle>Prescription Details</DialogTitle></DialogHeader>
+          <DialogContent className="max-w-4xl max-h-[88vh] overflow-auto">
+            <DialogHeader><DialogTitle>Prescription View</DialogTitle></DialogHeader>
             {selectedPrescription && (
-              <div className="space-y-4 text-sm">
-                <div><h4 className="font-semibold mb-1">Patient</h4><pre className="bg-muted p-2 rounded text-xs overflow-auto">{JSON.stringify(selectedPrescription.patient_data, null, 2)}</pre></div>
-                <div><h4 className="font-semibold mb-1">Clinical Data</h4><pre className="bg-muted p-2 rounded text-xs overflow-auto">{JSON.stringify(selectedPrescription.clinical_data, null, 2)}</pre></div>
-                <div><h4 className="font-semibold mb-1">Medicines</h4><pre className="bg-muted p-2 rounded text-xs overflow-auto">{JSON.stringify(selectedPrescription.medicines, null, 2)}</pre></div>
-                <div><h4 className="font-semibold mb-1">Advice</h4><pre className="bg-muted p-2 rounded text-xs overflow-auto">{JSON.stringify(selectedPrescription.advice, null, 2)}</pre></div>
+              <div className="space-y-5 text-sm">
+                {(() => {
+                  const patient = selectedPrescription.patient_data || {};
+                  const clinical = selectedPrescription.clinical_data || {};
+                  const exam = clinical.onExamination || {};
+                  const medicinesList = Array.isArray(selectedPrescription.medicines) ? selectedPrescription.medicines : [];
+                  const advice = selectedPrescription.advice || {};
+                  const examEntries = nonEmptyEntries(exam);
+
+                  return (
+                    <>
+                      <div className="rounded-lg border border-border bg-card p-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <p className="text-[11px] uppercase text-muted-foreground">Patient</p>
+                            <h3 className="text-lg font-semibold text-foreground">{showValue(patient.name)}</h3>
+                            <p className="text-xs text-muted-foreground">ID: {showValue(patient.patientId)}</p>
+                          </div>
+                          <div className="text-xs text-muted-foreground sm:text-right">
+                            <p>Doctor: <span className="font-medium text-foreground">{getDoctorName(selectedPrescription.user_id)}</span></p>
+                            <p>Date: {new Date(selectedPrescription.created_at).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
+                          {[
+                            ["Age", patient.age],
+                            ["Sex", patient.sex],
+                            ["Mobile", patient.mobile],
+                            ["Address", patient.address],
+                            ["Visit Fee", advice.visitFee ? `৳${advice.visitFee}` : ""],
+                          ].map(([label, value]) => (
+                            <div key={label} className="rounded-md bg-muted/45 p-2">
+                              <p className="text-[10px] uppercase text-muted-foreground">{label}</p>
+                              <p className="font-medium text-foreground">{showValue(value)}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-4 lg:grid-cols-2">
+                        <section className="rounded-lg border border-border p-4">
+                          <h4 className="mb-3 font-semibold text-foreground">Clinical Information</h4>
+                          <div className="space-y-3">
+                            {[
+                              ["Chief Complaint", clinical.chiefComplaint],
+                              ["Diagnosis", clinical.diagnosis],
+                              ["Investigation", clinical.investigation],
+                              ["Drug History", clinical.drugHistory],
+                            ].map(([label, value]) => (
+                              showValue(value) !== "—" && (
+                                <div key={label}>
+                                  <p className="text-[10px] uppercase text-muted-foreground">{label}</p>
+                                  <div className="whitespace-pre-wrap text-foreground">{renderText(value)}</div>
+                                </div>
+                              )
+                            ))}
+                          </div>
+                        </section>
+
+                        <section className="rounded-lg border border-border p-4">
+                          <h4 className="mb-3 font-semibold text-foreground">On Examination</h4>
+                          {examEntries.length > 0 ? (
+                            <div className="grid grid-cols-2 gap-2">
+                              {examEntries.map(([key, value]) => (
+                                <div key={key} className="flex items-center justify-between gap-2 rounded-md bg-muted/45 px-2 py-1.5">
+                                  <span className="text-[10px] uppercase text-muted-foreground">{labelFromKey(key)}</span>
+                                  <span className="text-right text-xs font-medium text-foreground">{showValue(value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-muted-foreground">No examination notes</p>
+                          )}
+                        </section>
+                      </div>
+
+                      <section className="rounded-lg border border-border p-4">
+                        <h4 className="mb-3 font-semibold text-foreground">Rx Medicines</h4>
+                        {medicinesList.length > 0 ? (
+                          <div className="overflow-x-auto">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead className="w-10">#</TableHead>
+                                  <TableHead>Medicine</TableHead>
+                                  <TableHead>Dose</TableHead>
+                                  <TableHead>Duration</TableHead>
+                                  <TableHead>Meal / Instructions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {medicinesList.map((medicine: any, index: number) => (
+                                  <TableRow key={medicine.id || `${medicine.name}-${index}`}>
+                                    <TableCell className="font-medium">{index + 1}</TableCell>
+                                    <TableCell>
+                                      <p className="font-semibold text-foreground">{showValue(medicine.name)}</p>
+                                      <p className="text-[11px] text-muted-foreground">{showValue(medicine.type || medicine.formulation)}</p>
+                                    </TableCell>
+                                    <TableCell className="font-medium">{showValue(medicine.dose)}</TableCell>
+                                    <TableCell>{showValue(medicine.duration)}</TableCell>
+                                    <TableCell>
+                                      <div>{showValue(medicine.mealTiming)}</div>
+                                      {showValue(medicine.instructions) !== "—" && <div className="text-xs text-muted-foreground">{medicine.instructions}</div>}
+                                      {Array.isArray(medicine.taperingDoses) && medicine.taperingDoses.length > 0 && (
+                                        <div className="mt-1 space-y-0.5 text-[11px] text-muted-foreground">
+                                          {medicine.taperingDoses.map((taper: any, taperIndex: number) => (
+                                            <p key={taper.id || taperIndex}>Then: {showValue(taper.dose)} — {showValue(taper.duration)}</p>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">No medicines added</p>
+                        )}
+                      </section>
+
+                      <section className="rounded-lg border border-border p-4">
+                        <h4 className="mb-3 font-semibold text-foreground">Advice & Follow-up</h4>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div>
+                            <p className="text-[10px] uppercase text-muted-foreground">Advice</p>
+                            <div className="whitespace-pre-wrap text-foreground">{renderText(advice.advice)}</div>
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase text-muted-foreground">Follow-up</p>
+                            <p className="text-foreground">{showValue(advice.followUpDate)}</p>
+                          </div>
+                        </div>
+                      </section>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </DialogContent>
