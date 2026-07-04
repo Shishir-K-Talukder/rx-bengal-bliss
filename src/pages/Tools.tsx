@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Baby, CalendarHeart, Scale, Pill, User, Activity, Syringe, Heart } from "lucide-react";
+import { Baby, CalendarHeart, Scale, Pill, User, Activity, Syringe, Heart, Shield } from "lucide-react";
 import { PEDIATRIC_DRUGS, calculateDose, type PediatricDrug } from "@/lib/pediatricDrugs";
 import { ADULT_DRUGS, calculateAdultDose, type AdultDrug } from "@/lib/adultDrugs";
 import { addDays, differenceInDays, format, parseISO } from "date-fns";
