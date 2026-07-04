@@ -498,6 +498,7 @@ const Tools = () => {
             <TabsTrigger value="adultdose" className="text-xs">Adult Dose</TabsTrigger>
             <TabsTrigger value="gfr" className="text-xs">GFR</TabsTrigger>
             <TabsTrigger value="insulin" className="text-xs">Insulin</TabsTrigger>
+            <TabsTrigger value="rabies" className="text-xs">Rabies</TabsTrigger>
             <TabsTrigger value="edd" className="text-xs">EDD</TabsTrigger>
             <TabsTrigger value="ovulation" className="text-xs">Ovulation</TabsTrigger>
             <TabsTrigger value="bmi" className="text-xs">BMI</TabsTrigger>
@@ -506,6 +507,10 @@ const Tools = () => {
           <TabsContent value="adultdose"><AdultDose /></TabsContent>
           <TabsContent value="gfr"><GFRCalculator /></TabsContent>
           <TabsContent value="insulin"><InsulinCalc /></TabsContent>
+          <TabsContent value="rabies"><RabiesSchedule /></TabsContent>
+          <TabsContent value="edd"><EDDCalculator /></TabsContent>
+          <TabsContent value="ovulation"><OvulationCalculator /></TabsContent>
+          <TabsContent value="bmi"><BMICalculator /></TabsContent>
           <TabsContent value="edd"><EDDCalculator /></TabsContent>
           <TabsContent value="ovulation"><OvulationCalculator /></TabsContent>
           <TabsContent value="bmi"><BMICalculator /></TabsContent>
