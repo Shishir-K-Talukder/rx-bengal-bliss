@@ -134,6 +134,42 @@ const Admin = () => {
   const activeDoctors = doctors.filter((d) => d.is_active !== false).length;
   const inactiveDoctors = doctors.filter((d) => d.is_active === false).length;
 
+  const showValue = (value: unknown) => {
+    if (value === null || value === undefined) return "—";
+    const text = String(value).trim();
+    return text || "—";
+  };
+
+  const labelFromKey = (key: string) =>
+    key
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (char) => char.toUpperCase())
+      .replace(/\bBp\b/, "BP")
+      .replace(/\bSpo2\b/, "SpO₂")
+      .replace(/\bFhr\b/, "FHR")
+      .replace(/\bLmp\b/, "LMP")
+      .replace(/\bEdd\b/, "EDD")
+      .replace(/\bRr\b/, "RR");
+
+  const nonEmptyEntries = (obj: Record<string, unknown> = {}) =>
+    Object.entries(obj).filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "");
+
+  const renderText = (text: unknown) => {
+    const lines = showValue(text).split("\n");
+    return lines.map((line, lineIndex) => {
+      const parts = line.split(/(\*\*.*?\*\*)/g).filter(Boolean);
+      return (
+        <span key={`${line}-${lineIndex}`} className="block">
+          {parts.map((part, partIndex) => part.startsWith("**") && part.endsWith("**") ? (
+            <strong key={`${part}-${partIndex}`}>{part.slice(2, -2)}</strong>
+          ) : (
+            <span key={`${part}-${partIndex}`}>{part}</span>
+          ))}
+        </span>
+      );
+    });
+  };
+
   // Monthly chart data
   const monthlyData = useMemo(() => {
     const months: { name: string; prescriptions: number; patients: number; appointments: number }[] = [];
