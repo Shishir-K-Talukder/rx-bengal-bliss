@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Baby, CalendarHeart, Scale, Pill, User, Activity, Syringe, Heart } from "lucide-react";
+import { Baby, CalendarHeart, Scale, Pill, User, Activity, Syringe, Heart, Shield } from "lucide-react";
 import { PEDIATRIC_DRUGS, calculateDose, type PediatricDrug } from "@/lib/pediatricDrugs";
 import { ADULT_DRUGS, calculateAdultDose, type AdultDrug } from "@/lib/adultDrugs";
 import { addDays, differenceInDays, format, parseISO } from "date-fns";
@@ -390,6 +390,89 @@ const InsulinCalc = () => {
   );
 };
 
+/* -------------------- Rabies Vaccine Schedule -------------------- */
+const RabiesSchedule = () => {
+  const [day0, setDay0] = useState("");
+  const [regimen, setRegimen] = useState<"im" | "multisite">("im");
+
+  const schedule = useMemo(() => {
+    if (!day0) return null;
+    try {
+      const start = parseISO(day0);
+      const today = new Date();
+      const days = regimen === "im" ? [0, 3, 7, 14, 28] : [0, 7, 21];
+      return days.map((d) => {
+        const date = addDays(start, d);
+        const diff = differenceInDays(date, today);
+        const status = diff < 0 ? "Done" : diff === 0 ? "Today" : `In ${diff} day${diff === 1 ? "" : "s"}`;
+        const dose =
+          regimen === "im"
+            ? "1 injection × 1 ml IM"
+            : d === 0
+            ? "2 injections × 1 ml (separate sites)"
+            : "1 injection × 1 ml";
+        return { d, date: format(date, "EEE, dd MMM yyyy"), status, dose, past: diff < 0, todayFlag: diff === 0 };
+      });
+    } catch { return null; }
+  }, [day0, regimen]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Shield className="w-4 h-4 text-primary" /> Rabies Vaccine Schedule
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs">Day 0 (1st dose date)</Label>
+            <Input type="date" value={day0} onChange={(e) => setDay0(e.target.value)} className="h-9" />
+          </div>
+          <div>
+            <Label className="text-xs">Regimen</Label>
+            <Select value={regimen} onValueChange={(v) => setRegimen(v as any)}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="im">Standard IM (1-1-1-1-1)</SelectItem>
+                <SelectItem value="multisite">Abbreviated multisite (2-1-1)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        {schedule && (
+          <div className="rounded-lg border-2 border-primary/40 bg-primary/5 overflow-hidden">
+            <div className="px-3 py-2 bg-primary/10 text-xs font-semibold text-primary">
+              {regimen === "im" ? "Standard IM regimen (1-1-1-1-1)" : "Abbreviated multisite regimen (2-1-1)"}
+            </div>
+            <div className="divide-y">
+              {schedule.map((s) => (
+                <div
+                  key={s.d}
+                  className={`flex items-center justify-between px-3 py-2 text-sm ${
+                    s.todayFlag ? "bg-primary/10" : s.past ? "opacity-60" : ""
+                  }`}
+                >
+                  <div>
+                    <div className="font-semibold">Day {s.d} <span className="text-xs text-muted-foreground">• {s.date}</span></div>
+                    <div className="text-[11px] text-muted-foreground">{s.dose}</div>
+                  </div>
+                  <span className={`text-xs font-bold ${s.todayFlag ? "text-primary" : s.past ? "text-muted-foreground" : "text-foreground"}`}>
+                    {s.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <p className="text-[10px] text-muted-foreground italic">
+          Post-exposure prophylaxis (PEP). Add RIG for Category III exposures. Follow WHO guidelines.
+        </p>
+      </CardContent>
+    </Card>
+  );
+};
+
 /* -------------------- Page -------------------- */
 const Tools = () => {
   return (
@@ -415,6 +498,7 @@ const Tools = () => {
             <TabsTrigger value="adultdose" className="text-xs">Adult Dose</TabsTrigger>
             <TabsTrigger value="gfr" className="text-xs">GFR</TabsTrigger>
             <TabsTrigger value="insulin" className="text-xs">Insulin</TabsTrigger>
+            <TabsTrigger value="rabies" className="text-xs">Rabies</TabsTrigger>
             <TabsTrigger value="edd" className="text-xs">EDD</TabsTrigger>
             <TabsTrigger value="ovulation" className="text-xs">Ovulation</TabsTrigger>
             <TabsTrigger value="bmi" className="text-xs">BMI</TabsTrigger>
@@ -423,6 +507,10 @@ const Tools = () => {
           <TabsContent value="adultdose"><AdultDose /></TabsContent>
           <TabsContent value="gfr"><GFRCalculator /></TabsContent>
           <TabsContent value="insulin"><InsulinCalc /></TabsContent>
+          <TabsContent value="rabies"><RabiesSchedule /></TabsContent>
+          <TabsContent value="edd"><EDDCalculator /></TabsContent>
+          <TabsContent value="ovulation"><OvulationCalculator /></TabsContent>
+          <TabsContent value="bmi"><BMICalculator /></TabsContent>
           <TabsContent value="edd"><EDDCalculator /></TabsContent>
           <TabsContent value="ovulation"><OvulationCalculator /></TabsContent>
           <TabsContent value="bmi"><BMICalculator /></TabsContent>
