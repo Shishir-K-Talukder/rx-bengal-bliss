@@ -511,9 +511,6 @@ const Tools = () => {
           <TabsContent value="edd"><EDDCalculator /></TabsContent>
           <TabsContent value="ovulation"><OvulationCalculator /></TabsContent>
           <TabsContent value="bmi"><BMICalculator /></TabsContent>
-          <TabsContent value="edd"><EDDCalculator /></TabsContent>
-          <TabsContent value="ovulation"><OvulationCalculator /></TabsContent>
-          <TabsContent value="bmi"><BMICalculator /></TabsContent>
         </Tabs>
       </main>
     </div>
